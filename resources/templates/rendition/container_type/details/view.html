@@ -1,0 +1,148 @@
+{% extends "finale_base.html" %}
+{% load universe_tags %}
+{% block title %}Financial Lightweight Editor - {{container.name}}{% endblock %}
+{% block readyoptions %}
+				$(".btn").not('#comment').tooltip();
+				gridster = $(".gridster ul").gridster({
+					widget_margins: [10, 10],
+					widget_base_dimensions: [340, 340],
+					resize: {
+						enabled: false,
+					}
+				}).data('gridster').disable();
+				fillContent();
+{% endblock %}
+{% block headeroptions %}
+	<script>
+		var emptyWidget = "<li id='zone_%%index%%'><div class='row'>&nbsp;</div></li>";
+
+		var layoutInformation = {{layout|get_as_json_string|safe}};
+		var container = {{container_json|safe}};
+		var labels = {{labels|get_as_json_string|safe}};
+		var complete_fields = {{complete_fields|get_as_json_string|safe}}
+		var gridster;
+
+		var editedData = {};
+		
+		function deleteItem(itemId, containerField) {
+			console.log(itemId);
+			var updateForm = new FormData();
+			updateForm.append('container_field', containerField);
+			updateForm.append('item_id',itemId);
+			updateForm.append('container_id',urlParams['container_id']);
+			updateForm.append('container_type',urlParams['container_type']);
+			updateForm.append('render_name','view');
+			$.ajax({
+				url: '/container_partial_delete.html',
+				type: 'POST',
+				data: updateForm,
+				processData: false,
+				contentType: false,
+				success: containerFieldsSaved,
+				error: onCallError
+			});
+		}
+
+		function sendItemForEdition(data, containerField) {
+			$.each(data, function(field, value) {
+				if (value.hasOwnProperty('identifier')) {
+					$("#" + containerField + "-" + field).val(value.identifier);
+				} else {
+					$("#" + containerField + "-" + field).val(value);
+				}
+			});
+		}
+
+		function addWidget(layout, index, callback) {
+			gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', index),layout.size_x, layout.size_y]);
+			if (layoutInformation.data[index].type=="LAYOUT_OBJECT_TYPE_SINGLES") {
+				var rendition_url = '/container_render_singles_list.html';
+				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_fields": JSON.stringify(layoutInformation.data[index].data)}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
+			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_TYPE_LIST") {
+				var rendition_url = "/container_render_many_to_many.html";
+				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_field": layoutInformation.data[index].data[0], "rendition_width": (layout.size_x>1?"large":"small")}, function() { $(".btn").not('#comment').tooltip(); controlLoading(); });
+			} else if (layoutInformation.data[index].type=="LAYOUT_HISTORY_CHART") {
+				var rendition_url = "/container_render_history_chart.html";
+				$("#zone_" + index).load(rendition_url, {"track_info": JSON.stringify(layoutInformation.data[index].data), "widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": "{{container.id}}", "container_type": "{{container.type.identifier}}"}, function(responseText, textStatus, jqXHR) { window["showTrack_" + index](); $(".btn").not('#comment').tooltip(); controlLoading(); });
+			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_CUSTOM_STANDARD") {
+				var rendition_url = "/container_render_custom_standard.html";
+				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_fields": JSON.stringify(layoutInformation.data[index].data)}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
+			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_CUSTOM_TEMPLATE") {
+				var rendition_url = "/container_render_custom_template.html";
+				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_template": layoutInformation.data[index].data.template}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
+			}
+		}
+
+		function fillContent() {
+			initializeLoading(layoutInformation.layout.length);
+			$.each(layoutInformation.layout, function (index, layout) {
+				addWidget(layout, index.toString(), function() {});
+			});
+		}
+
+		function onCallError(e) {
+			alert(e.status);
+		}
+		
+		function containerFieldsSaved() {
+			location.reload();
+		}
+
+		function updateContainer(index, custom) {
+			var updateForm = new FormData();
+			updateForm.append('container_data', JSON.stringify(editedData[index]));
+			updateForm.append('container_id',urlParams['container_id']);
+			updateForm.append('container_type',urlParams['container_type']);
+			updateForm.append('render_name','view');
+			if (custom) {
+				updateForm.append('container_custom',custom?'True':'False');
+			} else {
+				updateForm.append('container_custom','False');
+			}
+			$.ajax({
+				url: '/container_partial_save.html',
+				type: 'POST',
+				data: updateForm,
+				processData: false,
+				contentType: false,
+				success: containerFieldsSaved,
+				error: onCallError
+			});
+		}
+
+	</script>
+{% endblock %}
+{% block content %}
+		<div class="row">
+			<div class="col-lg-11">
+				<h1 class="">{{ container.name }}
+					<div class="btn-group">
+						<button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"/></button>
+						<ul class="dropdown-menu" role="menu">
+							{% with template_name='statics/'|add:container.type.identifier|add:'_view_menus_en.html' %}
+								{% include template_name %}
+							{% endwith %}
+						</ul>
+					</div>
+				</h1>
+	  			<p class="lead">{% if container.short_description %}{{ container.short_description }}{% else %}No description is available.{% endif %}<br/>
+			</div>
+		</div>
+		<div class="row">&nbsp;</div>
+		<div class="row">
+			<form class="form-horizontal" role="form">
+				<div id="layoutGrid" class="gridster col-lg-12">
+					<ul id="layoutGridContent">
+					</ul>
+				</div>
+			</form>
+		</div>
+	{% for index in layout|get_dict_key:"data" %}
+		{% with template_name=layout|get_dict_key:"data"|get_dict_key:index|get_dict_key:"type" %}
+			{% include 'rendition/container_type/details/edition/'|add:template_name|add:".html" with index=index complete_fields=complete_fields custom_fields=custom_fields data=layout|get_dict_key:"data"|get_dict_key:index labels=labels container=container custom_data=custom_data %}
+		{% endwith %}
+	{% endfor %}
+
+	{% include 'rendition/container_type/details/edition/add_price.html' %}
+
+{% endblock %}

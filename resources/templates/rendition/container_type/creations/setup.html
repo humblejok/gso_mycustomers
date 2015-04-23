@@ -1,0 +1,276 @@
+{% extends "finale_base_edit.html" %}
+{% block title %}Financial Lightweight Editor - Setup{% endblock %}
+{% block readyoptions %}
+				$(".btn").not('#comment').tooltip();
+				containerChanged();
+{% endblock %}
+{% block headeroptions %}
+<script>
+
+	var allItems = {{global|safe}};
+	var initialLoad = true;
+	var allFields = {};
+	var filteringEntry;
+
+	var currentOption;
+	var currentOptionIndex = 0;
+
+
+	function onCallError(e) {
+		alert(e.status);
+	}
+
+	function onForeignClick(fieldName) {
+		$(".sub-" + fieldName).toggleClass("hidden");
+	}
+
+	function containerFieldsSaved(e) {
+
+	}
+
+	function allowDrop(e) {
+		e.preventDefault();
+	}
+
+	function removeDropped(element) {
+		var parent = $(element).parent();
+
+		var index = parseInt($(element).parent().attr('id').replace('group_',''));
+		var subIndex = $(element).index();
+
+		allItems[$("#containerType").val()][currentOption].options[index].splice(subIndex, 1);
+
+		if (allItems[$("#containerType").val()][currentOption].options[index].length==0) {
+			allItems[$("#containerType").val()][currentOption].options.splice(index, 1);
+		}
+		$(element).remove();
+		if (parent.children().length==0) {
+			parent.remove();
+			currentOptionIndex = currentOptionIndex - 1;
+			$.each($(".top-level-group"), function(index, value) {
+				$(value).attr('id', 'group_' + index);
+			});
+		}
+		saveListSetup();
+	}
+
+	function drop(e) {
+		e.preventDefault();
+		var identifier = e.dataTransfer.getData("identifier");
+		var label = e.dataTransfer.getData("label");
+		var effectiveTarget = $(e.target);
+		while (!effectiveTarget.hasClass("top-level-group")) {
+			effectiveTarget = effectiveTarget.parent();
+		}
+		effectiveTarget.append("<div id='" + identifier.replace("source_", "target_") + "' class='list-group-item' onclick='removeDropped(this)'>" + label + "</div>");
+		var index = parseInt(effectiveTarget.attr('id').replace('group_',''));
+		allItems[$("#containerType").val()][currentOption].options[index].push(identifier.replace("source_", ""));
+		saveListSetup();
+	}
+
+
+	function drag(e) {
+		e.dataTransfer.setData("identifier", e.target.id);
+		e.dataTransfer.setData("label", $(e.target).text());
+	}
+
+	function filteringEntryLoaded(e) {
+		filteringEntry = {};
+		$.each(e.result, function(index, value) {
+			$("#filtersList").append("<div id='source_" + value.identifier + "' class='list-group-item' draggable='true' ondragstart='drag(event)' identifier=" + value.identifier + ">" + value.name + "</div>");
+			filteringEntry[value.identifier] = value.name;
+		});
+		$.each(allItems[$("#containerType").val()][currentOption].options, function(index, value) {
+			addGroup(true);
+			$.each(value, function(subIndex, subValue) {
+				$("#groupsList :nth-child(" + currentOptionIndex + ")").append("<div id='target_" + subValue + "' class='list-group-item' onclick='removeDropped(this)'>" + filteringEntry[subValue] + "</div>");
+			});
+		});
+	}
+
+	function saveListSetup() {
+		var containerSetup = {};
+		containerSetup.type = $("#containerType").val();
+		containerSetup.data = allItems[$("#containerType").val()];
+		var updateForm = new FormData();
+		updateForm.append('container_setup', JSON.stringify(containerSetup));
+		updateForm.append('item',urlParams['item']);
+		updateForm.append('type',urlParams['type']);
+		updateForm.append('render_name','edition');
+		$.ajax({
+			url: '/container_setup_save.html',
+			type: 'POST',
+			data: updateForm,
+			processData: false,
+			contentType: false,
+			success: containerFieldsSaved,
+			error: onCallError
+		});
+	}
+
+	function preparePopup(fieldName) {
+		$('#filtersList').empty();
+		$('#groupsList').empty();
+
+		currentOptionIndex = 0;
+
+		currentOption = fieldName;
+
+		var queryForm = new FormData();
+		queryForm.append('container_type', $("#containerType").val());
+		queryForm.append('filtered_field', fieldName);
+		queryForm.append('filtering_field', allFields[fieldName].filter);
+		$.ajax({
+			url: '/get_filtering_entry.html',
+			type: 'POST',
+			data: queryForm,
+			processData: false,
+			contentType: false,
+			success: filteringEntryLoaded,
+			error: onCallError
+		});
+	}
+
+	function addGroup(building) {
+		$("#groupsList").append('<div class="list-group-item top-level-group" ondrop="drop(event)" ondragover="allowDrop(event)" id="group_' + currentOptionIndex + '"></div>');
+		if (!building) {
+			allItems[$("#containerType").val()][currentOption].options.push(new Array());
+		}
+		currentOptionIndex = currentOptionIndex + 1;
+	}
+
+	function onFieldClick(fieldName) {
+		if ($(".main-" + fieldName).hasClass("list-group-item-success")) {
+			$(".select-" + fieldName).remove();
+			delete allItems[$("#containerType").val()][fieldName];
+		} else {
+			$("#selectedfieldsList").append('<a class="list-group-item select-' + fieldName + '" onclick="onFieldClick(\'' + fieldName + '\')" role="button">' + fieldName + '</a>');
+			if (allFields[fieldName].type==='ManyToManyField') {
+				$("#selectedfieldsOptions").append('<a class="list-group-item select-' + fieldName + '" href="#modal_define_option" role="button" data-toggle="modal" data-placement="bottom" title="Define the options regarding many to many relations" onclick="preparePopup(\'' + fieldName + '\')">Define</a>')
+			} else {
+				$("#selectedfieldsOptions").append('<div class="list-group-item select-' + fieldName + '">-</div>')
+			}
+			if (!allItems.hasOwnProperty($("#containerType").val())) {
+				allItems[$("#containerType").val()] = {};
+			}
+			if (!allItems[$("#containerType").val()].hasOwnProperty(fieldName)) {
+				allItems[$("#containerType").val()][fieldName] = {'field': fieldName, 'options':[]};
+			}
+		}
+		$(".main-" + fieldName).toggleClass("list-group-item-success");
+
+		if (!initialLoad) {
+			saveListSetup();
+		}
+	}
+
+	function fieldsLoaded(e) {
+		var currentList = [];
+		var preSelection = [];
+
+		allFields = e.static_fields;
+
+		$("#selectedfieldsList").empty();
+		$("#selectedfieldsOptions").empty();
+
+		if (allItems.hasOwnProperty($("#containerType").val())) {
+			preSelection = allItems[$("#containerType").val()];
+		}
+
+		$("#fieldsList").empty();
+
+		$.each(e.static_fields, function(index, value) {
+			currentList.push(index);
+		});
+		currentList.sort();
+		$.each(currentList, function(index, value) {
+			$("#fieldsList").append('<a class="list-group-item main-' + value + '" onclick="onFieldClick(\'' + value + '\')">' + value + '</a>');
+		});
+		$.each(preSelection, function(index, value) {
+			var selected;
+			$(".main-" + index).click();
+		});
+		initialLoad = false;
+	}
+
+	function containerChanged() {
+		initialLoad = true;
+		var fieldsForm = new FormData();
+		fieldsForm.append('container_type', $("#containerType").val());
+		$.ajax({
+			url: '/object_fields_get.html',
+			type: 'POST',
+			data: fieldsForm,
+			processData: false,
+			contentType: false,
+			success: fieldsLoaded,
+			error: onCallError
+		});
+	}
+</script>
+{% endblock %}
+	</head>
+	<body>
+{% block content %}
+		<div class="row">
+			<div class="col-lg-11">
+				<h1 class="">Mandatory fields while creating containers</h1>
+	  			<p class="lead">Define the all fields that are mandatory while creating<br/>
+			</div>
+		</div>
+		<div class="row">
+			<select class="form-control no-enter" id="containerType" name="containerType" onchange="containerChanged()">
+				{% with value='' %}
+					{% include selection_template %}
+				{% endwith %}
+			</select>
+			<b
+		</div>
+		<div class="row">&nbsp;</div>
+		<div class="row">
+			<div class="col-lg-offset-1 col-lg-3 text-center">
+				<h4>Available fields</h4>
+			</div>
+			<div class="col-lg-3 col-lg-offset-3 text-center">
+				<h4>Selected fields</h4>
+			</div>
+			<div class="col-lg-1 text-center">
+				<h4>Options</h4>
+			</div>
+		</div>
+		<div class="row">
+			<div id="fieldsList" class="list-group col-lg-offset-1 col-lg-3">
+			</div>
+			<div id="selectedfieldsList" class="list-group col-lg-3 col-lg-offset-3">
+			</div>
+			<div id="selectedfieldsOptions" class="list-group text-center col-lg-1">
+			</div>
+		</div>
+		<div class="modal fade" id="modal_define_option" tabindex="-1" role="dialog" aria-labelledby="modal_define_option_label" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="modal_create_internal_label">Define the options regarding many to many relations</h4>
+					</div>
+					<form id="create_form_internal" role="form" action="#" method="POST">{% csrf_token %}
+						<div id="optionBody"  class="modal-body">
+							<div class="row">
+								<h4>Create a new group and then drag a filtering option in that group</h4>
+								<h6>Each group indicates a mandatory user input. All filters within a group are "OR" relations.</h6>
+							<div>
+							<div class="row"><a id="addButton" class="btn btn-default col-lg-10 col-lg-offset-1" onclick="addGroup(false)">Add a group</a></div>
+							<div class="row">&nbsp;</div>
+							<div class="row">
+								<div id="filtersList" class="col-lg-4 col-lg-offset-1 list-group"></div>
+								<div id="groupsList" class="col-lg-4 col-lg-offset-2 list-group"></div>
+							</div>
+						</div>
+					</form>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Close the popup" onclick="" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}
