@@ -1,5 +1,5 @@
-{% extends "finale_base_edit.html" %}
-{% block title %}Financial Lightweight Editor - Setup{% endblock %}
+{% extends base_template %}
+{% block title %}Container Details View Setup{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				initGridster();
@@ -124,7 +124,7 @@
 		updateForm.append('type',urlParams['type']);
 		updateForm.append('render_name','view');
 		$.ajax({
-			url: '/container_setup_save.html',
+			url: '/container/setup_save.html',
 			type: 'POST',
 			data: updateForm,
 			processData: false,
@@ -227,9 +227,9 @@
 			htmlToAppend = htmlToAppend.replaceAll('%%index%%', index);
 			
 			callLater = function() {
-				$("#frequency_" + index).load("/static/templates/frequency_select_en.html", checkLoads);
-				$("#track_type_" + index).load("/static/templates/numeric_type_select_en.html", checkLoads);
-				$("#datasource_" + index).load("/static/templates/data_source_select_en.html", checkLoads);
+				$("#frequency_" + index).load("/statics/templates/frequency_select_en.html", checkLoads);
+				$("#track_type_" + index).load("/statics/templates/numeric_type_select_en.html", checkLoads);
+				$("#datasource_" + index).load("/statics/templates/data_source_select_en.html", checkLoads);
 			};
 		} else if(selectedType=='LAYOUT_OBJECT_CUSTOM_STANDARD') {
 			htmlToAppend += "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
@@ -269,7 +269,7 @@
 			$.each(currentInformation.layout, function (index, layout) {
 				var closureIndex = currentItem;
 				gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', currentItem),layout.size_x, layout.size_y]);
-				$("#type_" + currentItem).load("/static/templates/layout_object_type_select_en.html", function() {
+				$("#type_" + currentItem).load("/statics/templates/layout_object_type_select_en.html", function() {
 					$("#title_" + closureIndex).val(currentInformation.data[closureIndex.toString()].title);
 					$("#type_" + closureIndex).attr('onchange','changeType(' + closureIndex + ')');
 					$("#type_" + closureIndex).val(currentInformation.data[closureIndex.toString()].type);
@@ -306,7 +306,7 @@
 	function addWidget(layout) {
 		gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', currentItem),layout.size_x, layout.size_y]);
 		var index = currentItem;
-		$("#type_" + currentItem).load("/static/templates/layout_object_type_select_en.html", function() {
+		$("#type_" + currentItem).load("/statics/templates/layout_object_type_select_en.html", function() {
 			changeType(index);
 		});
 		$("#type_" + currentItem).attr('onchange','changeType(' + currentItem + ')');
@@ -354,7 +354,7 @@
 		var fieldsForm = new FormData();
 		fieldsForm.append('container_type', $("#containerType").val());
 		$.ajax({
-			url: '/object_fields_get.html',
+			url: '/container/fields_get.html',
 			type: 'POST',
 			data: fieldsForm,
 			processData: false,

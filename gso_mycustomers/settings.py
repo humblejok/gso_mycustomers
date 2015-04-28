@@ -103,6 +103,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'container.utilities.utils.StripWhitespaceMiddleware'
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -113,7 +114,7 @@ ROOT_URLCONF = 'gso_mycustomers.urls'
 WSGI_APPLICATION = 'gso_mycustomers.wsgi.application'
 
 TEMPLATE_DIRS = (
-    'C:/DEV/Sources/gso_mycustomers/resources/templates'
+    'C:/DEV/Sources/gso_mycustomers/resources/templates',
 )
 
 INSTALLED_APPS = (
@@ -158,18 +159,6 @@ CACHES = {
 }
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
-
-MONGO_URL = 'mongodb://localhost:27017/'
-
-RESOURCES_MAIN_PATH = 'c:\\DEV\\Sources\\gso_mycustomers\\resources'
-MAIN_PATH = 'c:\\DEV\\Sources\\gso_mycustomers\\resources'
-STATICS_PATH = 'c:\\DEV\\Sources\\gso_mycustomers\\resources\\statics\\templates'
-STATICS_GLOBAL_PATH = 'c:\\DEV\\Sources\\gso_mycustomers\\resources\\templates\\statics'
-
-MAILGUN_KEY = 'key-531bd6d34425805a27746678af906ec2'
-MAILGUN_DOMAIN = 'sequoia-ge.com'
-MAILGUN_FROM = 'Cyrus <cyrus@sequoia-ge.com>'
-MAILGUN_DEFAULT_CAMPAIGN = 'e59lm'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

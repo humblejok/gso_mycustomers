@@ -1,6 +1,6 @@
-{% extends "finale_base.html" %}
-{% load universe_tags %}
-{% block title %}Financial Lightweight Editor - {{container.name}}{% endblock %}
+{% extends base_template %}
+{% load container_tags %}
+{% block title %}{{container.name}}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				gridster = $(".gridster ul").gridster({
@@ -33,7 +33,7 @@
 			updateForm.append('container_type',urlParams['container_type']);
 			updateForm.append('render_name','view');
 			$.ajax({
-				url: '/container_partial_delete.html',
+				url: '/container/partial_delete.html',
 				type: 'POST',
 				data: updateForm,
 				processData: false,
@@ -56,19 +56,19 @@
 		function addWidget(layout, index, callback) {
 			gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', index),layout.size_x, layout.size_y]);
 			if (layoutInformation.data[index].type=="LAYOUT_OBJECT_TYPE_SINGLES") {
-				var rendition_url = '/container_render_singles_list.html';
+				var rendition_url = '/container/rendition/render_singles_list.html';
 				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_fields": JSON.stringify(layoutInformation.data[index].data)}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
 			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_TYPE_LIST") {
-				var rendition_url = "/container_render_many_to_many.html";
+				var rendition_url = "/container/rendition/render_many_to_many.html";
 				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_field": layoutInformation.data[index].data[0], "rendition_width": (layout.size_x>1?"large":"small")}, function() { $(".btn").not('#comment').tooltip(); controlLoading(); });
 			} else if (layoutInformation.data[index].type=="LAYOUT_HISTORY_CHART") {
-				var rendition_url = "/container_render_history_chart.html";
+				var rendition_url = "/container/rendition/render_history_chart.html";
 				$("#zone_" + index).load(rendition_url, {"track_info": JSON.stringify(layoutInformation.data[index].data), "widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": "{{container.id}}", "container_type": "{{container.type.identifier}}"}, function(responseText, textStatus, jqXHR) { window["showTrack_" + index](); $(".btn").not('#comment').tooltip(); controlLoading(); });
 			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_CUSTOM_STANDARD") {
-				var rendition_url = "/container_render_custom_standard.html";
+				var rendition_url = "/container/rendition/render_custom_standard.html";
 				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_fields": JSON.stringify(layoutInformation.data[index].data)}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
 			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_CUSTOM_TEMPLATE") {
-				var rendition_url = "/container_render_custom_template.html";
+				var rendition_url = "/container/rendition/render_custom_template.html";
 				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_template": layoutInformation.data[index].data.template}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
 			}
 		}
@@ -142,7 +142,5 @@
 			{% include 'rendition/container_type/details/edition/'|add:template_name|add:".html" with index=index complete_fields=complete_fields custom_fields=custom_fields data=layout|get_dict_key:"data"|get_dict_key:index labels=labels container=container custom_data=custom_data %}
 		{% endwith %}
 	{% endfor %}
-
-	{% include 'rendition/container_type/details/edition/add_price.html' %}
 
 {% endblock %}

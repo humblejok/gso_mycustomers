@@ -1,4 +1,4 @@
-{% extends "finale_base.html" %}
+{% extends base_template %}
 {% block title %}Financial Lightweight Editor - Setup{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
@@ -109,7 +109,7 @@
 			deleteForm.append('object_type', objType);
 			deleteForm.append('object_name', toRemove);
 			$.ajax({
-				url: '/object_delete.html',
+				url: '/container/object_delete.html',
 				type: 'POST',
 				data: deleteForm,
 				processData: false,
@@ -155,7 +155,7 @@
 			updateForm.append('object_name', currentName);
 			updateForm.append('object_fields', JSON.stringify(currentObject["fields"]));
 			$.ajax({
-				url: '/object_save.html',
+				url: '/container/object_save.html',
 				type: 'POST',
 				data: updateForm,
 				processData: false,
@@ -209,7 +209,7 @@
 		function addField(index, value) {
 			currentRow = index;
 			$("#fieldsTable").append('<tr><td><input id="attributeType_' + index + '" name="attributeType_' + index + '" type="hidden" value="' + (value?value.attribute:"") + '"><input type="text" class="form-control" id="fieldName_' + index + '" value="' + (value?value.name:"") + '"/></td><td id="fieldTypeId_' + index + '"></td><td><button type="button" class="btn btn-default btn-sm edit-btn" id="editButton_' + index + '" onclick="changeChoice(' + index +')"><span class="glyphicon glyphicon-edit" ></span></button>&nbsp;&nbsp;<button type="button" class="btn btn-default btn-sm up-btn"><span class="glyphicon glyphicon-arrow-up" onclick="moveFieldEntry(' + index +',-1)"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm down-btn" onclick="moveFieldEntry(' + index +',1)"><span class="glyphicon glyphicon-arrow-down"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm remove-btn" onclick="removeFieldEntry(' + index + ')"><span class="glyphicon glyphicon-remove"></span></button></td></tr>');
-			$("#fieldTypeId_" + index).load("/static/templates/field_type_select_en.html", function() {
+			$("#fieldTypeId_" + index).load("/statics/templates/field_type_select_en.html", function() {
 				if (value) {
 					$("#fieldTypeId_" + index + " > select").val(value.type);
 				}
@@ -252,7 +252,7 @@
 				<button class="btn btn-default btn-sm save-btn" onclick="saveFields()">Save</button>
 				<button class="btn btn-danger btn-sm delete-btn col-lg-offset-9" onclick="deleteObject()">Delete</button>
 				<div>&nbsp;</div>
-				<form id="define_form" role="form" action="/object_base_save.html" method="POST">{% csrf_token %}
+				<form id="define_form" role="form" action="/container/object_save.html" method="POST">{% csrf_token %}
 					<table id="fieldsTable" class="table">
 					</table>
 				</form>
@@ -265,7 +265,7 @@
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 						<h4 class="modal-title" id="modal_create_label">Create a new object</h4>
 					</div>
-					<form id="create_form" role="form" action="/object_base_edit.html" method="POST">{% csrf_token %}
+					<form id="create_form" role="form" action="/container/object_create.html" method="POST">{% csrf_token %}
 						<div class="modal-body">
 							<div class="form-group">
 								<label for="name">Name</label>

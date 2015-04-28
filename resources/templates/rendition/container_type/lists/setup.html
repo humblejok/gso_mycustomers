@@ -1,5 +1,5 @@
-{% extends "finale_base_edit.html" %}
-{% block title %}Financial Lightweight Editor - Setup{% endblock %}
+{% extends base_template %}
+{% block title %}Results List Setup{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				containerChanged();
@@ -35,7 +35,7 @@
 		updateForm.append('type',urlParams['type']);
 		updateForm.append('render_name','results');
 		$.ajax({
-			url: '/container_setup_save.html',
+			url: '/container/setup_save.html',
 			type: 'POST',
 			data: updateForm,
 			processData: false,
@@ -124,7 +124,7 @@
 		var fieldsForm = new FormData();
 		fieldsForm.append('container_type', $("#containerType").val());
 		$.ajax({
-			url: '/object_fields_get.html',
+			url: '/container/fields_get.html',
 			type: 'POST',
 			data: fieldsForm,
 			processData: false,
@@ -159,9 +159,11 @@
 			</div>
 		</div>
 		<div class="row">
-			<div id="fieldsList" class="list-group col-lg-offset-1 col-lg-3">
-			</div>
-			<div id="selectedfieldsList" class="list-group col-lg-3 col-lg-offset-4">
-			</div>
+			<b>
+				<div id="fieldsList" class="list-group col-lg-offset-1 col-lg-3">
+				</div>
+				<div id="selectedfieldsList" class="list-group col-lg-3 col-lg-offset-4">
+				</div>
+			</b>
 		</div>
 {% endblock %}

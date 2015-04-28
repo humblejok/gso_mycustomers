@@ -1,5 +1,5 @@
-{% extends "finale_base_edit.html" %}
-{% block title %}Financial Lightweight Editor - Setup{% endblock %}
+{% extends base_template %}
+{% block title %}Container Creation Wizard Setup{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				containerChanged();
@@ -98,7 +98,7 @@
 		updateForm.append('type',urlParams['type']);
 		updateForm.append('render_name','edition');
 		$.ajax({
-			url: '/container_setup_save.html',
+			url: '/container/setup_save.html',
 			type: 'POST',
 			data: updateForm,
 			processData: false,
@@ -121,7 +121,7 @@
 		queryForm.append('filtered_field', fieldName);
 		queryForm.append('filtering_field', allFields[fieldName].filter);
 		$.ajax({
-			url: '/get_filtering_entry.html',
+			url: '/container/get_filtering_entry.html',
 			type: 'POST',
 			data: queryForm,
 			processData: false,
@@ -198,7 +198,7 @@
 		var fieldsForm = new FormData();
 		fieldsForm.append('container_type', $("#containerType").val());
 		$.ajax({
-			url: '/object_fields_get.html',
+			url: '/container/fields_get.html',
 			type: 'POST',
 			data: fieldsForm,
 			processData: false,
@@ -224,7 +224,6 @@
 					{% include selection_template %}
 				{% endwith %}
 			</select>
-			<b
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
@@ -239,12 +238,14 @@
 			</div>
 		</div>
 		<div class="row">
+			<b>
 			<div id="fieldsList" class="list-group col-lg-offset-1 col-lg-3">
 			</div>
 			<div id="selectedfieldsList" class="list-group col-lg-3 col-lg-offset-3">
 			</div>
 			<div id="selectedfieldsOptions" class="list-group text-center col-lg-1">
 			</div>
+			</b>
 		</div>
 		<div class="modal fade" id="modal_define_option" tabindex="-1" role="dialog" aria-labelledby="modal_define_option_label" aria-hidden="true">
 			<div class="modal-dialog">

@@ -10,8 +10,8 @@ import datetime
 from django.template.context import Context
 from django.template import loader
 import os
-from gso_mycustomers.settings import MONGO_URL, STATICS_GLOBAL_PATH
 from container.models import Attributes
+from container.settings import MONGO_URL, STATICS_PATH
 
 client = MongoClient(MONGO_URL)
 
@@ -34,7 +34,7 @@ def set_object_type_fields(values):
             template = loader.get_template('rendition/object_type/lists/object_type_choices.html')
             rendition = template.render(context)
             # TODO Implement multi-langage
-            outfile = os.path.join(STATICS_GLOBAL_PATH, a_type.identifier + '_en.html')
+            outfile = os.path.join(STATICS_PATH, a_type.identifier + '_en.html')
             with open(outfile,'w') as o:
                 o.write(rendition.encode('utf-8'))
 

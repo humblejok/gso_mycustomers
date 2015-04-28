@@ -1,6 +1,6 @@
-{% load universe_tags %}
-{% templatetag openblock %} extends "finale_base.html" {% templatetag closeblock %}
-{% templatetag openblock %} block title {% templatetag closeblock %}Financial Lightweight Editor - {% templatetag openvariable %}container_label{% templatetag closevariable %}s{% templatetag openblock %} endblock {% templatetag closeblock %}
+{% load container_tags %}
+{% templatetag openblock %} extends base_template {% templatetag closeblock %}
+{% templatetag openblock %} block title {% templatetag closeblock %}{% templatetag openvariable %}container_label{% templatetag closevariable %}s{% templatetag openblock %} endblock {% templatetag closeblock %}
 {% templatetag openblock %} block readyoptions {% templatetag closeblock %}
 				$(".btn").not('#comment').tooltip();
 {% templatetag openblock %} endblock {% templatetag closeblock %}
@@ -86,7 +86,7 @@
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 						<h4 class="modal-title" id="modal_create_label">Create a new {% templatetag openvariable %}container_label|lower{% templatetag closevariable %}</h4>
 					</div>
-					<form id="create_form" role="form" action="/container_base_edit.html" method="POST">{% templatetag openblock %} csrf_token %}
+					<form id="create_form" role="form" action="/container/base_edit.html" method="POST">{% templatetag openblock %} csrf_token %}
 						<input type="hidden" id="container_type" name="container_type" value="{% templatetag openvariable %}container_type{% templatetag closevariable %}"/>
 						<div class="modal-body">
 							<div class="form-group">

@@ -1,6 +1,4 @@
 from django.db import models
-from gso_mycustomers.settings import RESOURCES_MAIN_PATH, STATICS_PATH,\
-    STATICS_GLOBAL_PATH
 import os
 from django.template.context import Context
 from django.template import loader
@@ -13,6 +11,9 @@ from django.db.models import Q
 import traceback
 from django.contrib.auth.models import User
 import container
+from container.settings import RESOURCES_MAIN_PATH, STATICS_PATH,\
+    TEMPLATES_STATICS_PATH
+from gso_mycustomers.settings import TEMPLATE_DIRS
 
 # Create your models here.
 LOGGER = logging.getLogger(__name__)
@@ -26,6 +27,14 @@ def setup():
 def setup_menus():
     MenuEntries.objects.all().delete()
     populate_model_from_xlsx('container.models.MenuEntries', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
+    GlobalMenuEntries.objects.all().delete()
+    populate_model_from_xlsx('container.models.GlobalMenuEntries', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
+    generate_global_templates()
+    
+def setup_global_menus():
+    GlobalMenuEntries.objects.all().delete()
+    populate_model_from_xlsx('container.models.GlobalMenuEntries', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
+    generate_global_templates()
 
 def setup_labels():
     FieldLabel.objects.all().delete()
@@ -36,19 +45,30 @@ def setup_attributes():
     populate_attributes_from_xlsx('container.models.Dictionary', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
     generate_attributes()
 
+def generate_global_templates():
+    languages = Attributes.objects.filter(active=True, type='available_language')
+    template = loader.get_template('rendition/gso.html')
+    for language in languages:
+        entries = GlobalMenuEntries.objects.filter(language=language.short_name).order_by('id')
+        context = Context({'entries': entries})
+        rendition = template.render(context)
+        outfile = os.path.join(TEMPLATE_DIRS[0], 'gso_' + language.short_name + '.html')
+        with open(outfile,'w') as o:
+            o.write(rendition.encode('utf-8'))
+
 def generate_attributes():
     all_types = Attributes.objects.all().order_by('type').distinct('type')
     context = Context({"selection": all_types})
     template = loader.get_template('rendition/attributes_list_option_renderer.html')
     rendition = template.render(context)
     # TODO Implement multi-langage
-    outfile = os.path.join(STATICS_PATH, 'all_types_option_en.html')
+    outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_option_en.html')
     with open(outfile,'w') as o:
         o.write(rendition.encode('utf-8'))
     template = loader.get_template('rendition/attributes_list_select_renderer.html')
     rendition = template.render(context)
     # TODO Implement multi-langage
-    outfile = os.path.join(STATICS_GLOBAL_PATH, 'all_types_select_en.html')
+    outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_select_en.html')
     with open(outfile,'w') as o:
         o.write(rendition.encode('utf-8'))
     for a_type in all_types:
@@ -57,19 +77,25 @@ def generate_attributes():
         template = loader.get_template('rendition/attributes_option_renderer.html')
         rendition = template.render(context)
         # TODO Implement multi-langage
+        outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_en.html')
+        with open(outfile,'w') as o:
+            o.write(rendition.encode('utf-8'))
         outfile = os.path.join(STATICS_PATH, a_type.type + '_en.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
         template = loader.get_template('rendition/attributes_select_renderer.html')
         rendition = template.render(context)
         # TODO Implement multi-langage
-        outfile = os.path.join(STATICS_GLOBAL_PATH, a_type.type + '_select_en.html')
+        outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_select_en.html')
+        with open(outfile,'w') as o:
+            o.write(rendition.encode('utf-8'))
+        outfile = os.path.join(STATICS_PATH, a_type.type + '_select_en.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
         template = loader.get_template('rendition/attributes_list_elements_renderer.html')
         rendition = template.render(context)
         # TODO Implement multi-langage
-        outfile = os.path.join(STATICS_GLOBAL_PATH, a_type.type + '_list_elements_en.html')
+        outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_list_elements_en.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
 
@@ -310,6 +336,27 @@ class MenuEntries(CoreModel):
     class Meta:
         ordering = ['menu_target']
         
+    
+class GlobalMenuEntries(CoreModel):
+    name = models.CharField(max_length=128)
+    short_name = models.CharField(max_length=32)
+    menu_target = models.CharField(max_length=128)
+    menu_group_target = models.CharField(max_length=128, null=True, blank=True)
+    menu_type = models.CharField(max_length=128)
+    container_type = models.ForeignKey(Attributes, limit_choices_to={'type':'container_type'}, related_name='container_type_gbl_menu_rel', null=True)
+    language = models.CharField(max_length=3)
+    data_target = models.CharField(max_length=128)
+    action_type = models.CharField(max_length=128, null=True, blank=True)
+    action_label = models.CharField(max_length=128)
+    administrator_only = models.BooleanField(default=False)
+
+    @staticmethod
+    def get_fields():
+        return ['menu_target','menu_group_target','menu_type','container_type','language','data_target','action_type','action_label','administrator_only']
+
+    class Meta:
+        ordering = ['menu_target']
+    
 class Dictionary(CoreModel):
     identifier = models.CharField(max_length=128)
     name = models.CharField(max_length=128)

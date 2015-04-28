@@ -1,5 +1,5 @@
-{% extends "finale_base_edit.html" %}
-{% block title %}Financial Lightweight Editor - Setup{% endblock %}
+{% extends base_template %}
+{% block title %}Container Menu Setup{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				containerChanged();
@@ -40,7 +40,7 @@
 	}
 
 	function updateTargetSelect(index, onCompleted) {
-		$("#target_" + index).load("/menu_setup_render.html",
+		$("#target_" + index).load("/container/menu_setup_render.html",
 			 {"menu_target": $("#group_" + index).val(),
 			  "language":"en",
 			  "container_type":$("#containerType").val(),
@@ -95,7 +95,7 @@
 		updateForm.append('type',urlParams['type']);
 		updateForm.append('render_name','view');
 		$.ajax({
-			url: '/container_setup_save.html',
+			url: '/container/setup_save.html',
 			type: 'POST',
 			data: updateForm,
 			processData: false,
@@ -111,7 +111,7 @@
 
 	function addRow() {
 		$("#menuTable").append(defaultRow.replaceAll('%%index%%', currentIndex));
-		$("#group_" + currentIndex).load("/static/templates/container_menu_target_select_en.html",
+		$("#group_" + currentIndex).load("/statics/templates/container_menu_target_select_en.html",
 										 checkLoads);
 		currentIndex = currentIndex + 1;
 	}
