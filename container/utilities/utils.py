@@ -36,6 +36,13 @@ class StripWhitespaceMiddleware(object):
         else:
             return response    
 
+def get_or_create_user_profile(user_id):
+    profile = setup_content.get_data('user_profiles', user_id)
+    if profile==None:
+        profile = {'_id': user_id, 'language':'AVAIL_LANGUAGE_EN'}
+    setup_content.set_data('user_profiles', profile, False)
+    return profile
+
 def filter_custom_fields(field_type, field_name):
     values = setup_content.get_data('object_type_fields')
     if values.has_key(field_type):

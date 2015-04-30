@@ -7,36 +7,31 @@ import itertools
 from json import dumps
 import json
 import logging
-import os
 
-from bson import json_util
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
-from django.shortcuts import render, redirect
-from seq_common.utils import classes
+from django.shortcuts import render
 
 from container.models import Attributes, FieldLabel
-from container.settings import WORKING_PATH
-from container.utilities import external_content, setup_content
-from container.utilities.container_container import get_container_information, \
-    set_container_information
-from container.utilities.utils import get_static_fields, filter_custom_fields, \
-    complete_fields_information, dict_to_json_compliance, \
-    complete_custom_fields_information, get_model_foreign_field_class, \
-    get_effective_class, get_effective_container
+from container.utilities import setup_content
+from container.utilities.container_container import get_container_information
+from container.utilities.utils import complete_fields_information, \
+    dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
+    get_effective_container, get_or_create_user_profile
 
 
 LOGGER = logging.getLogger(__name__)
 
 def lists(request):
     # TODO: Check user
+    profile = get_or_create_user_profile(request.user.id)
     container_type = request.GET['item']
     # TODO: Handle error
     effective_class = get_effective_class(container_type)
     results = effective_class.objects.all().order_by('name')
-    context = {'base_template': 'gso_fr.html', 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
+    context = {'base_template': 'gso_' + Attributes.objects.get(identifier=profile['language'], active=True).short_name + '.html', 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
     return render(request, 'statics/' + container_type + '_results_lists_en.html', context)
 
 def definition_save(request):
