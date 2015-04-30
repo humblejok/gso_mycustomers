@@ -135,7 +135,15 @@
 		     	{% templatetag openblock %} block readyoptions {% templatetag closeblock %}
 		     	{% templatetag openblock %} endblock {% templatetag closeblock %}
 			});
+			
+			function displayDynamicModal(modal_url, url_arguments) {
+				console.log(modal_url);
+				console.log(url_arguments);
+				console.log(modal_url + (url_arguments?"?" + url_arguments:""));
 
+				$("#dynamic_modal_content").empty();
+				$("#dynamic_modal_content").load(modal_url + (url_arguments?"?" + url_arguments:""), function() {console.log("LOADED");$("#dynamic_modal").modal({"show": true});});
+			}
 		</script>
 
 		{% templatetag openblock %} block headeroptions {% templatetag closeblock %}
@@ -161,7 +169,7 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{entry.menu_target}} <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 							{% endifchanged %}
-							{% ifchanged entry.menu_group_target %}{% if entry.menu_group_target %}<li role="presentation" class="dropdown-header">{{entry.menu_group_target}}</li>{% endif %}{% endifchanged %}{% if entry.menu_type == "link" %}<li><a href="/container/{{entry.data_target}}.html?item={{entry.container_type.identifier}}">{{entry.name}}</a></li>{% elif entry.menu_type == "url" %}<li><a href="{{entry.data_target}}{% if entry.action_type %}?{{entry.action_type|safe}}{% endif %}">{{entry.name}}</a></li>{% endif %}
+							{% ifchanged entry.menu_group_target %}{% if entry.menu_group_target %}<li role="presentation" class="dropdown-header">{{entry.menu_group_target}}</li>{% endif %}{% endifchanged %}{% if entry.menu_type == "link" %}<li><a href="/container/{{entry.data_target}}.html?item={{entry.container_type.identifier}}">{{entry.name}}</a></li>{% elif entry.menu_type == "url" %}<li><a href="{{entry.data_target}}{% if entry.action_type %}?{{entry.action_type|safe}}{% endif %}">{{entry.name}}</a></li>{% elif entry.menu_type == "modal" %}<li><a href="#" onclick="displayDynamicModal('{{entry.data_target}}'{% if entry.action_type %}, '{{entry.action_type}}'{% endif %})">{{entry.name}}</a></li>{% endif %}
 	{% if forloop.last %}</ul></li>{% endif %}
 						{% endfor %}
 					</ul>
@@ -188,5 +196,10 @@
 			{% templatetag openblock %} else {% templatetag closeblock %}
 				<center><a href="/accounts/login" class="btn btn-primary btn-lg" role="button">Login</a></center>
 			{% templatetag openblock %} endif {% templatetag closeblock %}
+		</div>
+		<div class="modal fade" id="dynamic_modal" tabindex="-1" role="dialog" aria-labelledby="dynamic_modal_label" aria-hidden="true">
+			<div id="dynamic_modal_content" class="modal-dialog modal-lg">
+
+			</div>
 		</div>
 	</body>

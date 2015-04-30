@@ -109,7 +109,7 @@
 			deleteForm.append('object_type', objType);
 			deleteForm.append('object_name', toRemove);
 			$.ajax({
-				url: '/container/object_delete.html',
+				url: '/container/object/delete.html',
 				type: 'POST',
 				data: deleteForm,
 				processData: false,
@@ -155,7 +155,7 @@
 			updateForm.append('object_name', currentName);
 			updateForm.append('object_fields', JSON.stringify(currentObject["fields"]));
 			$.ajax({
-				url: '/container/object_save.html',
+				url: '/container/object/save.html',
 				type: 'POST',
 				data: updateForm,
 				processData: false,
@@ -252,7 +252,7 @@
 				<button class="btn btn-default btn-sm save-btn" onclick="saveFields()">Save</button>
 				<button class="btn btn-danger btn-sm delete-btn col-lg-offset-9" onclick="deleteObject()">Delete</button>
 				<div>&nbsp;</div>
-				<form id="define_form" role="form" action="/container/object_save.html" method="POST">{% csrf_token %}
+				<form id="define_form" role="form" action="/container/object/save.html" method="POST">{% csrf_token %}
 					<table id="fieldsTable" class="table">
 					</table>
 				</form>
@@ -265,7 +265,7 @@
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 						<h4 class="modal-title" id="modal_create_label">Create a new object</h4>
 					</div>
-					<form id="create_form" role="form" action="/container/object_create.html" method="POST">{% csrf_token %}
+					<form id="create_form" role="form" action="/container/object/create.html" method="POST">{% csrf_token %}
 						<div class="modal-body">
 							<div class="form-group">
 								<label for="name">Name</label>

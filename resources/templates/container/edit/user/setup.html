@@ -1,0 +1,38 @@
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="dynamic_modal_label">Edit your account</h4>
+					</div>
+					<form id="create_form" role="form" action="/container/user/save.html" method="POST">{% csrf_token %}
+						<div class="modal-body">
+							<div class="form-group">
+								<label for="login">Login</label>
+								<input name="login" type="text" class="form-control" id="login" placeholder="Enter a login" value="{{request.user.username}}"/>
+							</div>
+							<div class="form-group">
+								<label for="last_name">Last name</label>
+								<input name="last_name" type="text" class="form-control" id="last_name" placeholder="Enter your last name" value="{{request.user.last_name}}"/>
+							</div>
+							<div class="form-group">
+								<label for="first_name">First name</label>
+								<input name="first_name" type="text" class="form-control" id="first_name" placeholder="Enter your first name" value="{{request.user.first_name}}"/>
+							</div>
+							<div class="form-group">
+								<label for="email">Email address</label>
+								<input name="email" type="text" class="form-control" id="email" placeholder="Enter your email address" value="{{request.user.email}}"/>
+							</div>
+							<div class="form-group">
+								<label for="language">Preferred language</label>
+								<select class='form-control no-enter' id='language' name='language'>
+									{% with value='' %}
+										{% include 'statics/available_language_en.html' %}
+									{% endwith %}
+								</select>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Confirm your modifications">Save</button>
+						</div>
+					</form>
+				</div>

@@ -3,27 +3,33 @@ Created on Apr 27, 2015
 
 @author: sdejonckheere
 '''
-from container.utilities import setup_content
-from container.models import Attributes, FieldLabel, MenuEntries
-from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
-import json
 import itertools
-from django.template.context import Context
-from django.template import loader
-from container.settings import TEMPLATES_STATICS_PATH, STATICS_PATH
-import os
-from container.utilities.utils import complete_fields_information,\
-    dict_to_json_compliance
-from seq_common.utils import classes
 from json import dumps
+import json
+import os
+
+from django.contrib.auth.models import User
 from django.http.response import HttpResponse
+from django.shortcuts import render, redirect
+from django.template import loader
+from django.template.context import Context
+from seq_common.utils import classes
+
+from container.models import Attributes, FieldLabel, MenuEntries
+from container.settings import TEMPLATES_STATICS_PATH, STATICS_PATH
+from container.utilities import setup_content
+from container.utilities.utils import complete_fields_information, \
+    dict_to_json_compliance
+
+
+def application(request):
+    None
 
 def setup(request):
     # TODO: Check user
     item = request.GET['item']
     item_view_type = request.GET['type']
-    all_data = getattr(setup_content, 'get_' + item + '_' + item_view_type)()
+    all_data = setup_content.get_data(item + '_' + item_view_type)
     print all_data
     context = {'base_template': 'gso_fr.html', 'data_set': Attributes.objects.filter(type=item), 'selection_template': 'statics/' + item + '_en.html','global': dumps(all_data) if not all_data.has_key('global') else dumps(all_data['global']), 'user': {} if not all_data.has_key('user') else dumps(all_data['user'])}
     return render(request, 'rendition/' + item + '/' + item_view_type + '/setup.html', context)
@@ -44,9 +50,9 @@ def save(request):
     effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
     effective_class = classes.my_class_import(effective_class_name)
     
-    all_data = getattr(setup_content, 'get_' + item + '_' + item_view_type)()
+    all_data = setup_content.get_data(item + '_' + item_view_type)
     all_data[container_setup["type"]] = container_setup['data']
-    getattr(setup_content, 'set_' + item + '_' + item_view_type)(all_data)
+    setup_content.set_data(item + '_' + item_view_type, all_data)
     if item_view_type=='fields':
         data_as_dict = container_setup["data"]
         # TODO Clean the mess
@@ -56,7 +62,8 @@ def save(request):
                 if '.' not in field:
                     data_as_dict[field] = {'name': field}
         filtering = lambda d, k: d[k]['data']
-        fields = list(itertools.chain(*[filtering(setup_content.get_container_type_details()[container_setup["type"]]['data'], k) for k in setup_content.get_container_type_details()[container_setup["type"]]['data'].keys()]))
+        working_data = setup_content.get_data('container_type_details')
+        fields = list(itertools.chain(*[filtering(working_data[container_setup["type"]]['data'], k) for k in working_data[container_setup["type"]]['data'].keys()]))
         context = Context({"fields":container_setup['fields'], "complete_fields": complete_fields_information(effective_class,  data_as_dict), "container" : container_setup["type"], "labels": dict_to_json_compliance({label.identifier: label.field_label for label in FieldLabel.objects.filter(identifier__in=fields, langage='en')})})
         template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
         rendition = template.render(context)
@@ -106,11 +113,11 @@ def object_create(request):
     user = User.objects.get(id=request.user.id)
     name = request.POST['name']
     new_type = request.POST['newObjectType']
-    all_data = setup_content.get_object_type_fields()
+    all_data = setup_content.get_data('object_type_fields')
     if not all_data.has_key(new_type) or not isinstance(all_data[new_type], list):
         all_data[new_type] = []
     all_data[new_type].append({'name': name, 'fields':[]})
-    setup_content.set_object_type_fields(all_data)
+    setup_content.set_data('object_type_fields', all_data)
     return redirect(request.META.get('HTTP_REFERER') + '&name=' + name + '&newObjectType=' + new_type)
 
 def object_save(request):
@@ -120,7 +127,7 @@ def object_save(request):
     object_name = request.POST['object_name']
     object_fields = request.POST['object_fields']
     object_fields = json.loads(object_fields)
-    all_data = setup_content.get_object_type_fields()
+    all_data = setup_content.get_data('object_type_fields')
     for element in all_data[object_type]:
         if element['name']==object_name:
             element['fields'] = object_fields
@@ -132,7 +139,7 @@ def object_save(request):
             print outfile
             with open(outfile,'w') as o:
                 o.write(rendition.encode('utf-8'))
-    setup_content.set_object_type_fields(all_data)
+    setup_content.set_data('object_type_fields', all_data)
     return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
 
 def object_delete(request):
@@ -140,7 +147,7 @@ def object_delete(request):
     user = User.objects.get(id=request.user.id)
     object_type = request.POST['object_type']
     object_name = request.POST['object_name']
-    all_data = setup_content.get_object_type_fields()
+    all_data = setup_content.get_data('object_type_fields')
     new_list = []
     # TODO Pythonize this
     for element in all_data[object_type]:
@@ -149,7 +156,7 @@ def object_delete(request):
         else:
             new_list.append(element)
     all_data[object_type] = new_list
-    setup_content.set_object_type_fields(all_data)
+    setup_content.set_data('object_type_fields', all_data)
     return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
 
 def menu_render(request):

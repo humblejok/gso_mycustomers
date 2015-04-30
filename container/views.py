@@ -17,16 +17,15 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from seq_common.utils import classes
 
-from container.models import Attributes, FieldLabel, Container
+from container.models import Attributes, FieldLabel
 from container.settings import WORKING_PATH
-from container.utilities import external_content
-from container.utilities.container_container import get_container_information, set_container_information
-from container.utilities.setup_content import get_container_type_fields
+from container.utilities import external_content, setup_content
+from container.utilities.container_container import get_container_information, \
+    set_container_information
 from container.utilities.utils import get_static_fields, filter_custom_fields, \
     complete_fields_information, dict_to_json_compliance, \
     complete_custom_fields_information, get_model_foreign_field_class, \
-    get_effective_instance
-from utilities import setup_content
+    get_effective_class, get_effective_container
 
 
 LOGGER = logging.getLogger(__name__)
@@ -34,10 +33,8 @@ LOGGER = logging.getLogger(__name__)
 def lists(request):
     # TODO: Check user
     container_type = request.GET['item']
-    container_class = container_type + '_CLASS'
     # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
+    effective_class = get_effective_class(container_type)
     results = effective_class.objects.all().order_by('name')
     context = {'base_template': 'gso_fr.html', 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
     return render(request, 'statics/' + container_type + '_results_lists_en.html', context)
@@ -48,18 +45,16 @@ def definition_save(request):
     container = request.POST['container']
     definitions = request.POST['definitions']
     definitions = json.loads(definitions)
-    all_data = setup_content.get_container_type_fields()
+    all_data = setup_content.get_data('container_type_fields')
     all_data[container] = definitions
-    setup_content.set_container_type_fields(all_data)
+    setup_content.set_data('container_type_fields', all_data)
     return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
 
 def base_edit(request):
     # TODO: Check user
     container_type = request.POST['container_type']
-    container_class = container_type + '_CLASS'
     # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
+    effective_class = get_effective_class(container_type)
 
     active_status = Attributes.objects.get(identifier='STATUS_ACTIVE')
     container_attribute = Attributes.objects.get(identifier=container_type)
@@ -80,7 +75,7 @@ def base_edit(request):
     source.status = active_status
     source.save()
     # Working on creations mandatory fields
-    creation_data = setup_content.get_container_type_creations()
+    creation_data = setup_content.get_data('container_type_creations')
     if creation_data.has_key(container_type):
         creation_data = creation_data[container_type]
     else:
@@ -105,13 +100,8 @@ def delete(request):
     # TODO: Check user
     user = User.objects.get(id=request.user.id)
     container_id = request.GET['container_id']
-    container_type = request.GET['container_type']
-    container_class = container_type + '_CLASS'
     # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
-    
-    effective_class.objects.get(id=container_id).delete()
+    get_effective_container(container_id).delete()
     return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
 
 def get(request):
@@ -119,14 +109,12 @@ def get(request):
     user = User.objects.get(id=request.user.id)
     container_id = request.GET['container_id']
     container_type = request.GET['container_type']
-    container_class = container_type + '_CLASS'
     # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
-    
-    container = effective_class.objects.get(id=container_id)
+    effective_class = get_effective_class(container_type)
+    container = get_effective_container(container_id)
     filtering = lambda d, k: d[k]['data']
-    fields = list(itertools.chain(*[filtering(setup_content.get_container_type_details()[container_type]['data'], k) for k in setup_content.get_container_type_details()[container_type]['data'].keys()]))
+    working_data = setup_content.get_data('container_type_details')
+    fields = list(itertools.chain(*[filtering(working_data[container_type]['data'], k) for k in working_data[container_type]['data'].keys()]))
     custom_fields = complete_custom_fields_information(container_type)
     custom_data = get_container_information(container)
     # TODO: Handle other langage and factorize with other views
@@ -135,7 +123,7 @@ def get(request):
                'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}),
                'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
                'custom_data': custom_data,
-               'container_type': container_type, 'layout': setup_content.get_container_type_details()[container_type], 'labels': labels}
+               'container_type': container_type, 'layout': working_data[container_type], 'labels': labels}
     return render(request,'rendition/container_type/details/view.html', context)
 
 def filters(request):
@@ -168,13 +156,11 @@ def partial_delete(request):
     user = User.objects.get(id=request.user.id)
     container_id = request.POST['container_id']
     container_type = request.POST['container_type']
-    container_class = container_type + '_CLASS'
     container_field = request.POST['container_field']
     item_id = request.POST['item_id']
     # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
-    container = effective_class.objects.get(id=container_id)
+    effective_class = get_effective_class(container_type)
+    container = get_effective_container(container_id)
     foreign = get_model_foreign_field_class(effective_class, container_field)
     if foreign!=None:
         entry = foreign.objects.get(id=item_id)
@@ -190,11 +176,9 @@ def partial_save(request):
     container_data = request.POST['container_data']
     container_data = json.loads(container_data)
     container_type = request.POST['container_type']
-    container_class = container_type + '_CLASS'
     # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
-    container = effective_class.objects.get(id=container_id)
+    effective_class = get_effective_class(container_type)
+    container = get_effective_container(container_id)
     if container_data.has_key('many-to-many'):
         foreign = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
         if foreign!=None:
@@ -226,11 +210,8 @@ def search(request):
         action = request.POST['action']
         # TODO: Check user
         user = User.objects.get(id=request.user.id)
-        container_type = request.POST['container_type']
-        container_class = container_type + '_CLASS'
         # TODO: Handle error
-        effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-        effective_class = classes.my_class_import(effective_class_name)
+        effective_class = get_effective_class(request.POST['container_type'])
         results = effective_class.objects.filter(Q(name__icontains=searching) | Q(short_name__icontains=searching) | Q(aliases__alias_value__icontains=searching)).order_by('name').distinct()
         results_list = [result.get_short_json() for result in results]
         context['securities'] = results_list
@@ -242,13 +223,11 @@ def search(request):
 def fields_get(request):
     # TODO: Check user
     user = User.objects.get(id=request.user.id)
-    container_class = request.POST['container_type'] + '_CLASS'
     # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
+    effective_class = get_effective_class(request.POST['container_type'])
     object_static_fields = get_static_fields(effective_class)
     
-    object_custom_fields = get_container_type_fields()
+    object_custom_fields = setup_content.get_data('container_type_fields')
     if object_custom_fields.has_key(request.POST['container_type']):
         object_custom_fields = object_custom_fields[request.POST['container_type']]
     else:
@@ -259,14 +238,9 @@ def fields_get(request):
 def get_filtering_entry(request):
     user = User.objects.get(id=request.user.id)
     # TODO: Check user
-    container_type = request.POST['container_type']
     filtered_field = request.POST['filtered_field']
     filtering_field = request.POST['filtering_field']
-    
-    container_class = container_type + '_CLASS'
-    # TODO: Handle error
-    effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
-    effective_class = classes.my_class_import(effective_class_name)
+    effective_class = get_effective_class(request.POST['container_type'])
     target_class = effective_class._meta.get_field(filtered_field).rel.to
     limit = dict(target_class._meta.get_field(str(filtering_field)).rel.limit_choices_to)
     limit['active'] = True
@@ -279,8 +253,7 @@ def custom_edit(request):
     container_id = request.GET['container_id']
     custom_id = request.GET['custom']
     target = request.GET['target']
-    container = Container.objects.get(id=container_id)
-    container = get_effective_instance(container)
+    container = get_effective_container(container_id)
     context = {'base_template': 'gso_fr.html','container': container, 'all_types': {}}
     all_types = Attributes.objects.filter(type__startswith=custom_id).order_by('type').distinct('type')
     all_types_json = {}
@@ -299,8 +272,7 @@ def custom_export(request):
     custom_id = request.GET['custom']
     target = request.GET['target']
     file_type = request.GET['file_type']
-    container = Container.objects.get(id=container_id)
-    container = get_effective_instance(container)
+    container = get_effective_container(container_id)
     external = classes.my_import('external.' + custom_id)
     content = getattr(external, 'export_' + target)(container, getattr(external_content, 'get_' + custom_id + "_" + target)()[str(container.id)])
     # TODO: handle mime-type
@@ -332,7 +304,6 @@ def custom_view(request):
     container_id = request.GET['container_id']
     custom_id = request.GET['custom']
     target = request.GET['target']
-    container = Container.objects.get(id=container_id)
-    container = get_effective_instance(container)
+    container = get_effective_container(container_id)
     context = {'base_template': 'gso_fr.html', 'container': container}
     return render(request, 'external/' + custom_id + '/' + target +'/view.html', context)

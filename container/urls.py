@@ -35,10 +35,14 @@ urlpatterns = patterns(
     #########################
     url(r'^setup.html', 'container.setup.views.setup', name='setup'),
     url(r'^setup_save.html', 'container.setup.views.save', name='container_setup_save'),
-    url(r'^menu_setup_render.html', 'container.setup.views.menu_render', name='menu_setup_render'),
-    url(r'^object_create.html', 'container.setup.views.object_create', name='object_create'),
-    url(r'^object_save.html', 'container.setup.views.object_save', name='object_save'),
-    url(r'^object_delete.html', 'container.setup.views.object_delete', name='object_delete'),
+    url(r'^menu/setup_render.html', 'container.setup.views.menu_render', name='menu_setup_render'),
+    url(r'^object/create.html', 'container.setup.views.object_create', name='object_create'),
+    url(r'^object/save.html', 'container.setup.views.object_save', name='object_save'),
+    url(r'^object/delete.html', 'container.setup.views.object_delete', name='object_delete'),
+    url(r'^user/setup.html', 'container.setup.user.views.setup', name='user_setup'),
+    url(r'^user/remove.html', 'container.setup.user.views.remove', name='user_remove'),
+    url(r'^user/save.html', 'container.setup.user.views.save', name='user_save'),
+    
     
     #########################
     # Custom views          #

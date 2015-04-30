@@ -6,7 +6,6 @@ from seq_common.utils import classes
 
 from container.models import Attributes
 from container.utilities import setup_content
-from container.utilities.setup_content import get_object_type_fields
 import re
 
 LOGGER = logging.getLogger(__name__)
@@ -38,13 +37,27 @@ class StripWhitespaceMiddleware(object):
             return response    
 
 def filter_custom_fields(field_type, field_name):
-    values = get_object_type_fields()
+    values = setup_content.get_data('object_type_fields')
     if values.has_key(field_type):
         values = values[field_type]
         for value in values:
             if value['name']==field_name:
                 return value
     return None
+
+def clean_post_value(value):
+    if isinstance(value, list) and len(value)==1:
+        return value[0]
+    else:
+        return value
+
+def get_effective_class(container_type):
+    effective_class_name = Attributes.objects.get(identifier=container_type + '_CLASS', active=True).name
+    effective_class = classes.my_class_import(effective_class_name)
+    return effective_class
+
+def get_effective_container(container_id):
+    None
 
 def get_effective_instance(container):
     if container!=None:
@@ -70,9 +83,9 @@ def get_model_foreign_field_class(model_class, field):
 def complete_custom_fields_information(container_type, filtering_fields=None):
     all_data = {}
    
-    all_custom_fields = setup_content.get_container_type_fields()
+    all_custom_fields = setup_content.get_data('container_type_fields')
     if all_custom_fields.has_key(container_type):
-        all_fields_information = setup_content.get_object_type_fields()
+        all_fields_information = setup_content.get_data('object_type_fields')
         for field in all_custom_fields[container_type]:
             if all_fields_information.has_key(field['type']):
                 for group in all_fields_information[field['type']]:
