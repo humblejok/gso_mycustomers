@@ -1,5 +1,6 @@
 {% extends base_template %}
-{% block title %}MyCustomers - Setup{% endblock %}
+{% load i18n %}
+{% block title %}MyCustomers - {% blocktrans %}Setup{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				if (urlParams.newObjectType) {
@@ -226,8 +227,8 @@
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">Custom objects definition</h1>
-	  			<p class="lead">Define all the custom objects you may need in your application.<br/>
+				<h1 class="">{% blocktrans %}Custom objects definition{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Define all the custom objects you may need in your application.{% endblocktrans %}<br/>
 			</div>
 		</div>
 		<div class="row">
@@ -239,7 +240,7 @@
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
-			<button data-target="#modal_create_object" class="btn btn-default col-lg-3" type="button" data-toggle="modal" data-placement="bottom" title="Create a new object">Create</button>
+			<button data-target="#modal_create_object" class="btn btn-default col-lg-3" type="button" data-toggle="modal" data-placement="bottom" title="Create a new object">{% blocktrans %}Create{% endblocktrans %}</button>
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
@@ -248,9 +249,9 @@
 				</ul>
 			</div>
 			<div id="objectFieldsDiv" class="col-lg-9">
-				<button class="btn btn-default btn-sm add-btn" onclick="addField(currentRow + 1, null)">Add field</button>
+				<button class="btn btn-default btn-sm add-btn" onclick="addField(currentRow + 1, null)">{% blocktrans %}Add field{% endblocktrans %}</button>
 				<button class="btn btn-default btn-sm save-btn" onclick="saveFields()">Save</button>
-				<button class="btn btn-danger btn-sm delete-btn col-lg-offset-9" onclick="deleteObject()">Delete</button>
+				<button class="btn btn-danger btn-sm delete-btn col-lg-offset-9" onclick="deleteObject()">{% blocktrans %}Delete{% endblocktrans %}</button>
 				<div>&nbsp;</div>
 				<form id="define_form" role="form" action="/container/object/save.html" method="POST">{% csrf_token %}
 					<table id="fieldsTable" class="table">
@@ -263,19 +264,19 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="modal_create_label">Create a new object</h4>
+						<h4 class="modal-title" id="modal_create_label">{% blocktrans %}Create a new object{% endblocktrans %}</h4>
 					</div>
 					<form id="create_form" role="form" action="/container/object/create.html" method="POST">{% csrf_token %}
 						<div class="modal-body">
 							<div class="form-group">
 								<label for="name">Name</label>
-								<input name="name" type="text" class="form-control no-enter" id="name" placeholder="Enter a name" value=""/>
+								<input name="name" type="text" class="form-control no-enter" id="name" placeholder="{% blocktrans %}Enter a name{% endblocktrans %}" value=""/>
 							</div>
 						</div>
 						<input type="hidden" name="newObjectType" id="newObjectType" value=""/>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Confirm object creation and go to edition mode">Continue</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
+							<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm object creation and go to edition mode{% endblocktrans %}">{% blocktrans %}Continue{% endblocktrans %}</button>
 						</div>
 					</form>
 				</div>
@@ -285,7 +286,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h4 class="modal-title" id="modal_select_label">Create a new object</h4>
+						<h4 class="modal-title" id="modal_select_label">{% blocktrans %}Create a new object{% endblocktrans %}</h4>
 					</div>
 					<form id="create_form" role="form" action="" method="POST">
 						<div class="modal-body">
@@ -299,7 +300,7 @@
 							</div>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Confirm attribute selection and continue edition" data-dismiss="modal" onclick="validateAttributeSelection()">Select</button>
+							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm attribute selection and continue edition{% endblocktrans %}" data-dismiss="modal" onclick="validateAttributeSelection()">{% blocktrans %}Select{% endblocktrans %}</button>
 						</div>
 					</form>
 				</div>

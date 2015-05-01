@@ -13,7 +13,7 @@
 	var callbacks = [];
 
 	var currentIndex = 0;
-	var defaultRow = "<tr id='menu-row-%%index%%' class='container-row'><td><select id='group_%%index%%' class='form-control no-enter col-lg-11' onchange='updateTargetSelect(%%index%%, targetLoaded)'></select></td><td><select id='target_%%index%%' class='form-control no-enter col-lg-11'></select></td><td><button id='remove-button-%%index%%' type='button' class='btn btn-default col-lg-12' onclick='removeRow(%%index%%)'>Remove</button></td></tr>";
+	var defaultRow = "<tr id='menu-row-%%index%%' class='container-row'><td><select id='group_%%index%%' class='form-control no-enter col-lg-11' onchange='updateTargetSelect(%%index%%, targetLoaded)'></select></td><td><select id='target_%%index%%' class='form-control no-enter col-lg-11'></select></td><td><button id='remove-button-%%index%%' type='button' class='btn btn-default col-lg-12' onclick='removeRow(%%index%%)'>{% blocktrans %}Remove{% endblocktrans %}</button></td></tr>";
 
 	function onCallError(e) {
 		alert(e.status);
@@ -120,8 +120,8 @@
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">Menus definition</h1>
-	  			<p class="lead">Define the menu entries for the selected container.<br/>
+				<h1 class="">{% blocktrans %}Menus definition{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Define the menu entries for the selected container.{% endblocktrans %}<br/>
 			</div>
 		</div>
 		<div class="row">
@@ -134,7 +134,7 @@
 		<div class="row">&nbsp;</div>
 		<form class="form">
 			<table id='menuTable' class="table">
-				<tr><th class='col-lg-5'>Menu group</th><th class='col-lg-5'>Target</th><th><button type='button' class='btn btn-default col-lg-6' onclick='addRow()'>Add</button><button type='button' class='btn btn-default col-lg-6' onclick='saveContent()'>Save</button></th></tr>
+				<tr><th class='col-lg-5'>Menu group</th><th class='col-lg-5'>Target</th><th><button type='button' class='btn btn-default col-lg-6' onclick='addRow()'>{% blocktrans %}Add{% endblocktrans %}</button><button type='button' class='btn btn-default col-lg-6' onclick='saveContent()'>{% blocktrans %}Save{% endblocktrans %}</button></th></tr>
 			</table>
 		</form>
 {% endblock %}

@@ -19,7 +19,7 @@ from container.models import Attributes, FieldLabel, MenuEntries
 from container.settings import TEMPLATES_STATICS_PATH, STATICS_PATH
 from container.utilities import setup_content
 from container.utilities.utils import complete_fields_information, \
-    dict_to_json_compliance
+    dict_to_json_compliance, get_or_create_user_profile
 
 
 def application(request):
@@ -27,11 +27,11 @@ def application(request):
 
 def setup(request):
     # TODO: Check user
+    profile = get_or_create_user_profile(request.user.id)
     item = request.GET['item']
     item_view_type = request.GET['type']
     all_data = setup_content.get_data(item + '_' + item_view_type)
-    print all_data
-    context = {'base_template': 'gso_fr.html', 'data_set': Attributes.objects.filter(type=item), 'selection_template': 'statics/' + item + '_en.html','global': dumps(all_data) if not all_data.has_key('global') else dumps(all_data['global']), 'user': {} if not all_data.has_key('user') else dumps(all_data['user'])}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'data_set': Attributes.objects.filter(type=item), 'selection_template': 'statics/' + item + '_en.html','global': dumps(all_data) if not all_data.has_key('global') else dumps(all_data['global']), 'user': {} if not all_data.has_key('user') else dumps(all_data['user'])}
     return render(request, 'rendition/' + item + '/' + item_view_type + '/setup.html', context)
 
 def save(request):
@@ -160,6 +160,7 @@ def object_delete(request):
     return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
 
 def menu_render(request):
+    profile = get_or_create_user_profile(request.user.id)
     container_type = request.POST['container_type']
     language = request.POST['language']
     menu_target = request.POST['menu_target']
@@ -167,5 +168,5 @@ def menu_render(request):
     if request.POST.has_key('selected'):
         selected = request.POST['selected']
     entries = MenuEntries.objects.filter(menu_target__identifier=menu_target, language=language, container_type__identifier=container_type)
-    context = {'language': 'fr', 'entries': entries, 'selected': selected}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'entries': entries, 'selected': selected}
     return render(request, 'rendition/menu_setup_select_renderer.html', context)

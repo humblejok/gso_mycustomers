@@ -1,4 +1,5 @@
 {% extends base_template %}
+{% load i18n %}
 {% block title %}Container Extended Fields Setup{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
@@ -115,8 +116,8 @@
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">Custom objects assignment</h1>
-	  			<p class="lead">Define the custom objects associated to containers<br/>
+				<h1 class="">{% blocktrans %}Custom objects assignment{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Define the custom objects associated to containers{% endblocktrans %}<br/>
 			</div>
 		</div>
 		<div class="row">
@@ -149,6 +150,6 @@
 				<select class='form-control col-lg-3 no-enter' id='objectDefinition' name='objectDefinition' onchange="">
 				</select>
 			</div>
-			<button class="btn btn-default btn-sm col-lg-1 add-btn" onclick='addObjectDefinition(currentRow + 1, {"name":$("#objectDefinition").val(), "type":$("#objectType").val(), "typeLabel":$("#objectType option:selected").text(), "repeat":0, "instanceType":"FIELD_ASSIGNMENT_SINGLE"})'>Add</button>
+			<button class="btn btn-default btn-sm col-lg-1 add-btn" onclick='addObjectDefinition(currentRow + 1, {"name":$("#objectDefinition").val(), "type":$("#objectType").val(), "typeLabel":$("#objectType option:selected").text(), "repeat":0, "instanceType":"FIELD_ASSIGNMENT_SINGLE"})'>{% blocktrans %}Add{% endblocktrans %}</button>
 		</div>
 {% endblock %}

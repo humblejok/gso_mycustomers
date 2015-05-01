@@ -1,5 +1,6 @@
 {% extends base_template %}
-{% block title %}Container Creation Wizard Setup{% endblock %}
+{% load i18n %}
+{% block title %}{% blocktrans %}Container Creation Wizard Setup{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				containerChanged();
@@ -146,7 +147,7 @@
 		} else {
 			$("#selectedfieldsList").append('<a class="list-group-item select-' + fieldName + '" onclick="onFieldClick(\'' + fieldName + '\')" role="button">' + fieldName + '</a>');
 			if (allFields[fieldName].type==='ManyToManyField') {
-				$("#selectedfieldsOptions").append('<a class="list-group-item select-' + fieldName + '" href="#modal_define_option" role="button" data-toggle="modal" data-placement="bottom" title="Define the options regarding many to many relations" onclick="preparePopup(\'' + fieldName + '\')">Define</a>')
+				$("#selectedfieldsOptions").append('<a class="list-group-item select-' + fieldName + '" href="#modal_define_option" role="button" data-toggle="modal" data-placement="bottom" title="{% blocktrans %}Define the options regarding many to many relations{% endblocktrans %}" onclick="preparePopup(\'' + fieldName + '\')">{% blocktrans %}Define{% endblocktrans %}</a>')
 			} else {
 				$("#selectedfieldsOptions").append('<div class="list-group-item select-' + fieldName + '">-</div>')
 			}
@@ -214,8 +215,8 @@
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">Mandatory fields while creating containers</h1>
-	  			<p class="lead">Define the all fields that are mandatory while creating<br/>
+				<h1 class="">{% blocktrans %}Mandatory fields while creating containers{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Define all the fields that are mandatory while creating{% endblocktrans %}<br/>
 			</div>
 		</div>
 		<div class="row">
@@ -228,13 +229,13 @@
 		<div class="row">&nbsp;</div>
 		<div class="row">
 			<div class="col-lg-offset-1 col-lg-3 text-center">
-				<h4>Available fields</h4>
+				<h4>{% blocktrans %}Available fields{% endblocktrans %}</h4>
 			</div>
 			<div class="col-lg-3 col-lg-offset-3 text-center">
-				<h4>Selected fields</h4>
+				<h4>{% blocktrans %}Selected fields{% endblocktrans %}</h4>
 			</div>
 			<div class="col-lg-1 text-center">
-				<h4>Options</h4>
+				<h4>{% blocktrans %}Options{% endblocktrans %}</h4>
 			</div>
 		</div>
 		<div class="row">
@@ -252,15 +253,15 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="modal_create_internal_label">Define the options regarding many to many relations</h4>
+						<h4 class="modal-title" id="modal_create_internal_label">{% blocktrans %}Define the options regarding many to many relations{% endblocktrans %}</h4>
 					</div>
 					<form id="create_form_internal" role="form" action="#" method="POST">{% csrf_token %}
 						<div id="optionBody"  class="modal-body">
 							<div class="row">
-								<h4>Create a new group and then drag a filtering option in that group</h4>
-								<h6>Each group indicates a mandatory user input. All filters within a group are "OR" relations.</h6>
+								<h4>{% blocktrans %}Create a new group and then drag a filtering option in that group{% endblocktrans %}</h4>
+								<h6>{% blocktrans %}Each group indicates a mandatory user input. All filters within a group are "OR" relations.{% endblocktrans %}</h6>
 							<div>
-							<div class="row"><a id="addButton" class="btn btn-default col-lg-10 col-lg-offset-1" onclick="addGroup(false)">Add a group</a></div>
+							<div class="row"><a id="addButton" class="btn btn-default col-lg-10 col-lg-offset-1" onclick="addGroup(false)">{% blocktrans %}Add a group{% endblocktrans %}</a></div>
 							<div class="row">&nbsp;</div>
 							<div class="row">
 								<div id="filtersList" class="col-lg-4 col-lg-offset-1 list-group"></div>
@@ -269,7 +270,7 @@
 						</div>
 					</form>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Close the popup" onclick="" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Close the popup{% endblocktrans %}" onclick="" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
 					</div>
 				</div>
 			</div>

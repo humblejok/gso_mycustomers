@@ -7,19 +7,26 @@ import itertools
 from json import dumps
 import json
 import logging
+import os
 
+from bson import json_util
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from seq_common.utils import classes
 
 from container.models import Attributes, FieldLabel
-from container.utilities import setup_content
-from container.utilities.container_container import get_container_information
+from container.settings import WORKING_PATH
+from container.utilities import setup_content, external_content
+from container.utilities.container_container import get_container_information, \
+    set_container_information
 from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
-    get_effective_container, get_or_create_user_profile
+    get_effective_container, get_or_create_user_profile, \
+    get_model_foreign_field_class, get_static_fields, filter_custom_fields
 
 
 LOGGER = logging.getLogger(__name__)
@@ -31,7 +38,8 @@ def lists(request):
     # TODO: Handle error
     effective_class = get_effective_class(container_type)
     results = effective_class.objects.all().order_by('name')
-    context = {'base_template': 'gso_' + Attributes.objects.get(identifier=profile['language'], active=True).short_name + '.html', 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
+    request.session['django_language'] = profile['language_code']
+    context = {'base_template': profile['base_template'], 'profile': profile, 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
     return render(request, 'statics/' + container_type + '_results_lists_en.html', context)
 
 def definition_save(request):
@@ -101,7 +109,7 @@ def delete(request):
 
 def get(request):
     # TODO: Check user
-    user = User.objects.get(id=request.user.id)
+    profile = get_or_create_user_profile(request.user.id)
     container_id = request.GET['container_id']
     container_type = request.GET['container_type']
     # TODO: Handle error
@@ -114,7 +122,7 @@ def get(request):
     custom_data = get_container_information(container)
     # TODO: Handle other langage and factorize with other views
     labels = dict_to_json_compliance({label.identifier: label.field_label for label in FieldLabel.objects.filter(identifier__in=fields, langage='en')})
-    context = {'base_template': 'gso_fr.html', 
+    context = {'base_template': profile['base_template'], 'profile': profile, 
                'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}),
                'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
                'custom_data': custom_data,
@@ -196,7 +204,8 @@ def partial_save(request):
     return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
 
 def search(request):
-    context = {'base_template': 'gso_fr.html'}
+    profile = get_or_create_user_profile(request.user.id)
+    context = {'base_template': profile['base_template'], 'profile': profile}
     try:
         searching = request.POST[u'searching']
         
@@ -245,11 +254,12 @@ def get_filtering_entry(request):
 
 def custom_edit(request):
     # TODO: Check user
+    profile = get_or_create_user_profile(request.user.id)
     container_id = request.GET['container_id']
     custom_id = request.GET['custom']
     target = request.GET['target']
     container = get_effective_container(container_id)
-    context = {'base_template': 'gso_fr.html','container': container, 'all_types': {}}
+    context = {'base_template': profile['base_template'], 'profile': profile,'container': container, 'all_types': {}}
     all_types = Attributes.objects.filter(type__startswith=custom_id).order_by('type').distinct('type')
     all_types_json = {}
     for a_type in all_types:
@@ -296,9 +306,10 @@ def custom_save(request):
 
 def custom_view(request):
     # TODO: Check user
+    profile = get_or_create_user_profile(request.user.id)
     container_id = request.GET['container_id']
     custom_id = request.GET['custom']
     target = request.GET['target']
     container = get_effective_container(container_id)
-    context = {'base_template': 'gso_fr.html', 'container': container}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'container': container}
     return render(request, 'external/' + custom_id + '/' + target +'/view.html', context)

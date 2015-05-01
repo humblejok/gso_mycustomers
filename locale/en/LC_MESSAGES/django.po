@@ -1,0 +1,196 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-05-01 17:57+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\resources\templates\container\edit\user\setup.html.py:5
+msgid "Edit your account"
+msgstr "Edit your account"
+
+#: .\resources\templates\container\edit\user\setup.html.py:10
+msgid "Login"
+msgstr "Login"
+
+#: .\resources\templates\container\edit\user\setup.html.py:14
+msgid "Last name"
+msgstr "Last name"
+
+#: .\resources\templates\container\edit\user\setup.html.py:18
+msgid "First name"
+msgstr "First name"
+
+#: .\resources\templates\container\edit\user\setup.html.py:22
+msgid "Email address"
+msgstr "Email address"
+
+#: .\resources\templates\container\edit\user\setup.html.py:26
+msgid "Preferred language"
+msgstr "Preferred language"
+
+#: .\resources\templates\container\edit\user\setup.html.py:36
+msgid "Confirm your modifications"
+msgstr "Confirm your modifications"
+
+#: .\resources\templates\container\edit\user\setup.html.py:36
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:137
+msgid "Save"
+msgstr "Save"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:3
+msgid "Container Creation Wizard Setup"
+msgstr "Container Creation Wizard Setup"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:150
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:256
+msgid "Define the options regarding many to many relations"
+msgstr "Define the options regarding many to many relations"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:150
+msgid "Define"
+msgstr "Define"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:218
+msgid "Mandatory fields while creating containers"
+msgstr "Mandatory fields while creating containers"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:219
+msgid "Define all the fields that are mandatory while creating"
+msgstr "Define all the fields that are mandatory while creating"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:232
+#: .\resources\templates\rendition\container_type\lists\setup.html.py:155
+msgid "Available fields"
+msgstr "Available fields"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:235
+#: .\resources\templates\rendition\container_type\lists\setup.html.py:158
+msgid "Selected fields"
+msgstr "Selected fields"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:238
+msgid "Options"
+msgstr ""
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:261
+msgid "Create a new group and then drag a filtering option in that group"
+msgstr "Create a new group and then drag a filtering option in that group"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:262
+msgid ""
+"Each group indicates a mandatory user input. All filters within a group are "
+"\"OR\" relations."
+msgstr ""
+"Each group indicates a mandatory user input. All filters within a group are "
+"\"OR\" relations."
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:264
+msgid "Add a group"
+msgstr "Add a group"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:273
+msgid "Close the popup"
+msgstr "Close the popup"
+
+#: .\resources\templates\rendition\container_type\creations\setup.html.py:273
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:278
+msgid "Close"
+msgstr "Close"
+
+#: .\resources\templates\rendition\container_type\fields\setup.html.py:119
+#, fuzzy
+msgid "Custom objects assignment"
+msgstr "Custom objects definition"
+
+#: .\resources\templates\rendition\container_type\fields\setup.html.py:120
+#, fuzzy
+msgid "Define the custom objects associated to containers"
+msgstr "Define all the custom objects you may need in your application."
+
+#: .\resources\templates\rendition\container_type\fields\setup.html.py:153
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:137
+msgid "Add"
+msgstr "Add"
+
+#: .\resources\templates\rendition\container_type\lists\setup.html.py:141
+msgid "Lists and results layout definition"
+msgstr ""
+
+#: .\resources\templates\rendition\container_type\lists\setup.html.py:142
+msgid ""
+"Define the columns layout for all results or lists of the selected item."
+msgstr ""
+"Define the columns layout for all results or lists of the selected item."
+
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:16
+msgid "Remove"
+msgstr "Remove"
+
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:123
+msgid "Menus definition"
+msgstr "Menus definition"
+
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:124
+msgid "Define the menu entries for the selected container."
+msgstr "Define the menu entries for the selected container."
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:3
+msgid "Setup"
+msgstr "Setup"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:230
+msgid "Custom objects definition"
+msgstr "Custom objects definition"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:231
+msgid "Define all the custom objects you may need in your application."
+msgstr "Define all the custom objects you may need in your application."
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:243
+msgid "Create"
+msgstr "Create"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:252
+msgid "Add field"
+msgstr "Add field"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:254
+msgid "Delete"
+msgstr "Delete"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:267
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:289
+msgid "Create a new object"
+msgstr "Create a new object"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:273
+msgid "Enter a name"
+msgstr "Enter a name"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:279
+msgid "Confirm object creation and go to edition mode"
+msgstr "Confirm object creation and go to edition mode"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:279
+msgid "Continue"
+msgstr "Continue"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:303
+msgid "Confirm attribute selection and continue edition"
+msgstr "Confirm attribute selection and continue edition"
+
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:303
+msgid "Select"
+msgstr "Select"

@@ -1,4 +1,5 @@
 {% templatetag openblock %} load socialaccount {% templatetag closeblock %}
+{% templatetag openblock %} load i18n {% templatetag closeblock %}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -57,6 +58,22 @@
 				$("#backgroundProgress").removeClass("invisible");
 			}
 
+			
+
+			function proceedFormAjax(link, data, callType) {
+				$("#backgroundProgress").removeClass("invisible");
+				$.ajax({
+					url: link,
+					type: callType,
+					data: data,
+					processData: false,
+					contentType: false,
+					success: taskFinished,
+					error: taskFailed
+				});
+				return false;
+			}
+
 			function proceedPageAjax(link, data, callType) {
 				$("#backgroundProgress").removeClass("invisible");
 				$.ajax({
@@ -88,6 +105,23 @@
 					success: taskFinished,
 					error: taskFailed
 				});
+			}
+
+			function displayDynamicModal(modal_url, url_arguments) {
+
+				$("#dynamic_modal_content").empty();
+				$("#dynamic_modal_content").load(modal_url + (url_arguments?"?" + url_arguments:""), function() {console.log("LOADED");$("#dynamic_modal").modal({"show": true});});
+			}
+
+			function confirmDynamicModal(confirm_url, modal_form) {
+				$("#dynamic_modal").modal({"show": false});
+				var asArray = $(modal_form).serializeArray();
+				var dynamicData = new FormData();
+				for (var index = 0; index<asArray.length;index++) {
+					dynamicData.append(String(asArray[index].name), String(asArray[index].value));
+				}
+				proceedFormAjax(confirm_url, dynamicData, 'POST');
+				return true;
 			}
 		</script>
 		<script>
@@ -136,20 +170,13 @@
 		     	{% templatetag openblock %} endblock {% templatetag closeblock %}
 			});
 			
-			function displayDynamicModal(modal_url, url_arguments) {
-				console.log(modal_url);
-				console.log(url_arguments);
-				console.log(modal_url + (url_arguments?"?" + url_arguments:""));
-
-				$("#dynamic_modal_content").empty();
-				$("#dynamic_modal_content").load(modal_url + (url_arguments?"?" + url_arguments:""), function() {console.log("LOADED");$("#dynamic_modal").modal({"show": true});});
-			}
 		</script>
 
 		{% templatetag openblock %} block headeroptions {% templatetag closeblock %}
 		{% templatetag openblock %} endblock {% templatetag closeblock %}
 	</head>
 	<body>
+		{% templatetag openblock %} language profile.language_code {% templatetag closeblock %}
 		<nav class="navbar navbar-default navbar-static-top clearfix" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
@@ -202,4 +229,5 @@
 
 			</div>
 		</div>
+		{% templatetag openblock %} endlanguage {% templatetag closeblock %}
 	</body>
