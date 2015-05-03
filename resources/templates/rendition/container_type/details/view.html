@@ -1,4 +1,5 @@
 {% extends base_template %}
+{% load i18n %}
 {% load container_tags %}
 {% block title %}{{container.name}}{% endblock %}
 {% block readyoptions %}
@@ -125,7 +126,7 @@
 						</ul>
 					</div>
 				</h1>
-	  			<p class="lead">{% if container.short_description %}{{ container.short_description }}{% else %}No description is available.{% endif %}<br/>
+	  			<p class="lead">{% if container.short_description %}{{ container.short_description }}{% else %}{% blocktrans %}No description is available.{% endblocktrans %}{% endif %}<br/>
 			</div>
 		</div>
 		<div class="row">&nbsp;</div>

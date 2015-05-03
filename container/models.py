@@ -15,7 +15,6 @@ from container.settings import RESOURCES_MAIN_PATH, STATICS_PATH,\
     TEMPLATES_STATICS_PATH
 from gso_mycustomers.settings import TEMPLATE_DIRS
 
-# Create your models here.
 LOGGER = logging.getLogger(__name__)
 
 def setup():
@@ -23,6 +22,8 @@ def setup():
     setup_labels()
     populate_model_from_xlsx('container.models.MenuEntries', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
     generate_attributes()
+    setup_menus()
+    setup_global_menus()
 
 def setup_menus():
     MenuEntries.objects.all().delete()
@@ -49,8 +50,8 @@ def generate_global_templates():
     languages = Attributes.objects.filter(active=True, type='available_language')
     template = loader.get_template('rendition/gso.html')
     for language in languages:
-        entries = GlobalMenuEntries.objects.filter(language=language.short_name).order_by('id')
-        context = Context({'entries': entries})
+        entries = GlobalMenuEntries.objects.all().order_by('id')
+        context = Context({'entries': entries, 'language_code': language.short_name})
         rendition = template.render(context)
         outfile = os.path.join(TEMPLATE_DIRS[0], 'gso_' + language.short_name + '.html')
         with open(outfile,'w') as o:
@@ -61,13 +62,13 @@ def generate_attributes():
     context = Context({"selection": all_types})
     template = loader.get_template('rendition/attributes_list_option_renderer.html')
     rendition = template.render(context)
-    # TODO Implement multi-langage
+    # TODO Implement multi-language
     outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_option_en.html')
     with open(outfile,'w') as o:
         o.write(rendition.encode('utf-8'))
     template = loader.get_template('rendition/attributes_list_select_renderer.html')
     rendition = template.render(context)
-    # TODO Implement multi-langage
+    # TODO Implement multi-language
     outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_select_en.html')
     with open(outfile,'w') as o:
         o.write(rendition.encode('utf-8'))
@@ -76,7 +77,7 @@ def generate_attributes():
         context = Context({"selection": all_elements})
         template = loader.get_template('rendition/attributes_option_renderer.html')
         rendition = template.render(context)
-        # TODO Implement multi-langage
+        # TODO Implement multi-language
         outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_en.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
@@ -85,7 +86,7 @@ def generate_attributes():
             o.write(rendition.encode('utf-8'))
         template = loader.get_template('rendition/attributes_select_renderer.html')
         rendition = template.render(context)
-        # TODO Implement multi-langage
+        # TODO Implement multi-language
         outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_select_en.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
@@ -94,7 +95,7 @@ def generate_attributes():
             o.write(rendition.encode('utf-8'))
         template = loader.get_template('rendition/attributes_list_elements_renderer.html')
         rendition = template.render(context)
-        # TODO Implement multi-langage
+        # TODO Implement multi-language
         outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_list_elements_en.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
@@ -141,8 +142,8 @@ def populate_labels_from_xlsx(model_name, xlsx_file):
     LOGGER.info('Using header:' + str(header))
     row_index += 1
     while row_index<=sheet.get_highest_row():
-        if model.objects.filter(identifier=sheet.cell(row = row_index, column=1).value).exists():
-            instance = model.objects.get(identifier=sheet.cell(row = row_index, column=1).value, langage=sheet.cell(row = row_index, column=2))
+        if model.objects.filter(identifier=sheet.cell(row = row_index, column=1).value, language=sheet.cell(row = row_index, column=2)).exists():
+            instance = model.objects.get(identifier=sheet.cell(row = row_index, column=1).value, language=sheet.cell(row = row_index, column=2))
         else:
             instance = model()
         for i in range(0,len(header)):
@@ -290,12 +291,12 @@ class CoreModel(models.Model):
 
 class FieldLabel(CoreModel):
     identifier = models.CharField(max_length=512)
-    langage = models.CharField(max_length=3)
+    language = models.CharField(max_length=3)
     field_label = models.CharField(max_length=1024)
     
     @staticmethod
     def get_fields():
-        return ['identifier','langage','field_label']
+        return ['identifier','language','field_label']
     
     def get_identifier(self):
         return 'identifier'
@@ -324,14 +325,13 @@ class MenuEntries(CoreModel):
     menu_target = models.ForeignKey(Attributes, limit_choices_to={'type':'container_menu_target'}, related_name='container_menu_target_rel', null=True)
     menu_type = models.CharField(max_length=128)
     container_type = models.ForeignKey(Attributes, limit_choices_to={'type':'container_type'}, related_name='container_type_menu_rel', null=True)
-    language = models.CharField(max_length=3)
+    language_identifier = models.CharField(max_length=64)
     data_target = models.CharField(max_length=128)
     action_type = models.CharField(max_length=128, null=True, blank=True)
-    action_label = models.CharField(max_length=128)
     
     @staticmethod
     def get_fields():
-        return ['menu_target','menu_type','container_type','language','data_target','action_type','action_label']
+        return ['menu_target','menu_type','container_type','language_identifier','data_target','action_type']
 
     class Meta:
         ordering = ['menu_target']
@@ -344,15 +344,14 @@ class GlobalMenuEntries(CoreModel):
     menu_group_target = models.CharField(max_length=128, null=True, blank=True)
     menu_type = models.CharField(max_length=128)
     container_type = models.ForeignKey(Attributes, limit_choices_to={'type':'container_type'}, related_name='container_type_gbl_menu_rel', null=True)
-    language = models.CharField(max_length=3)
+    language_identifier = models.CharField(max_length=64)
     data_target = models.CharField(max_length=128)
     action_type = models.CharField(max_length=128, null=True, blank=True)
-    action_label = models.CharField(max_length=128)
     administrator_only = models.BooleanField(default=False)
 
     @staticmethod
     def get_fields():
-        return ['menu_target','menu_group_target','menu_type','container_type','language','data_target','action_type','action_label','administrator_only']
+        return ['menu_target','menu_group_target','menu_type','container_type','language_identifier','data_target','action_type','administrator_only']
 
     class Meta:
         ordering = ['menu_target']

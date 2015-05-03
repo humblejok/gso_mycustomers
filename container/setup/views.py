@@ -64,7 +64,7 @@ def save(request):
         filtering = lambda d, k: d[k]['data']
         working_data = setup_content.get_data('container_type_details')
         fields = list(itertools.chain(*[filtering(working_data[container_setup["type"]]['data'], k) for k in working_data[container_setup["type"]]['data'].keys()]))
-        context = Context({"fields":container_setup['fields'], "complete_fields": complete_fields_information(effective_class,  data_as_dict), "container" : container_setup["type"], "labels": dict_to_json_compliance({label.identifier: label.field_label for label in FieldLabel.objects.filter(identifier__in=fields, langage='en')})})
+        context = Context({"fields":container_setup['fields'], "complete_fields": complete_fields_information(effective_class,  data_as_dict), "container" : container_setup["type"]})
         template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
         rendition = template.render(context)
         # TODO Implement multi-langage
@@ -73,20 +73,21 @@ def save(request):
             o.write(rendition.encode('utf-8'))
     elif item_view_type=='menus':
         headers = Attributes.objects.filter(active=True, type='container_menu_target').order_by('name')
-        print headers
         entries = {}
         for entry in container_setup['data']:
             if entry['entry_id']!=None:
                 if not entries.has_key(entry['menu_target']):
                     entries[entry['menu_target']] = []
                 entries[entry['menu_target']].append(MenuEntries.objects.get(id=entry['entry_id']))
-        context = Context({'entries': entries, 'headers': headers})
-        template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
-        rendition = template.render(context)
-        # TODO Implement multi-langage
-        outfile = os.path.join(TEMPLATES_STATICS_PATH, container_setup["type"] + '_' + item_render_name + '_' + item_view_type + '_en.html')
-        with open(outfile,'w') as o:
-            o.write(rendition.encode('utf-8'))
+        languages = Attributes.objects.filter(active=True, type='available_language')
+        template = loader.get_template('rendition/gso.html')
+        for language in languages:
+            context = Context({'entries': entries, 'headers': headers, 'language_code': language.short_name})
+            template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
+            rendition = template.render(context)
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, container_setup["type"] + '_' + item_render_name + '_' + item_view_type + '_' + language.short_name + '.html')
+            with open(outfile,'w') as o:
+                o.write(rendition.encode('utf-8'))
     elif item_view_type!='details':
         data_as_dict = container_setup["data"]
         # TODO Clean the mess
@@ -98,8 +99,7 @@ def save(request):
         filtering = lambda d, k: d[k]['data']
         context = Context({"fields":container_setup['data'],
                            "complete_fields": complete_fields_information(effective_class,  data_as_dict),
-                           "container" : container_setup["type"],
-                           "labels": dict_to_json_compliance({label.identifier: label.field_label for label in FieldLabel.objects.filter(langage='en')})})
+                           "container" : container_setup["type"]})
         template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
         rendition = template.render(context)
         # TODO Implement multi-langage
@@ -162,11 +162,10 @@ def object_delete(request):
 def menu_render(request):
     profile = get_or_create_user_profile(request.user.id)
     container_type = request.POST['container_type']
-    language = request.POST['language']
     menu_target = request.POST['menu_target']
     selected = None
     if request.POST.has_key('selected'):
         selected = request.POST['selected']
-    entries = MenuEntries.objects.filter(menu_target__identifier=menu_target, language=language, container_type__identifier=container_type)
+    entries = MenuEntries.objects.filter(menu_target__identifier=menu_target, container_type__identifier=container_type)
     context = {'base_template': profile['base_template'], 'profile': profile, 'entries': entries, 'selected': selected}
     return render(request, 'rendition/menu_setup_select_renderer.html', context)

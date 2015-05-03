@@ -1,7 +1,8 @@
 {% load container_tags %}
-{% templatetag openblock %} load i18n {% templatetag closeblock %}
+{% load i18n %}
 {% templatetag openblock %} extends base_template {% templatetag closeblock %}
-{% templatetag openblock %} block title {% templatetag closeblock %}{% templatetag openvariable %}container_label{% templatetag closevariable %}s{% templatetag openblock %} endblock {% templatetag closeblock %}
+{% templatetag openblock %} load container_tags {% templatetag closeblock %}
+{% templatetag openblock %} block title {% templatetag closeblock %}{% verbatim %}{% with text_id="results."|add:container_type|add:".title" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}{% endverbatim %}{% templatetag openblock %} endblock {% templatetag closeblock %}
 {% templatetag openblock %} block readyoptions {% templatetag closeblock %}
 				$(".btn").not('#comment').tooltip();
 {% templatetag openblock %} endblock {% templatetag closeblock %}
@@ -33,15 +34,15 @@
 {% templatetag openblock %} block content {% templatetag closeblock %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">All {% templatetag openvariable %}container_label|lower{% templatetag closevariable %}s</h1>
-	  			<p class="lead">Manage and explore all {% templatetag openvariable %}container_label|lower{% templatetag closevariable %}s from here<br/>
+				<h1 class="">{% verbatim %}{% with text_id="results."|add:container_type|add:".header" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}{% endverbatim %}</h1>
+	  			<p class="lead">{% verbatim %}{% with text_id="results."|add:container_type|add:".subtitle" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}{% endverbatim %}<br/>
 			</div>
 		</div>
 		<div class="row">
 			<form id="look_form" role="form" action="#" method="POST">{% templatetag openblock %} csrf_token {% templatetag closeblock %}
 				<div class="form-group">
-					<label for="searchName" class="col-lg-1">Look for:</label>
-					<input name="searchName" type="text" class="form-control" id="searchName" placeholder="Enter a part of any of the displayed fields" value="" onkeyup="filterList()"/>
+					<label for="searchName" class="col-lg-1">{% verbatim %}{{"results.look_for"|get_translated_text:profile.language_code }}{% endverbatim %}</label>
+					<input name="searchName" type="text" class="form-control" id="searchName" placeholder="{% verbatim %}{{"results.look_for.placeholder"|get_translated_text:profile.language_code }}{% endverbatim %}" value="" onkeyup="filterList()"/>
 				</div>
 			</form>
 		</div>
@@ -50,7 +51,7 @@
 				<table id="resultTable" class="table table.striped">
 					<tr>
 						{% for field in fields %}
-						<th>{% if labels|get_dict_key:field %}{{labels|get_dict_key:field}}{% else %}{{field}}{% endif %}</th>
+						<th>{% templatetag openvariable %}"{{field}}"|get_translated_text:profile.language_code{% templatetag closevariable %}</th>
 						{% endfor %}
 						<th></th>
 					</tr>
@@ -64,7 +65,7 @@
 								<button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"/></button>
 								<ul class="dropdown-menu" role="menu">
 									{% verbatim %}
-										{% with template_name='statics/'|add:container.type.identifier|add:'_view_menus_en.html' %}
+										{% with template_name='statics/'|add:container.type.identifier|add:'_view_menus_'|add:profile.language_code|add:'.html' %}
 											{% include template_name %}
 										{% endwith %}
 									{% endverbatim %}
@@ -75,7 +76,7 @@
 					{% templatetag openblock %} endfor {% templatetag closeblock %}
 				</table>
 			</div>
-			<a href="#modal_create_container" class="btn btn-default" role="button" data-toggle="modal" data-placement="bottom" title="Create a new {% templatetag openvariable %}container_label|lower{% templatetag closevariable %}">
+			<a href="#modal_create_container" class="btn btn-default" role="button" data-toggle="modal" data-placement="bottom" title="{% verbatim %}{% with text_id="results."|add:container_type|add:".create.tooltip" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}{% endverbatim %}">
 				<span class="glyphicon glyphicon-plus"></span>
 			</a>
 		</div>
@@ -85,26 +86,26 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="modal_create_label">Create a new {% templatetag openvariable %}container_label|lower{% templatetag closevariable %}</h4>
+						<h4 class="modal-title" id="modal_create_label">{% verbatim %}{% with text_id="results."|add:container_type|add:".create.tooltip" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}{% endverbatim %}</h4>
 					</div>
 					<form id="create_form" role="form" action="/container/base_edit.html" method="POST">{% templatetag openblock %} csrf_token %}
 						<input type="hidden" id="container_type" name="container_type" value="{% templatetag openvariable %}container_type{% templatetag closevariable %}"/>
 						<div class="modal-body">
 							<div class="form-group">
-								<label for="name">Name</label>
-								<input name="name" type="text" class="form-control" id="name" placeholder="Enter a name" value=""/>
+								<label for="name">{% verbatim %}{{"global.name"|get_translated_text:profile.language_code }}{% endverbatim %}</label>
+								<input name="name" type="text" class="form-control" id="name" placeholder="{% verbatim %}{{"global.name.placeholder"|get_translated_text:profile.language_code }}{% endverbatim %}" value=""/>
 							</div>
 							<div class="form-group">
-								<label for="short_name">Short name</label>
-								<input name="short_name" type="text" class="form-control" id="short_name" placeholder="Enter an alias" value=""/>
+								<label for="short_name">{% verbatim %}{{"global.short_name"|get_translated_text:profile.language_code }}{% endverbatim %}</label>
+								<input name="short_name" type="text" class="form-control" id="short_name" placeholder="{% verbatim %}{{"global.short_name.placeholder"|get_translated_text:profile.language_code }}{% endverbatim %}" value=""/>
 							</div>
 							{% with template_name=container|add:"_edition_creations_en.html" %}
 							{% templatetag openblock %} include "statics/{{template_name}}" {% templatetag closeblock %}
 							{% endwith %}
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Confirm {% templatetag openvariable %}container_label|lower{% templatetag closevariable %} creation and go to content edition">Continue</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">{% verbatim %}{{"global.close"|get_translated_text:profile.language_code }}{% endverbatim %}</button>
+							<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% verbatim %}{% with text_id="results."|add:container_type|add:".continue.tooltip" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}{% endverbatim %}">{% verbatim %}{{"global.continue"|get_translated_text:profile.language_code }}{% endverbatim %}</button>
 						</div>
 					</form>
 				</div>

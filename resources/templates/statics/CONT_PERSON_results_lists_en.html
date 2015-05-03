@@ -1,6 +1,8 @@
 
+
 {% extends base_template %}
-{% block title %}{{container_label}}s{% endblock %}
+{% load container_tags %}
+{% block title %}{% with text_id="results."|add:container_type|add:".title" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 {% endblock %}
@@ -32,15 +34,15 @@
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">All {{container_label|lower}}s</h1>
-	  			<p class="lead">Manage and explore all {{container_label|lower}}s from here<br/>
+				<h1 class="">{% with text_id="results."|add:container_type|add:".header" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}</h1>
+	  			<p class="lead">{% with text_id="results."|add:container_type|add:".subtitle" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}<br/>
 			</div>
 		</div>
 		<div class="row">
 			<form id="look_form" role="form" action="#" method="POST">{% csrf_token %}
 				<div class="form-group">
-					<label for="searchName" class="col-lg-1">Look for:</label>
-					<input name="searchName" type="text" class="form-control" id="searchName" placeholder="Enter a part of any of the displayed fields" value="" onkeyup="filterList()"/>
+					<label for="searchName" class="col-lg-1">{{"results.look_for"|get_translated_text:profile.language_code }}</label>
+					<input name="searchName" type="text" class="form-control" id="searchName" placeholder="{{"results.look_for.placeholder"|get_translated_text:profile.language_code }}" value="" onkeyup="filterList()"/>
 				</div>
 			</form>
 		</div>
@@ -49,20 +51,20 @@
 				<table id="resultTable" class="table table.striped">
 					<tr>
 						
-						<th>name</th>
+						<th>{{"last_name"|get_translated_text:profile.language_code}}</th>
 						
-						<th>inception_date</th>
+						<th>{{"first_name"|get_translated_text:profile.language_code}}</th>
 						
-						<th>status.name</th>
+						<th>{{"status.name"|get_translated_text:profile.language_code}}</th>
 						
 						<th></th>
 					</tr>
 					{% for container in containers %}
 					<tr>
 						
-						<td>{{container.name}}</td>
+						<td>{{container.last_name}}</td>
 						
-						<td>{{container.inception_date}}</td>
+						<td>{{container.first_name}}</td>
 						
 						<td>{{container.status.name}}</td>
 						
@@ -71,7 +73,7 @@
 								<button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"/></button>
 								<ul class="dropdown-menu" role="menu">
 									
-										{% with template_name='statics/'|add:container.type.identifier|add:'_view_menus_en.html' %}
+										{% with template_name='statics/'|add:container.type.identifier|add:'_view_menus_'|add:profile.language_code|add:'.html' %}
 											{% include template_name %}
 										{% endwith %}
 									
@@ -82,7 +84,7 @@
 					{% endfor %}
 				</table>
 			</div>
-			<a href="#modal_create_container" class="btn btn-default" role="button" data-toggle="modal" data-placement="bottom" title="Create a new {{container_label|lower}}">
+			<a href="#modal_create_container" class="btn btn-default" role="button" data-toggle="modal" data-placement="bottom" title="{% with text_id="results."|add:container_type|add:".create.tooltip" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}">
 				<span class="glyphicon glyphicon-plus"></span>
 			</a>
 		</div>
@@ -92,26 +94,26 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="modal_create_label">Create a new {{container_label|lower}}</h4>
+						<h4 class="modal-title" id="modal_create_label">{% with text_id="results."|add:container_type|add:".create.tooltip" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}</h4>
 					</div>
 					<form id="create_form" role="form" action="/container/base_edit.html" method="POST">{% csrf_token %}
 						<input type="hidden" id="container_type" name="container_type" value="{{container_type}}"/>
 						<div class="modal-body">
 							<div class="form-group">
-								<label for="name">Name</label>
-								<input name="name" type="text" class="form-control" id="name" placeholder="Enter a name" value=""/>
+								<label for="name">{{"global.name"|get_translated_text:profile.language_code }}</label>
+								<input name="name" type="text" class="form-control" id="name" placeholder="{{"global.name.placeholder"|get_translated_text:profile.language_code }}" value=""/>
 							</div>
 							<div class="form-group">
-								<label for="short_name">Short name</label>
-								<input name="short_name" type="text" class="form-control" id="short_name" placeholder="Enter an alias" value=""/>
+								<label for="short_name">{{"global.short_name"|get_translated_text:profile.language_code }}</label>
+								<input name="short_name" type="text" class="form-control" id="short_name" placeholder="{{"global.short_name.placeholder"|get_translated_text:profile.language_code }}" value=""/>
 							</div>
 							
 							{% include "statics/CONT_PERSON_edition_creations_en.html" %}
 							
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Confirm {{container_label|lower}} creation and go to content edition">Continue</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">{{"global.close"|get_translated_text:profile.language_code }}</button>
+							<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% with text_id="results."|add:container_type|add:".continue.tooltip" %}{{text_id|get_translated_text:profile.language_code }}{% endwith %}">{{"global.continue"|get_translated_text:profile.language_code }}</button>
 						</div>
 					</form>
 				</div>

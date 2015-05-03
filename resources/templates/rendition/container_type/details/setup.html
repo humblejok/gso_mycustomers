@@ -1,5 +1,6 @@
 {% extends base_template %}
-{% block title %}Container Details View Setup{% endblock %}
+{% load i18n %}
+{% block title %}{% blocktrans %}Container Details View Setup{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				initGridster();
@@ -370,8 +371,8 @@
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">Details page definition</h1>
-	  			<p class="lead">Define the information and layout of the details page.<br/>
+				<h1 class="">{% blocktrans %}Details page definition{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Define the information and layout of the details page.{% endblocktrans %}<br/>
 			</div>
 		</div>
 		<div class="row">
@@ -383,8 +384,8 @@
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
-			<button class="btn btn-default col-lg-3" type="button" data-placement="bottom" title="Add a new widget to the current layout" onclick='addWidget({"row": 1, "size_x": 1, "col": 1, "size_y": 1})'>Add</button>
-			<button class="btn btn-default col-lg-offset-6 col-lg-3" type="button" data-placement="bottom" title="Save the current layout" onclick="saveLayout()">Save</button>
+			<button class="btn btn-default col-lg-3" type="button" data-placement="bottom" title="{% blocktrans %}Add a new widget to the current layout{% endblocktrans %}" onclick='addWidget({"row": 1, "size_x": 1, "col": 1, "size_y": 1})'>{% blocktrans %}Add{% endblocktrans %}</button>
+			<button class="btn btn-default col-lg-offset-6 col-lg-3" type="button" data-placement="bottom" title="{% blocktrans %}Save the current layout{% endblocktrans %}" onclick="saveLayout()">{% blocktrans %}Save{% endblocktrans %}</button>
 		</div>
 		<div class="row">
 			<form class="form-horizontal" role="form">

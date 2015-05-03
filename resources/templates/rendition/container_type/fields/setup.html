@@ -1,6 +1,6 @@
 {% extends base_template %}
 {% load i18n %}
-{% block title %}Container Extended Fields Setup{% endblock %}
+{% block title %}{% blocktrans %}Container Extended Fields Setup{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				containerChanged();
@@ -128,7 +128,7 @@
 					{% endwith %}
 				</select>
 			</div>
-			<button class="btn btn-default btn-sm col-lg-1 save-btn" onclick="saveDefinitions()">Save</button>
+			<button class="btn btn-default btn-sm col-lg-1 save-btn" onclick="saveDefinitions()">{% blocktrans %}Save{% endblocktrans %}</button>
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">

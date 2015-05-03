@@ -6,10 +6,21 @@ Created on 10 mars 2014
 from django import template
 from json import dumps
 from django.forms.models import model_to_dict
-from container.models import CoreModel, Attributes
+from container.models import CoreModel, Attributes, FieldLabel
 from container.utilities.utils import dict_to_json_compliance
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 register = template.Library()
+
+@register.filter()
+def get_translated_text(text_id, language):
+    try:
+        return FieldLabel.objects.get(identifier=text_id, language=language).field_label
+    except:
+        LOGGER.error('Could not find ' + str(text_id) + ' with language set to ' + str(language))
+        return "NO TRANSLATION"
 
 @register.filter()
 def as_identifier(name):

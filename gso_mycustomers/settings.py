@@ -16,7 +16,8 @@ DATABASES = {
         # The following settings are not used with sqlite3:
         'USER': 'gso_mycustomers',
         'PASSWORD': 'boudux',
-        'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': '192.168.1.11',
+        'PORT': 5342                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
     },
 }
 
@@ -74,7 +75,7 @@ STATIC_URL = '/statics/'
 # Additional locations of static files
 # Additional locations of static files
 STATICFILES_DIRS = (
-    'c:/DEV/Sources/gso_mycustomers/resources/statics/',
+    'C:/Documents/Sources/gso_mycustomers/resources/statics/',
 )
 
 # List of finder classes that know how to find static files in
@@ -121,7 +122,7 @@ ROOT_URLCONF = 'gso_mycustomers.urls'
 WSGI_APPLICATION = 'gso_mycustomers.wsgi.application'
 
 TEMPLATE_DIRS = (
-    'C:/DEV/Sources/gso_mycustomers/resources/templates',
+    'C:/Documents/Sources/gso_mycustomers/resources/templates',
 )
 
 INSTALLED_APPS = (
@@ -167,9 +168,8 @@ CACHES = {
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
-
 LOCALE_PATHS = [
-    'C:/DEV/Sources/gso_mycustomers/locale',
+    'C:/Documents/Sources/gso_mycustomers/locale',
     ]
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -189,13 +189,21 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler'
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'container': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
         },
     }
 }

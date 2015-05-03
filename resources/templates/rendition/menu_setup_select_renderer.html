@@ -1,3 +1,4 @@
+{% load container_tags %}
 {% for entry in entries %}
-<option value='{{entry.id}}' {% if value == '{{entry.id}}' %}selected{% endif %}>{{entry.name}}</option>
+<option value='{{entry.id}}' {% if value == '{{entry.id}}' %}selected{% endif %}>{{entry.language_identifier|get_translated_text:profile.language_code}}</option>
 {% endfor %}

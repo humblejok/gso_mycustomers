@@ -25,7 +25,7 @@ def render_singles_list(request):
     effective_class = classes.my_class_import(effective_class_name)
 
     container = effective_class.objects.get(id=container_id)
-    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'fields': container_fields, 'labels': {label.identifier: label.field_label for label in FieldLabel.objects.filter(identifier__in=container_fields, langage='en')}}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'fields': container_fields}
     return render(request, 'container/view/simple_fields_list.html', context)
 
 def render_custom_standard(request):
@@ -47,7 +47,7 @@ def render_custom_standard(request):
     
     custom_data = enhance_container_information(get_container_information(container), effective_container_fields)
                         
-    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'fields': effective_container_fields, 'custom_data': custom_data, 'labels': {label.identifier: label.field_label for label in FieldLabel.objects.filter(identifier__in=container_fields, langage='en')}}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'fields': effective_container_fields, 'custom_data': custom_data}
     return render(request, 'container/view/custom_fields_list.html', context)
 
 def render_custom_template(request):
@@ -68,7 +68,7 @@ def render_custom_template(request):
     
     custom_data = get_container_information(container)
     
-    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'custom_data': custom_data, 'labels': {label.identifier: label.field_label for label in FieldLabel.objects.filter(langage='en')}}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'custom_data': custom_data}
     return render(request, container_template, context)
 
 def render_many_to_many(request):
@@ -93,6 +93,5 @@ def render_many_to_many(request):
                'container_id': container_id, 'container_type': container_type, 'container_field': container_field,
                'index':widget_index,
                'data': getattr(container,container_field),
-               'fields': foreign_class.get_displayed_fields(rendition_witdh),
-               'labels': {label.identifier: label.field_label for label in FieldLabel.objects.filter(identifier__in=foreign_class.get_displayed_fields(rendition_witdh), langage='en')}}
+               'fields': foreign_class.get_displayed_fields(rendition_witdh)}
     return render(request, 'container/view/many_to_many_field.html', context)

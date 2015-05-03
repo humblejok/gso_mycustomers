@@ -38,7 +38,7 @@ class StripWhitespaceMiddleware(object):
 
 def get_or_create_user_profile(user_id):
     profile = setup_content.get_data('user_profiles', user_id)
-    if profile==None:
+    if profile==None or not profile:
         language_attribute = Attributes.objects.get(active=True, identifier='AVAIL_LANGUAGE_EN')
         profile = {'_id': user_id, 'language':language_attribute.identifier, 'base_template': 'gso_' + language_attribute.short_name + '.html', 'language_code': language_attribute.short_name}
     setup_content.set_data('user_profiles', profile, False)

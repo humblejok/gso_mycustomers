@@ -121,12 +121,11 @@ def get(request):
     custom_fields = complete_custom_fields_information(container_type)
     custom_data = get_container_information(container)
     # TODO: Handle other langage and factorize with other views
-    labels = dict_to_json_compliance({label.identifier: label.field_label for label in FieldLabel.objects.filter(identifier__in=fields, langage='en')})
     context = {'base_template': profile['base_template'], 'profile': profile, 
                'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}),
                'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
                'custom_data': custom_data,
-               'container_type': container_type, 'layout': working_data[container_type], 'labels': labels}
+               'container_type': container_type, 'layout': working_data[container_type]}
     return render(request,'rendition/container_type/details/view.html', context)
 
 def filters(request):

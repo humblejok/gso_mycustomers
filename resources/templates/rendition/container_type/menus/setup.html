@@ -1,5 +1,6 @@
 {% extends base_template %}
-{% block title %}Container Menu Setup{% endblock %}
+{% load i18n %}
+{% block title %}{% blocktrans %}Container Menu Setup{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				containerChanged();
@@ -40,9 +41,8 @@
 	}
 
 	function updateTargetSelect(index, onCompleted) {
-		$("#target_" + index).load("/container/menu_setup_render.html",
+		$("#target_" + index).load("/container/menu/setup_render.html",
 			 {"menu_target": $("#group_" + index).val(),
-			  "language":"en",
 			  "container_type":$("#containerType").val(),
 			 },
 			 onCompleted);
@@ -134,7 +134,7 @@
 		<div class="row">&nbsp;</div>
 		<form class="form">
 			<table id='menuTable' class="table">
-				<tr><th class='col-lg-5'>Menu group</th><th class='col-lg-5'>Target</th><th><button type='button' class='btn btn-default col-lg-6' onclick='addRow()'>{% blocktrans %}Add{% endblocktrans %}</button><button type='button' class='btn btn-default col-lg-6' onclick='saveContent()'>{% blocktrans %}Save{% endblocktrans %}</button></th></tr>
+				<tr><th class='col-lg-5'>{% blocktrans %}Menu group{% endblocktrans %}</th><th class='col-lg-5'>{% blocktrans %}Target{% endblocktrans %}</th><th><button type='button' class='btn btn-default col-lg-6' onclick='addRow()'>{% blocktrans %}Add{% endblocktrans %}</button><button type='button' class='btn btn-default col-lg-6' onclick='saveContent()'>{% blocktrans %}Save{% endblocktrans %}</button></th></tr>
 			</table>
 		</form>
 {% endblock %}
