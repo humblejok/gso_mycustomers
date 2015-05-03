@@ -1,5 +1,5 @@
-<select class="form-control">
+{% load container_tags %}<select class="form-control">
 {% for item in selection %}
-	<option value='{{item.identifier}}'>{{item.name}}</option>
+	<option value='{{item.identifier}}'>{{item.identifier|get_translated_text:language_code}}</option>
 {% endfor %}
 </select>

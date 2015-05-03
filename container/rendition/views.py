@@ -95,3 +95,9 @@ def render_many_to_many(request):
                'data': getattr(container,container_field),
                'fields': foreign_class.get_displayed_fields(rendition_witdh)}
     return render(request, 'container/view/many_to_many_field.html', context)
+
+def render_template_for_load(request):
+    profile = get_or_create_user_profile(request.user.id)
+    template_name = request.POST['template_name']
+    context = {}
+    return render(request, 'statics/' + template_name + '_' + profile['language_code'] + '.html', context)

@@ -59,46 +59,37 @@ def generate_global_templates():
 
 def generate_attributes():
     all_types = Attributes.objects.all().order_by('type').distinct('type')
-    context = Context({"selection": all_types})
-    template = loader.get_template('rendition/attributes_list_option_renderer.html')
-    rendition = template.render(context)
-    # TODO Implement multi-language
-    outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_option_en.html')
-    with open(outfile,'w') as o:
-        o.write(rendition.encode('utf-8'))
-    template = loader.get_template('rendition/attributes_list_select_renderer.html')
-    rendition = template.render(context)
-    # TODO Implement multi-language
-    outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_select_en.html')
-    with open(outfile,'w') as o:
-        o.write(rendition.encode('utf-8'))
-    for a_type in all_types:
-        all_elements = Attributes.objects.filter(type=a_type.type, active=True)
-        context = Context({"selection": all_elements})
-        template = loader.get_template('rendition/attributes_option_renderer.html')
+    languages = Attributes.objects.filter(active=True, type='available_language')
+    for language in languages:
+        context = Context({'selection': all_types, 'language_code': language.short_name})
+        template = loader.get_template('rendition/attributes_list_option_renderer.html')
         rendition = template.render(context)
-        # TODO Implement multi-language
-        outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_en.html')
+        outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_option_' + language.short_name + '.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
-        outfile = os.path.join(STATICS_PATH, a_type.type + '_en.html')
-        with open(outfile,'w') as o:
-            o.write(rendition.encode('utf-8'))
-        template = loader.get_template('rendition/attributes_select_renderer.html')
+        template = loader.get_template('rendition/attributes_list_select_renderer.html')
         rendition = template.render(context)
-        # TODO Implement multi-language
-        outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_select_en.html')
+        outfile = os.path.join(TEMPLATES_STATICS_PATH, 'all_types_select_' + language.short_name + '.html')
         with open(outfile,'w') as o:
             o.write(rendition.encode('utf-8'))
-        outfile = os.path.join(STATICS_PATH, a_type.type + '_select_en.html')
-        with open(outfile,'w') as o:
-            o.write(rendition.encode('utf-8'))
-        template = loader.get_template('rendition/attributes_list_elements_renderer.html')
-        rendition = template.render(context)
-        # TODO Implement multi-language
-        outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_list_elements_en.html')
-        with open(outfile,'w') as o:
-            o.write(rendition.encode('utf-8'))
+        for a_type in all_types:
+            all_elements = Attributes.objects.filter(type=a_type.type, active=True)
+            context = Context({"selection": all_elements, 'language_code': language.short_name})
+            template = loader.get_template('rendition/attributes_option_renderer.html')
+            rendition = template.render(context)
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_' + language.short_name + '.html')
+            with open(outfile,'w') as o:
+                o.write(rendition.encode('utf-8'))
+            template = loader.get_template('rendition/attributes_select_renderer.html')
+            rendition = template.render(context)
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_select_' + language.short_name + '.html')
+            with open(outfile,'w') as o:
+                o.write(rendition.encode('utf-8'))
+            template = loader.get_template('rendition/attributes_list_elements_renderer.html')
+            rendition = template.render(context)
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, a_type.type + '_list_elements_' + language.short_name + '.html')
+            with open(outfile,'w') as o:
+                o.write(rendition.encode('utf-8'))
 
 def populate_attributes_from_xlsx(model_name, xlsx_file):
     model = classes.my_class_import(model_name)
