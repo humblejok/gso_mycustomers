@@ -111,7 +111,7 @@
 
 	function addRow() {
 		$("#menuTable").append(defaultRow.replaceAll('%%index%%', currentIndex));
-		$("#group_" + currentIndex).load("/statics/templates/container_menu_target_select_en.html",
+		$("#group_" + currentIndex).load("/container/rendition/render_template_for_load.html.html", {"template_name": "container_menu_target_select"},
 										 checkLoads);
 		currentIndex = currentIndex + 1;
 	}

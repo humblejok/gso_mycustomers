@@ -3,7 +3,6 @@ Created on Apr 27, 2015
 
 @author: sdejonckheere
 '''
-import itertools
 from json import dumps
 import json
 import os
@@ -15,12 +14,13 @@ from django.template import loader
 from django.template.context import Context
 from seq_common.utils import classes
 
-from container.models import Attributes, FieldLabel, MenuEntries
-from container.settings import TEMPLATES_STATICS_PATH, STATICS_PATH
+from container.models import Attributes, MenuEntries
+from container.settings import TEMPLATES_STATICS_PATH
 from container.utilities import setup_content
-from container.utilities.utils import complete_fields_information, \
-    dict_to_json_compliance, get_or_create_user_profile
+from container.utilities.utils import complete_fields_information, get_or_create_user_profile
+import logging
 
+LOGGER = logging.getLogger(__name__)
 
 def application(request):
     None
@@ -31,13 +31,12 @@ def setup(request):
     item = request.GET['item']
     item_view_type = request.GET['type']
     all_data = setup_content.get_data(item + '_' + item_view_type)
-    context = {'base_template': profile['base_template'], 'profile': profile, 'data_set': Attributes.objects.filter(type=item), 'selection_template': 'statics/' + item + '_en.html','global': dumps(all_data) if not all_data.has_key('global') else dumps(all_data['global']), 'user': {} if not all_data.has_key('user') else dumps(all_data['user'])}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'data_set': Attributes.objects.filter(type=item), 'selection_template': 'statics/' + item + '_' + profile['language_code'] + '.html','global': dumps(all_data) if not all_data.has_key('global') else dumps(all_data['global']), 'user': {} if not all_data.has_key('user') else dumps(all_data['user'])}
     return render(request, 'rendition/' + item + '/' + item_view_type + '/setup.html', context)
 
 def save(request):
     # TODO: Check user
-    user = User.objects.get(id=request.user.id)
-    
+    profile = get_or_create_user_profile(request.user.id)
     container_setup = request.POST['container_setup']
     container_setup = json.loads(container_setup)
     
@@ -61,9 +60,6 @@ def save(request):
             for field in container_setup["data"]:
                 if '.' not in field:
                     data_as_dict[field] = {'name': field}
-        filtering = lambda d, k: d[k]['data']
-        working_data = setup_content.get_data('container_type_details')
-        fields = list(itertools.chain(*[filtering(working_data[container_setup["type"]]['data'], k) for k in working_data[container_setup["type"]]['data'].keys()]))
         context = Context({"fields":container_setup['fields'], "complete_fields": complete_fields_information(effective_class,  data_as_dict), "container" : container_setup["type"]})
         template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
         rendition = template.render(context)
@@ -96,16 +92,17 @@ def save(request):
             for field in container_setup["data"]:
                 if '.' not in field:
                     data_as_dict[field] = {'name': field}
-        filtering = lambda d, k: d[k]['data']
-        context = Context({"fields":container_setup['data'],
-                           "complete_fields": complete_fields_information(effective_class,  data_as_dict),
-                           "container" : container_setup["type"]})
-        template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
-        rendition = template.render(context)
-        # TODO Implement multi-langage
-        outfile = os.path.join(TEMPLATES_STATICS_PATH, container_setup["type"] + '_' + item_render_name + '_' + item_view_type + '_en.html')
-        with open(outfile,'w') as o:
-            o.write(rendition.encode('utf-8'))
+        languages = Attributes.objects.filter(active=True, type='available_language')
+        for language in languages:
+            context = Context({"fields":container_setup['data'],
+                               "complete_fields": complete_fields_information(effective_class,  data_as_dict, language.short_name),
+                               "container" : container_setup["type"],
+                               "language_code": profile['language_code']})
+            template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
+            rendition = template.render(context)
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, container_setup["type"] + '_' + item_render_name + '_' + item_view_type + '_' + language.short_name + '.html')
+            with open(outfile,'w') as o:
+                o.write(rendition.encode('utf-8'))
     return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
 
 def object_create(request):
@@ -135,7 +132,7 @@ def object_save(request):
             template = loader.get_template('rendition/object_simple_wizard.html')
             rendition = template.render(context)
             # TODO Implement multi-langage
-            outfile = os.path.join(STATICS_PATH, element['name'] + '_en.html')
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, element['name'] + '_en.html')
             print outfile
             with open(outfile,'w') as o:
                 o.write(rendition.encode('utf-8'))

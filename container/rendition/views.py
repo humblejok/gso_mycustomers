@@ -3,7 +3,7 @@ Created on Apr 27, 2015
 
 @author: sdejonckheere
 '''
-from container.models import Attributes, FieldLabel
+from container.models import Attributes
 from seq_common.utils import classes
 from django.shortcuts import render
 from container.utilities.utils import complete_custom_fields_information,\
@@ -99,5 +99,9 @@ def render_many_to_many(request):
 def render_template_for_load(request):
     profile = get_or_create_user_profile(request.user.id)
     template_name = request.POST['template_name']
-    context = {}
+    if request.POST.has_key('selected_value'):
+        selected_value = request.POST['selected_value']
+    else:
+        selected_value = ''
+    context = {'value': selected_value}
     return render(request, 'statics/' + template_name + '_' + profile['language_code'] + '.html', context)

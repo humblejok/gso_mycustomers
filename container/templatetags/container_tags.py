@@ -69,3 +69,9 @@ def get_jquery_id(identity):
 @register.filter()
 def has_container_type(universe, container_type):
     return universe.members.filter(type__identifier=container_type).exists()
+
+@register.filter()
+def log_me(text):
+    LOGGER.debug(str(text))
+    return ""
+

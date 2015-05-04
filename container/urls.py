@@ -29,6 +29,7 @@ urlpatterns = patterns(
     #url(r'^render_history_chart.html', 'container.views.render_history_chart', name='container_render_history_chart'),
     url(r'^rendition/render_custom_standard.html', 'container.rendition.views.render_custom_standard', name='container_render_custom_standard'),
     url(r'^rendition/render_custom_template.html', 'container.rendition.views.render_custom_template', name='container_render_custom_template'),
+    url(r'^rendition/render_template_for_load.html', 'container.rendition.views.render_template_for_load', name='container_render_template_for_load'),    
     
     #########################
     # Setup views           #

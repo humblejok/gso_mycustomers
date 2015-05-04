@@ -108,7 +108,7 @@ def complete_custom_fields_information(container_type, filtering_fields=None):
                                 all_data[full_name] = field_info
     return all_data
 
-def complete_fields_information(model_class, information):
+def complete_fields_information(model_class, information, language_code='en'):
     all_fields = get_static_fields(model_class)
     for field in information:
         field_effective = field
@@ -121,21 +121,21 @@ def complete_fields_information(model_class, information):
                 current_class = classes.my_class_import(information[field]['target_class'])
                 if hasattr(current_class, 'get_fields'):
                     information[field]['options'] = getattr(current_class,'get_fields')()
-                if information[field]['target_class']=='universe.models.Attributes':
-                    information[field]['template'] = 'statics/' + information[field]['link']['type'] + '_en.html'
+                if information[field]['target_class']=='container.models.Attributes':
+                    information[field]['template'] = 'statics/' + information[field]['link']['type'] + '_' + language_code + '.html'
                 else:
                     if information[field]['type']!='ForeignKey':
-                        information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_en.html'
+                        information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
                     information[field]['datasource'] = '/container_filter.html?container_class=' + information[field]['target_class']
     return information
 
 def get_static_fields(clazz, trail = []):
     object_static_fields = {}
-    LOGGER.debug("Parsing ->" + str(clazz))
+    #LOGGER.debug("Parsing ->" + str(clazz))
     for field_name in clazz._meta.get_all_field_names():
         try:
             if not field_name.endswith('_rel') and not field_name.endswith('_ptr'):
-                LOGGER.debug("\tField ->" + str(field_name))
+                #LOGGER.debug("\tField ->" + str(field_name))
                 if clazz._meta.get_field(field_name).get_internal_type()=='ForeignKey' or clazz._meta.get_field(field_name).get_internal_type()=='ManyToManyField':
                     foreign_class = clazz._meta.get_field(field_name).rel.to
                     if clazz._meta.get_field(field_name).get_internal_type()=='ForeignKey':

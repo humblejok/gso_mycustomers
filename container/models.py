@@ -532,6 +532,10 @@ class Container(CoreModel):
     def get_querying_fields():
         return ['name', 'short_name', 'short_description']
         
+    @staticmethod
+    def get_filtering_field():
+        return "type"
+    
     def clean(self):
         self.many_fields = {}
         for field_name in self._meta.get_all_field_names():

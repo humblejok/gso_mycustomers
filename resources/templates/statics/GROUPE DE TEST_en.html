@@ -1,0 +1,26 @@
+
+<form id="object_form" role="form" action="/object_instanciante.html" method="POST">
+	
+		<div class="form-group">
+			<label for="test">TEST</label>
+			<input name="test" type="text" class="form-control no-enter" id="test" placeholder="Enter a test" value=""/>
+		</div>
+		<script>
+			
+				$("#test").datepicker({ dateFormat: "yy-mm-dd" });
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="test_2">TEST 2</label>
+			<input name="test_2" type="text" class="form-control no-enter" id="test_2" placeholder="Enter a test 2" value=""/>
+		</div>
+		<script>
+			
+		</script>
+	
+	<div class="row">
+		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Create the GROUPE DE TEST and save it">Continue</button>
+	</div>
+</form>
