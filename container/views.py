@@ -83,13 +83,17 @@ def base_edit(request):
         creation_data = creation_data[container_type]
     else:
         creation_data = {}
+    print "********************************"
+    print creation_data
     creation_data = complete_fields_information(effective_class,  creation_data)
+    print "********************************"
+    print creation_data
+    print "********************************"
     for field in creation_data.keys():
         if creation_data[field]['type'] in ['ForeignKey', 'ManyToManyField']:
             if creation_data[field]['type']=='ForeignKey':
                 # TODO: Implement not attribute
                 setattr(source, field, Attributes.objects.get(identifier=request.POST[field], active=True))
-                source.save()
             else:
                 target_class = classes.my_class_import(creation_data[field]['target_class'])
                 new_instance = target_class.retrieve_or_create(source, 'FinaLE', request.POST[field + '-' + creation_data[field]['filter']], request.POST[field])
@@ -97,6 +101,7 @@ def base_edit(request):
                 source.save()
         else:
             setattr(source, field, request.POST[field])
+    source.save()
     return redirect('/container/lists.html?item=' + container_type)
 
 def delete(request):

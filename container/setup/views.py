@@ -94,7 +94,7 @@ def save(request):
                     data_as_dict[field] = {'name': field}
         languages = Attributes.objects.filter(active=True, type='available_language')
         for language in languages:
-            context = Context({"fields":container_setup['data'],
+            context = Context({"fields": data_as_dict,
                                "complete_fields": complete_fields_information(effective_class,  data_as_dict, language.short_name),
                                "container" : container_setup["type"],
                                "language_code": profile['language_code']})

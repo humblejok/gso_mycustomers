@@ -1,18 +1,7 @@
 {% load container_tags %}
-							{% for entry in complete_fields %}
+							{% for entry in fields %}
 							{% with current_field=complete_fields|get_dict_key:entry%}
-							{% if current_field.options %}
-							{% for option in current_field.options %}
-							<div class="form-group">
-								<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
-								<select id="{{current_field.field}}-{{current_field.filter}}" name="{{current_field.field}}-{{current_field.filter}}" class="form-control">
-									{% with value="" active_list=option %}
-										{% include current_field.template %}
-									{% endwith %}
-								</select>
-								<input name="{{current_field.field}}" id="{{current_field.field}}" type="text" class="form-control with-autocomplete" placeholder="{{current_field.field|add:'.placeholder'|get_translated_text:language_code}}" value="" datasource="{{current_field.datasource}}"/>
-							</div>
-							{% endfor %}
+							{% if current_field.options and current_field.type == 'ManyToManyField' %}
 							{% else %}
 							<div class="form-group">
 								<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
