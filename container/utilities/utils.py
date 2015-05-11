@@ -118,7 +118,6 @@ def complete_fields_information(model_class, information, language_code='en'):
             information[field].update(all_fields[field_effective])
             if information[field]['type'] in ['ForeignKey', 'ManyToManyField']:
                 #current_class = classes.my_class_import(information[field]['target_class'])
-                print information[field]['options']
                 #if hasattr(current_class, 'get_fields'):
                 #    information[field]['options'] = getattr(current_class,'get_fields')()
                 if information[field]['target_class']=='container.models.Attributes':

@@ -56,9 +56,11 @@ def generate_wizards():
     template = loader.get_template('rendition/container_type/creations/wizard.html')
     for language in languages:
         for wizard in wizards:
-            all_fields = get_static_fields(classes.my_class_import(wizard.name))
-            all_fields = complete_fields_information(classes.my_class_import(wizard.name), all_fields, language.short_name)
-            context = Context({'fields': all_fields.keys(), 'complete_fields': all_fields, 'language_code': language.short_name})
+            working_class = classes.my_class_import(wizard.name)
+            print working_class
+            all_fields = get_static_fields(working_class)
+            all_fields = complete_fields_information(working_class, all_fields, language.short_name)
+            context = Context({'fields': working_class.get_wizard_fields(), 'complete_fields': all_fields, 'language_code': language.short_name})
             rendition = template.render(context)
             outfile = os.path.join(TEMPLATES_STATICS_PATH, wizard.short_name + '_' + language.short_name + '.html')
             with open(outfile,'w') as o:
@@ -393,6 +395,10 @@ class Address(CoreModel):
         return ['address_type','line_1','line_2','zip_code','city','country']
     
     @staticmethod
+    def get_wizard_fields():
+        return ['line_1','line_2','zip_code','city','country']
+    
+    @staticmethod
     def get_filtering_field():
         return "address_type"
     
@@ -413,6 +419,10 @@ class Email(CoreModel):
     @staticmethod
     def get_fields():
         return ['address_type','email_address']
+    
+    @staticmethod
+    def get_wizard_fields():
+        return ['email_address']
     
     @staticmethod
     def get_filtering_field():
@@ -439,7 +449,11 @@ class Phone(CoreModel):
     @staticmethod
     def get_fields():
         return ['line_type','phone_number']
-    
+
+    @staticmethod
+    def get_wizard_fields():
+        return ['phone_number']
+
     @staticmethod
     def get_displayed_fields(rendition_width):
         if rendition_width=='large':
@@ -458,7 +472,11 @@ class Alias(CoreModel):
     @staticmethod
     def get_fields():
         return ['alias_type','alias_value','alias_additional']
-    
+
+    @staticmethod
+    def get_wizard_fields():
+        return ['alias_value','alias_additional']
+
     @staticmethod
     def get_querying_fields():
         return ['alias_value','alias_additional']

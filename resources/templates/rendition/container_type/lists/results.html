@@ -99,7 +99,7 @@
 								<label for="short_name">{% verbatim %}{{"global.short_name"|get_translated_text:profile.language_code }}{% endverbatim %}</label>
 								<input name="short_name" type="text" class="form-control" id="short_name" placeholder="{% verbatim %}{{"global.short_name.placeholder"|get_translated_text:profile.language_code }}{% endverbatim %}" value=""/>
 							</div>
-							{% with template_name=container|add:"_edition_creations_en.html" %}
+							{% with template_name=container|add:"_edition_creations_"|add:language_code|add:".html" %}
 							{% templatetag openblock %} include "statics/{{template_name}}" {% templatetag closeblock %}
 							{% endwith %}
 						</div>

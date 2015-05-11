@@ -1,7 +1,7 @@
 {% load container_tags %}
 							{% for entry in fields %}
 							{% with current_field=complete_fields|get_dict_key:entry%}
-							{% if current_field.options and current_field.type == 'ManyToManyField' %}
+							{% if current_field.type == 'ManyToManyField' %}
 							{% for option in current_field.options %}
 							<div class="form-group">
 								<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
@@ -11,8 +11,17 @@
 								</select>
 								{% endif %}
 							</div>
-								{% include current_field.template_m2m %}
+							{% include current_field.template_m2m %}
 							{% empty %}
+							<div class="form-group">
+								<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
+								{% if current_field.template %}
+								<select id="{{current_field.field}}" name="{{current_field.field}}" class="form-control">
+								{% include current_field.template with active_list=option %}
+								</select>
+								{% endif %}
+							</div>
+							{% include current_field.template_m2m %}
 							{% endfor %}
 							{% else %}
 							<div class="form-group">
