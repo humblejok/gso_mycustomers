@@ -12,8 +12,8 @@ from django.template.context import Context
 from pymongo.mongo_client import MongoClient
 from seq_common.utils.dates import epoch_time
 
-from container.models import Attributes
 from container.settings import MONGO_URL, STATICS_PATH
+from seq_common.utils import classes
 
 
 client = MongoClient(MONGO_URL)
@@ -44,7 +44,7 @@ def set_data(collection_name, data, historize=True):
         globals()[collection_name + '_callback'](data)
         
 def object_type_callback(data):
-    all_types = Attributes.objects.filter(active=True, type='object_type')
+    all_types = classes.my_import('containet.models.Attributes').objects.filter(active=True, type='object_type')
     for a_type in all_types:
         if data.has_key(a_type.identifier):
             context = Context({"selection": data[a_type.identifier]})

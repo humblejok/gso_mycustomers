@@ -1,19 +1,23 @@
-from django.db import models
-import os
-from django.template.context import Context
-from django.template import loader
-import logging
-from seq_common.utils import classes
-from openpyxl.reader.excel import load_workbook
 import datetime
-from django.db.models.fields import FieldDoesNotExist
-from django.db.models import Q
+import logging
+import os
 import traceback
+
 from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Q
+from django.db.models.fields import FieldDoesNotExist
+from django.template import loader
+from django.template.context import Context
+from openpyxl.reader.excel import load_workbook
+from seq_common.utils import classes
+
 import container
-from container.settings import RESOURCES_MAIN_PATH, STATICS_PATH,\
-    TEMPLATES_STATICS_PATH
+from container.settings import RESOURCES_MAIN_PATH, TEMPLATES_STATICS_PATH
+from container.utilities.utils import get_static_fields, \
+    complete_fields_information
 from gso_mycustomers.settings import TEMPLATE_DIRS
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +26,7 @@ def setup():
     setup_labels()
     populate_model_from_xlsx('container.models.MenuEntries', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
     generate_attributes()
+    generate_wizards()
     setup_menus()
     setup_global_menus()
 
@@ -44,8 +49,21 @@ def setup_labels():
 def setup_attributes():
     populate_attributes_from_xlsx('container.models.Attributes', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
     populate_attributes_from_xlsx('container.models.Dictionary', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
-    generate_attributes()
 
+def generate_wizards():
+    wizards = Attributes.objects.filter(active=True, type='element_wizard')
+    languages = Attributes.objects.filter(active=True, type='available_language')
+    template = loader.get_template('rendition/container_type/creations/wizard.html')
+    for language in languages:
+        for wizard in wizards:
+            all_fields = get_static_fields(classes.my_class_import(wizard.name))
+            all_fields = complete_fields_information(classes.my_class_import(wizard.name), all_fields, language.short_name)
+            context = Context({'fields': all_fields.keys(), 'complete_fields': all_fields, 'language_code': language.short_name})
+            rendition = template.render(context)
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, wizard.short_name + '_' + language.short_name + '.html')
+            with open(outfile,'w') as o:
+                o.write(rendition.encode('utf-8'))
+                
 def generate_global_templates():
     languages = Attributes.objects.filter(active=True, type='available_language')
     template = loader.get_template('rendition/gso.html')

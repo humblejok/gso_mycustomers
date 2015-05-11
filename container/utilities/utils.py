@@ -4,7 +4,6 @@ from django.db.models.fields import FieldDoesNotExist
 from django.forms.models import model_to_dict
 from seq_common.utils import classes
 
-from container.models import Attributes
 from container.utilities import setup_content
 import re
 
@@ -39,7 +38,7 @@ class StripWhitespaceMiddleware(object):
 def get_or_create_user_profile(user_id):
     profile = setup_content.get_data('user_profiles', user_id)
     if profile==None or not profile:
-        language_attribute = Attributes.objects.get(active=True, identifier='AVAIL_LANGUAGE_EN')
+        language_attribute = classes.my_class_import('container.models.Attributes').objects.get(active=True, identifier='AVAIL_LANGUAGE_EN')
         profile = {'_id': user_id, 'language':language_attribute.identifier, 'base_template': 'gso_' + language_attribute.short_name + '.html', 'language_code': language_attribute.short_name}
     setup_content.set_data('user_profiles', profile, False)
     return profile
@@ -60,16 +59,16 @@ def clean_post_value(value):
         return value
 
 def get_effective_class(container_type):
-    effective_class_name = Attributes.objects.get(identifier=container_type + '_CLASS', active=True).name
+    effective_class_name = classes.my_class_import('container.models.Attributes').objects.get(identifier=container_type + '_CLASS', active=True).name
     effective_class = classes.my_class_import(effective_class_name)
     return effective_class
 
 def get_effective_container(container_id):
-    None
+    return get_effective_instance(classes.my_import('container.models.Container').objects.get(id=container_id))
 
 def get_effective_instance(container):
     if container!=None:
-        effective_class_name = Attributes.objects.get(identifier=container.type.identifier + '_CLASS', active=True).name
+        effective_class_name = classes.my_class_import('container.models.Attributes').objects.get(identifier=container.type.identifier + '_CLASS', active=True).name
         effective_class = classes.my_class_import(effective_class_name)
         effective_container = effective_class.objects.get(id=container.id)
         return effective_container
@@ -118,14 +117,17 @@ def complete_fields_information(model_class, information, language_code='en'):
         if all_fields.has_key(field_effective):
             information[field].update(all_fields[field_effective])
             if information[field]['type'] in ['ForeignKey', 'ManyToManyField']:
-                current_class = classes.my_class_import(information[field]['target_class'])
-                if hasattr(current_class, 'get_fields'):
-                    information[field]['options'] = getattr(current_class,'get_fields')()
+                #current_class = classes.my_class_import(information[field]['target_class'])
+                print information[field]['options']
+                #if hasattr(current_class, 'get_fields'):
+                #    information[field]['options'] = getattr(current_class,'get_fields')()
                 if information[field]['target_class']=='container.models.Attributes':
                     information[field]['template'] = 'statics/' + information[field]['link']['type'] + '_' + language_code + '.html'
                 else:
                     if information[field]['type']!='ForeignKey':
                         information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
+                        information[field]['template_m2m'] = 'statics/' + classes.my_class_import('container.models.Attributes').objects.get(name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
+                        print information[field]['template_m2m']
                     information[field]['datasource'] = '/container_filter.html?container_class=' + information[field]['target_class']
     return information
 

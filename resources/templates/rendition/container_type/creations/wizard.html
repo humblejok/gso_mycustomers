@@ -1,0 +1,18 @@
+{% load container_tags %}
+							{% for entry in fields %}
+							{% with current_field=complete_fields|get_dict_key:entry%}
+							{% if current_field.options and current_field.type == 'ManyToManyField' %}
+							{% else %}
+							<div class="form-group">
+								<label for="{{entry}}">{{entry|get_translated_text:language_code}}</label>
+								{% if current_field.template %}
+									<select id="{{entry}}" name="{{entry}}" class="form-control">
+									{% include current_field.template %}
+									</select>
+								{% else %}
+								<input name="{{entry}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" value=""/>
+								{% endif %}
+							</div>
+							{% endif %}
+							{% endwith %}
+							{% endfor %}
