@@ -4,13 +4,13 @@
 							{% if current_field.options and current_field.type == 'ManyToManyField' %}
 							{% else %}
 							<div class="form-group">
-								<label for="{{entry}}">{{entry|get_translated_text:language_code}}</label>
+								<label for="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}">{{entry|get_translated_text:language_code}}</label>
 								{% if current_field.template %}
-									<select id="{{entry}}" name="{{entry}}" class="form-control">
+									<select id="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" name="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" class="form-control">
 									{% include current_field.template %}
 									</select>
 								{% else %}
-								<input name="{{entry}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" value=""/>
+								<input name="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" value=""/>
 								{% endif %}
 							</div>
 							{% endif %}

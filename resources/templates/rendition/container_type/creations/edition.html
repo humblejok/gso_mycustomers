@@ -1,39 +1,49 @@
 {% load container_tags %}
-							{% for entry in fields %}
-							{% with current_field=complete_fields|get_dict_key:entry%}
-							{% if current_field.type == 'ManyToManyField' %}
-							{% for option in current_field.options %}
-							<div class="form-group">
-								<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
-								{% if current_field.template %}
-								<select id="{{current_field.field}}" name="{{current_field.field}}" class="form-control">
-								{% include current_field.template with active_list=option %}
-								</select>
-								{% endif %}
-							</div>
-							{% include current_field.template_m2m %}
-							{% empty %}
-							<div class="form-group">
-								<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
-								{% if current_field.template %}
-								<select id="{{current_field.field}}" name="{{current_field.field}}" class="form-control">
-								{% include current_field.template with active_list=option %}
-								</select>
-								{% endif %}
-							</div>
-							{% include current_field.template_m2m %}
-							{% endfor %}
-							{% else %}
-							<div class="form-group">
-								<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
-								{% if current_field.template %}
-									<select id="{{current_field.field}}" name="{{current_field.field}}" class="form-control">
-									{% include current_field.template %}
-									</select>
-								{% else %}
-								<input name="{{current_field.field}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{current_field.field}}" placeholder="{{current_field.field|add:'.placeholder'|get_translated_text:language_code}}" value=""/>
-								{% endif %}
-							</div>
-							{% endif %}
-							{% endwith %}
-							{% endfor %}
+{% for entry in fields %}
+	{% with current_field=complete_fields|get_dict_key:entry base_id=complete_fields|get_dict_key:entry|get_dict_key:"field" %}
+		{% if current_field.type == 'ManyToManyField' %}
+			{% for option in current_field.options %}
+				{% with index=forloop.counter0|stringformat:"s" %}
+				<div class="form-group">
+					<label for="{{base_id}}_{{index}}">{{current_field.field|get_translated_text:language_code}}</label>
+					{% if current_field.template %}
+						<select id="{{base_id}}_{{index}}" name="{{base_id}}_{{index}}" class="form-control">
+						{% include current_field.template with active_list=option %}
+						</select>
+					{% endif %}
+				</div>
+				<blockquote id="{{base_id}}_{{index}}blockquote">
+				<h6>
+				{% include current_field.template_m2m with prefix=base_id|add:"_"|add:index|add:"." %}
+				</h6>
+				</blockquote>
+				{% endwith %}
+			{% empty %}
+				<div class="form-group">
+					<label for="{{base_id}}_0">{{current_field.field|get_translated_text:language_code}}</label>
+					{% if current_field.template %}
+						<select id="{{base_id}}_0" name="{{base_id}}_0" class="form-control">
+						{% include current_field.template with active_list=option %}
+						</select>
+					{% endif %}
+				</div>
+				<blockquote id="{{base_id}}_0_blockquote">
+				<h6>
+				{% include current_field.template_m2m with prefix=base_id|add:"_0." %}
+				</h6>
+				</blockquote>
+			{% endfor %}
+		{% else %}
+			<div class="form-group">
+				<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
+				{% if current_field.template %}
+					<select id="{{current_field.field}}" name="{{current_field.field}}" class="form-control">
+					{% include current_field.template %}
+					</select>
+				{% else %}
+				<input name="{{current_field.field}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{current_field.field}}" placeholder="{{current_field.field|add:'.placeholder'|get_translated_text:language_code}}" value=""/>
+				{% endif %}
+			</div>
+		{% endif %}
+	{% endwith %}
+{% endfor %}
