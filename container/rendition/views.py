@@ -34,6 +34,7 @@ def render_singles_list(request):
     context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'fields': container_fields}
     return render(request, 'container/view/simple_fields_list.html', context)
 
+
 def render_custom_standard(request):
     # TODO: Check user
     profile = get_or_create_user_profile(request.user.id)
