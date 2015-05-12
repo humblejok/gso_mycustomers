@@ -7,25 +7,19 @@ from container.models import Attributes
 from seq_common.utils import classes
 from django.shortcuts import render
 from container.utilities.utils import complete_custom_fields_information,\
-    get_or_create_user_profile, clean_post_value
+    get_or_create_user_profile
 from container.utilities.container_container import get_container_information,\
     enhance_container_information
-from django.http.response import HttpResponseRedirect
-from django.core.urlresolvers import reverse
     
 def render_singles_list(request):
     # TODO: Check user
     profile = get_or_create_user_profile(request.user.id)
-    if 'REDIRECT_POST' not in request.session:
-        working_data = request.POST
-    else:
-        working_data = request.session.get('REDIRECT_POST')
-    container_id = clean_post_value(working_data['container_id'])
-    container_type = clean_post_value(working_data['container_type'])
+    container_id = request.POST['container_id'][0] if isinstance(request.POST['container_id'], list) else request.POST['container_id']
+    container_type = request.POST['container_type'][0] if isinstance(request.POST['container_type'], list) else request.POST['container_type']
     container_class = container_type + '_CLASS'
-    container_fields = eval(working_data['container_fields'])
-    widget_index = clean_post_value(working_data['widget_index'])
-    widget_title = clean_post_value(working_data['widget_title'])
+    container_fields = eval(request.POST['container_fields'])
+    widget_index = request.POST['widget_index'][0] if isinstance(request.POST['widget_index'], list) else request.POST['widget_index']
+    widget_title = request.POST['widget_title'][0] if isinstance(request.POST['widget_title'], list) else request.POST['widget_title']
     # TODO: Handle error
     effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
     effective_class = classes.my_class_import(effective_class_name)
@@ -33,7 +27,6 @@ def render_singles_list(request):
     container = effective_class.objects.get(id=container_id)
     context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'fields': container_fields}
     return render(request, 'container/view/simple_fields_list.html', context)
-
 
 def render_custom_standard(request):
     # TODO: Check user
@@ -102,11 +95,6 @@ def render_many_to_many(request):
                'data': getattr(container,container_field),
                'fields': foreign_class.get_displayed_fields(rendition_witdh)}
     return render(request, 'container/view/many_to_many_field.html', context)
-
-def render_view_for_load(request):
-    view_name = request.POST['view_name']
-    request.session['REDIRECT_POST'] = request.POST
-    return HttpResponseRedirect(reverse(view_name))
 
 def render_template_for_load(request):
     profile = get_or_create_user_profile(request.user.id)

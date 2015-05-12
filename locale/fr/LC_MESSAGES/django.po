@@ -268,7 +268,7 @@ msgstr "Aucune description n'est disponible."
 #: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_CUSTOM_STANDARD.html.py:22
 #: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_SINGLES.html.py:22
 msgid "Edit information"
-msgstr "Editer votre compte"
+msgstr "Editer les informations"
 
 #: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_CUSTOM_STANDARD.html.py:46
 #: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_LIST.html.py:54

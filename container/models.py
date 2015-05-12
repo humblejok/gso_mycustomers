@@ -405,9 +405,9 @@ class Address(CoreModel):
     @staticmethod
     def get_displayed_fields(rendition_width):
         if rendition_width=='large':
-            return ['address_type.name', 'line_1','line_2','zip_code','city', 'country.name']
+            return ['address_type.identifier', 'line_1','line_2','zip_code','city', 'country.identifier']
         elif rendition_width=='small':
-            return ['address_type.name', 'city', 'country.name']
+            return ['address_type.identifier', 'city', 'country.identifier']
 
     @staticmethod
     def retrieve_or_create(parent, source, key, value):

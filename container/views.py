@@ -143,7 +143,7 @@ def get(request):
     custom_data = get_container_information(container)
     # TODO: Handle other langage and factorize with other views
     context = {'base_template': profile['base_template'], 'profile': profile, 
-               'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}),
+               'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}, profile['language_code']),
                'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
                'custom_data': custom_data,
                'container_type': container_type, 'layout': working_data[container_type]}

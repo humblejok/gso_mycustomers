@@ -21,6 +21,13 @@ def get_translated_text(text_id, language):
     except:
         LOGGER.error('Could not find ' + str(text_id) + ' with language set to ' + str(language))
         return "NO TRANSLATION"
+    
+@register.filter()
+def try_translated_text(text_id, language):
+    try:
+        return FieldLabel.objects.get(identifier=text_id, language=language).field_label
+    except:
+        return text_id
 
 @register.filter()
 def as_identifier(name):

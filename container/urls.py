@@ -30,7 +30,6 @@ urlpatterns = patterns(
     url(r'^rendition/render_custom_standard.html', 'container.rendition.views.render_custom_standard', name='container_render_custom_standard'),
     url(r'^rendition/render_custom_template.html', 'container.rendition.views.render_custom_template', name='container_render_custom_template'),
     url(r'^rendition/render_template_for_load.html', 'container.rendition.views.render_template_for_load', name='container_render_template_for_load'),
-    url(r'^rendition/render_view_for_load.html', 'container.rendition.views.render_view_for_load', name='container_render_view_for_load'),
     #########################
     # Setup views           #
     #########################
