@@ -1,4 +1,5 @@
 {% load container_tags %}
+{% load i18n %}
 		<script>
 			function onchange_{{index}}(save) {
 				{% for entry in data.data %}
@@ -23,7 +24,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="modal_define_{{index}}_label">{{data.title}} - Add/edit information</h4>
+						<h4 class="modal-title" id="modal_define_{{index}}_label">{{data.title}} - {% blocktrans %}Add/edit information{% endblocktrans %}</h4>
 					</div>
 					<form id="edit_form_{{index}}" role="form" action="#" method="POST">{% csrf_token %}
 						<div id="optionBody"  class="modal-body">
@@ -39,8 +40,8 @@
 								</select>
 								{% for option in current_field.options %}
 								{% if  option != current_field.filter %}
-								<label for="{{entry}}-{{option}}">{% if labels|get_dict_key:option %}{{labels|get_dict_key:option}}{% else %}{{option}}{% endif %}</label>
-								<input name="{{entry}}-{{option}}" id="{{entry}}-{{option}}" type="text" class="form-control with-autocomplete" placeholder="Enter a {{option}}" value="" datasource="{{current_field.datasource}}"/>
+								<label for="{{entry}}-{{option}}">{{option|get_translated_text:language_code}}</label>
+								<input name="{{entry}}-{{option}}" id="{{entry}}-{{option}}" type="text" class="form-control with-autocomplete" placeholder="{{option|add:'.placeholder'|get_translated_text:language_code}}" value="" datasource="{{current_field.datasource}}"/>
 								{% endif %}
 								{% endfor %}
 								<input type="hidden" id="{{entry}}-id"/>
@@ -50,8 +51,8 @@
 						</div>
 					</form>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="Save the modifications" onclick="onchange_{{index}}(true)" data-dismiss="modal">Save</button>
-						<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Close the popup" onclick="onchange_{{index}}(false)" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Save the modifications{% endblocktrans %}" onclick="onchange_{{index}}(true)" data-dismiss="modal">{% blocktrans %}Save{% endblocktrans %}</button>
+						<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Close the popup{% endblocktrans %}" onclick="onchange_{{index}}(false)" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
 					</div>
 				</div>
 			</div>

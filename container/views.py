@@ -96,8 +96,24 @@ def base_edit(request):
                 setattr(source, field, Attributes.objects.get(identifier=request.POST[field], active=True))
             else:
                 target_class = classes.my_class_import(creation_data[field]['target_class'])
-                new_instance = target_class.retrieve_or_create(source, 'FinaLE', request.POST[field + '-' + creation_data[field]['filter']], request.POST[field])
-                setattr(source, field,[new_instance])
+                keys_set = [key for key in request.POST.keys() if key.startswith(field)]
+                index = 0
+                print keys_set
+                new_instances = []
+                while (field + "_" + str(index)) in keys_set:
+                    base_key = field + "_" + str(index)
+                    current_keys = [key for key in keys_set if key.startswith(base_key)]
+                    data = {}
+                    for key in current_keys:
+                        if key==base_key:
+                            data[creation_data[field]['filter']] = request.POST[base_key]
+                        else:
+                            data[key.replace(base_key + '.', '')] = request.POST[key]
+                    print data
+                    new_instance = target_class.retrieve_or_create('web', 'FinaLE', field, data)
+                    new_instances.append(new_instance)
+                    index = index + 1
+                setattr(source, field,new_instances)
                 source.save()
         else:
             setattr(source, field, request.POST[field])

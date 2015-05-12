@@ -228,9 +228,9 @@
 			htmlToAppend = htmlToAppend.replaceAll('%%index%%', index);
 			
 			callLater = function() {
-				$("#frequency_" + index).load("/container/rendition/render_template_for_load.html.html", {"template_name": "frequency_select"},checkLoads);
-				$("#track_type_" + index).load("/container/rendition/render_template_for_load.html.html", {"template_name": "numeric_type_select"},checkLoads);
-				$("#datasource_" + index).load("/container/rendition/render_template_for_load.html.html", {"template_name": "ata_source_select"},checkLoads);
+				$("#frequency_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "frequency_select"},checkLoads);
+				$("#track_type_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "numeric_type_select"},checkLoads);
+				$("#datasource_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "ata_source_select"},checkLoads);
 			};
 		} else if(selectedType=='LAYOUT_OBJECT_CUSTOM_STANDARD') {
 			htmlToAppend += "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
@@ -270,7 +270,7 @@
 			$.each(currentInformation.layout, function (index, layout) {
 				var closureIndex = currentItem;
 				gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', currentItem),layout.size_x, layout.size_y]);
-				$("#type_" + currentItem).load("/container/rendition/render_template_for_load.html.html", {"template_name": "layout_object_type_select"},function() {
+				$("#type_" + currentItem).load("/container/rendition/render_template_for_load.html", {"template_name": "layout_object_type_select"},function() {
 					$("#title_" + closureIndex).val(currentInformation.data[closureIndex.toString()].title);
 					$("#type_" + closureIndex).attr('onchange','changeType(' + closureIndex + ')');
 					$("#type_" + closureIndex).val(currentInformation.data[closureIndex.toString()].type);
@@ -307,7 +307,7 @@
 	function addWidget(layout) {
 		gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', currentItem),layout.size_x, layout.size_y]);
 		var index = currentItem;
-		$("#type_" + currentItem).load("/container/rendition/render_template_for_load.html.html", {"template_name": "layout_object_type_select"}, function() {
+		$("#type_" + currentItem).load("/container/rendition/render_template_for_load.html", {"template_name": "layout_object_type_select"}, function() {
 			changeType(index);
 		});
 		$("#type_" + currentItem).attr('onchange','changeType(' + currentItem + ')');

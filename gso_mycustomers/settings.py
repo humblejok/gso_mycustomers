@@ -16,8 +16,7 @@ DATABASES = {
         # The following settings are not used with sqlite3:
         'USER': 'gso_mycustomers',
         'PASSWORD': 'boudux',
-        'HOST': '192.168.1.11',
-        'PORT': 5342                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
     },
 }
 
@@ -75,7 +74,7 @@ STATIC_URL = '/statics/'
 # Additional locations of static files
 # Additional locations of static files
 STATICFILES_DIRS = (
-    'C:/Documents/Sources/gso_mycustomers/resources/statics/',
+    'C:/DEV/Sources/gso_mycustomers/resources/statics/',
 )
 
 # List of finder classes that know how to find static files in
@@ -122,7 +121,7 @@ ROOT_URLCONF = 'gso_mycustomers.urls'
 WSGI_APPLICATION = 'gso_mycustomers.wsgi.application'
 
 TEMPLATE_DIRS = (
-    'C:/Documents/Sources/gso_mycustomers/resources/templates',
+    'C:/DEV/Sources/gso_mycustomers/resources/templates',
 )
 
 INSTALLED_APPS = (
@@ -203,7 +202,7 @@ LOGGING = {
         },
         'container': {
             'handlers': ['console'],
-            'level': 'INFO'
+            'level': 'DEBUG'
         },
     }
 }

@@ -64,7 +64,7 @@ def get_effective_class(container_type):
     return effective_class
 
 def get_effective_container(container_id):
-    return get_effective_instance(classes.my_import('container.models.Container').objects.get(id=container_id))
+    return get_effective_instance(classes.my_class_import('container.models.Container').objects.get(id=container_id))
 
 def get_effective_instance(container):
     if container!=None:

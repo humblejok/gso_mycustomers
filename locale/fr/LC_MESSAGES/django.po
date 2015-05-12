@@ -7,19 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-03 20:21+0200\n"
+"POT-Creation-Date: 2015-05-12 15:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: .\resources\templates\index.html.py:3
 msgid "My Customers - Index"
-msgstr ""
+msgstr "My Customers - Index"
 
 #: .\resources\templates\index.html.py:14
 #, python-format
@@ -73,7 +73,7 @@ msgstr "Créer un nouvel univers"
 
 #: .\resources\templates\index.html.py:68
 #: .\resources\templates\index.html.py:120
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:273
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:270
 msgid "Enter a name"
 msgstr "Entrer un nom"
 
@@ -91,7 +91,10 @@ msgstr "Entrer un pseudonyme"
 #: .\resources\templates\index.html.py:101
 #: .\resources\templates\index.html.py:137
 #: .\resources\templates\rendition\container_type\creations\setup.html.py:273
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:278
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_CUSTOM_STANDARD.html.py:47
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_LIST.html.py:55
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_SINGLES.html.py:47
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:275
 msgid "Close"
 msgstr "Fermer"
 
@@ -101,7 +104,7 @@ msgstr "Confirmer la création de l'objet et passer en mode édition"
 
 #: .\resources\templates\index.html.py:82
 #: .\resources\templates\index.html.py:138
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:279
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:276
 msgid "Continue"
 msgstr "Continuer"
 
@@ -115,7 +118,7 @@ msgid "Do you really want to delete that universe?"
 msgstr "Voulez-vous réellement effacer cet univers?"
 
 #: .\resources\templates\index.html.py:102
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:254
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:251
 msgid "Delete"
 msgstr "Effacer"
 
@@ -167,8 +170,11 @@ msgstr "Confirmer vos modifications"
 
 #: .\resources\templates\container\edit\user\setup.html.py:36
 #: .\resources\templates\rendition\container_type\details\setup.html.py:388
-#: .\resources\templates\rendition\container_type\fields\setup.html.py:131
-#: .\resources\templates\rendition\container_type\menus\setup.html.py:138
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_CUSTOM_STANDARD.html.py:46
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_LIST.html.py:54
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_SINGLES.html.py:46
+#: .\resources\templates\rendition\container_type\fields\setup.html.py:128
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:137
 msgid "Save"
 msgstr "Sauvegarder"
 
@@ -223,6 +229,9 @@ msgid "Add a group"
 msgstr "Ajouter un groupe"
 
 #: .\resources\templates\rendition\container_type\creations\setup.html.py:273
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_CUSTOM_STANDARD.html.py:47
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_LIST.html.py:55
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_SINGLES.html.py:47
 msgid "Close the popup"
 msgstr "Fermer la fenêtre"
 
@@ -243,8 +252,8 @@ msgid "Add a new widget to the current layout"
 msgstr "Ajouter un nouvel élément dans ce canevas"
 
 #: .\resources\templates\rendition\container_type\details\setup.html.py:387
-#: .\resources\templates\rendition\container_type\fields\setup.html.py:153
-#: .\resources\templates\rendition\container_type\menus\setup.html.py:138
+#: .\resources\templates\rendition\container_type\fields\setup.html.py:150
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:137
 msgid "Add"
 msgstr "Ajouter"
 
@@ -256,15 +265,30 @@ msgstr "Sauvegarder le canevas actuel"
 msgid "No description is available."
 msgstr "Aucune description n'est disponible."
 
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_CUSTOM_STANDARD.html.py:22
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_SINGLES.html.py:22
+msgid "Edit information"
+msgstr "Editer votre compte"
+
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_CUSTOM_STANDARD.html.py:46
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_LIST.html.py:54
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_SINGLES.html.py:46
+msgid "Save the modifications"
+msgstr "Confirmer vos modifications"
+
+#: .\resources\templates\rendition\container_type\details\edition\LAYOUT_OBJECT_TYPE_LIST.html.py:27
+msgid "Add/edit information"
+msgstr "Ajouter/modifier les informations"
+
 #: .\resources\templates\rendition\container_type\fields\setup.html.py:3
 msgid "Container Extended Fields Setup"
 msgstr "Configuration des champs supplémentaires des éléments"
 
-#: .\resources\templates\rendition\container_type\fields\setup.html.py:119
+#: .\resources\templates\rendition\container_type\fields\setup.html.py:116
 msgid "Custom objects assignment"
 msgstr "Définition des objets personnalisés"
 
-#: .\resources\templates\rendition\container_type\fields\setup.html.py:120
+#: .\resources\templates\rendition\container_type\fields\setup.html.py:117
 msgid "Define the custom objects associated to containers"
 msgstr "Définir les objets personnalisés associés aux éléments"
 
@@ -295,19 +319,19 @@ msgstr "Configuration des menus d'éléments"
 msgid "Remove"
 msgstr "Supprimer"
 
-#: .\resources\templates\rendition\container_type\menus\setup.html.py:124
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:123
 msgid "Menus definition"
 msgstr "Définition des menus"
 
-#: .\resources\templates\rendition\container_type\menus\setup.html.py:125
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:124
 msgid "Define the menu entries for the selected container."
 msgstr "Définir les entrées dans le menu de l'élément sélectionné."
 
-#: .\resources\templates\rendition\container_type\menus\setup.html.py:138
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:137
 msgid "Menu group"
 msgstr "Groupe de menu"
 
-#: .\resources\templates\rendition\container_type\menus\setup.html.py:138
+#: .\resources\templates\rendition\container_type\menus\setup.html.py:137
 msgid "Target"
 msgstr "Cible"
 
@@ -315,35 +339,35 @@ msgstr "Cible"
 msgid "Setup"
 msgstr "Configuration"
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:230
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:227
 msgid "Custom objects definition"
 msgstr "Définition des objets personalisés"
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:231
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:228
 msgid "Define all the custom objects you may need in your application."
 msgstr "Définir tous les objets nécessaires à votre application."
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:243
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:240
 msgid "Create"
 msgstr "Créer"
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:252
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:249
 msgid "Add field"
 msgstr "Ajouter un champs"
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:267
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:289
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:264
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:286
 msgid "Create a new object"
 msgstr "Créer un nouvel objet"
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:279
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:276
 msgid "Confirm object creation and go to edition mode"
 msgstr "Confirmer la création de l'objet et passer en mode édition"
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:303
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:300
 msgid "Confirm attribute selection and continue edition"
 msgstr "Confirmer la sélection et passer en mode édition"
 
-#: .\resources\templates\rendition\object_type\fields\setup.html.py:303
+#: .\resources\templates\rendition\object_type\fields\setup.html.py:300
 msgid "Select"
 msgstr "Sélectionner"

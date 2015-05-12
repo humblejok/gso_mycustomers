@@ -409,6 +409,25 @@ class Address(CoreModel):
         elif rendition_width=='small':
             return ['address_type.name', 'city', 'country.name']
 
+    @staticmethod
+    def retrieve_or_create(parent, source, key, value):
+        if parent=='web':
+            addresses = Address.objects.filter(address_type__identifier=value['address_type'], line_1=value['line_1'], line_2=value['line_2'], zip_code=value['zip_code'], city=value['city'], country__identifier=value['country'])
+            if addresses.exists():
+                new_address = addresses[0]
+            else:
+                new_address = Address()
+                new_address.address_type = Attributes.objects.get(identifier=value['address_type'], active=True)
+                new_address.line_1 = value['line_1']
+                new_address.line_2 = value['line_2']
+                new_address.zip_code = value['zip_code']
+                new_address.city = value['city']
+                new_address.country = Attributes.objects.get(identifier=value['country'], active=True)
+                new_address.save()
+            return new_address
+        else:
+            return None
+
 class Email(CoreModel):
     address_type = models.ForeignKey(Attributes, limit_choices_to={'type':'email_type'}, related_name='email_type_rel', null=True)
     email_address = models.EmailField()

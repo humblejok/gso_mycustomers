@@ -91,13 +91,13 @@
 	function objectTypeChanged() {
 		var objectType = $("#objectType").val();
 		$("#objectDefinition").empty();
-		$("#objectDefinition").load("/container/rendition/render_template_for_load.html.html", {"template_name": objectType});
+		$("#objectDefinition").load("/container/rendition/render_template_for_load.html", {"template_name": objectType});
 	}
 
 	function addObjectDefinition(index, value) {
 		currentRow = index;
 		$("#associatedObjectsTable").append('<tr><td><span>' + (value?value.typeLabel:"") + '</span></td><td><span>' + (value?value.name:"") + '</span></td><td id="instanceType_' + index + '"></td><td><input type="text" class="form-control" id="maxRepeat_' + index + '" value="' + (value?value.repeat:"") + '" onblur="instanceCountChange(' + index + ')" onchange="instanceCountChange(' + index + ')"/></td><td><button type="button" class="btn btn-default btn-sm remove-btn" onclick="removeDefinitionEntry(' + index + ')"><span class="glyphicon glyphicon-remove"></span></button></td></tr>');
-		$("#instanceType_" + index).load("/container/rendition/render_template_for_load.html.html", {"template_name": "field_assignment_select", "selected_value": value}, function() {
+		$("#instanceType_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "field_assignment_select", "selected_value": value}, function() {
 			$("#instanceType_" + index + " > select").attr('id','instanceTypeId_' + index);
 			$("#instanceType_" + index + " > select").attr('name','instanceTypeId_' + index);
 			$("#instanceType_" + index + " > select").attr('onchange','instanceTypeChanged(' + index + ')');
