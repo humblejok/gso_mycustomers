@@ -7,12 +7,25 @@ from django import template
 from json import dumps
 from django.forms.models import model_to_dict
 from container.models import CoreModel, Attributes, FieldLabel
-from container.utilities.utils import dict_to_json_compliance
+from container.utilities.utils import dict_to_json_compliance,\
+    get_effective_class
 import logging
 
 LOGGER = logging.getLogger(__name__)
 
 register = template.Library()
+
+@register.filter()
+def get_wizard_fields(container_type, target):
+    clazz = get_effective_class(container_type)
+    clazz = clazz._meta.get_field(target).rel.to
+    return clazz.get_wizard_fields()  
+
+@register.filter()
+def get_edition_fields(container_type, target):
+    clazz = get_effective_class(container_type)
+    clazz = clazz._meta.get_field(target).rel.to
+    return [clazz.get_filtering_field()] + clazz.get_wizard_fields()
 
 @register.filter()
 def get_translated_text(text_id, language):

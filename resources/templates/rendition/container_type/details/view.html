@@ -120,7 +120,7 @@
 					<div class="btn-group">
 						<button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"/></button>
 						<ul class="dropdown-menu" role="menu">
-							{% with template_name='statics/'|add:container.type.identifier|add:'_view_menus_en.html' %}
+							{% with template_name='statics/'|add:container.type.identifier|add:'_view_menus_'|add:profile.language_code|add:'.html' %}
 								{% include template_name %}
 							{% endwith %}
 						</ul>

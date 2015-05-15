@@ -3,6 +3,17 @@
 
 
 <div class="form-group">
+	<label for="address_type">Address type</label>
+	
+		<select id="{{prefix}}address_type" name="{{prefix}}address_type" class="form-control">
+		<option value='ADR_HOME' >Home</option><option value='ADR_MAIN_OFFICE' >Main Office</option><option value='ADR_SUBSI_OFFICE' >Subsidiary Office</option><option value='ADR_WEB' >Web Address</option><option value='ADR_WORK' >Work</option>
+		</select>
+	
+</div>
+
+
+
+<div class="form-group">
 	<label for="line_1">Address</label>
 	
 	<input name="{{prefix}}line_1" type="text" class="form-control" id="{{prefix}}line_1" placeholder="Enter an address" value=""/>

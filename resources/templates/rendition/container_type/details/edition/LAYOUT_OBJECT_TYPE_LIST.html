@@ -4,11 +4,11 @@
 			function onchange_{{index}}(save) {
 				{% for entry in data.data %}
 					{% if forloop.first %}
-						editedData[{{index}}] = {'id': $("#{{entry}}-id").val(), 'many-to-many': '{{entry}}'};
+						editedData[{{index}}] = {'id': $("#{{entry}}-{{index}}-id").val(), 'many-to-many': '{{entry}}'};
 					{% endif %}
 					{% with current_field=complete_fields|get_dict_key:entry%}
 						{% for option in current_field.options %}
-							editedData[{{index}}]['{{option}}'] = $("#{{entry}}-{{option}}").val();
+							editedData[{{index}}]['{{option}}'] = $("#{{entry}}-{{index}}-{{option}}").val();
 						{% endfor %}
 					{% endwith %}
 				{% endfor %}
@@ -17,6 +17,18 @@
 				} else {
 					console.log(editedData[{{index}}]);
 				}
+			}
+
+			function onedit_{{index}}(data) {
+				clean_{{index}}();
+				if (data) {
+
+				}
+			}
+
+			function clean_{{index}} {
+				$("#{{entry}}-{{index}}-id").val("");
+				{% with current_field=complete_fields|get_dict_key:entry%}{% for option in current_field.options %}$("#{{entry}}-{{index}}-{{option}}").val("");{% endfor %}% endwith %}
 			}
 		</script>
 		<div class="modal fade" id="modal_define_{{index}}" tabindex="-1" role="dialog" aria-labelledby="modal_define_{{index}}_label" aria-hidden="true">
@@ -29,25 +41,7 @@
 					<form id="edit_form_{{index}}" role="form" action="#" method="POST">{% csrf_token %}
 						<div id="optionBody"  class="modal-body">
 							<div class="row">&nbsp;</div>
-							{% for entry in data.data %}
-							{% with current_field=complete_fields|get_dict_key:entry%}
-							<div class="form-group">
-								<label for="{{entry}}-{{current_field.filter}}">{% if labels|get_dict_key:current_field.filter %}{{labels|get_dict_key:current_field.filter}}{% else %}{{current_field.filter}}{% endif %}</label>
-								<select id="{{entry}}-{{current_field.filter}}" name="{{entry}}-{{current_field.filter}}" class="form-control">
-									{% with value=container|get_value:entry active_list=option %}
-										{% include current_field.template %}
-									{% endwith %}
-								</select>
-								{% for option in current_field.options %}
-								{% if  option != current_field.filter %}
-								<label for="{{entry}}-{{option}}">{{option|get_translated_text:language_code}}</label>
-								<input name="{{entry}}-{{option}}" id="{{entry}}-{{option}}" type="text" class="form-control with-autocomplete" placeholder="{{option|add:'.placeholder'|get_translated_text:language_code}}" value="" datasource="{{current_field.datasource}}"/>
-								{% endif %}
-								{% endfor %}
-								<input type="hidden" id="{{entry}}-id"/>
-							</div>
-							{% endwith %}
-							{% endfor %}
+							{% include complete_fields|get_dict_key:data.data.0|get_dict_key:"template_m2m_complete" with prefix=data.data.0|add:"-"|add:index|add:"-" %}
 						</div>
 					</form>
 					<div class="modal-footer">

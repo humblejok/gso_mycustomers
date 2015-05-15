@@ -57,12 +57,16 @@ def generate_wizards():
     for language in languages:
         for wizard in wizards:
             working_class = classes.my_class_import(wizard.name)
-            print working_class
             all_fields = get_static_fields(working_class)
             all_fields = complete_fields_information(working_class, all_fields, language.short_name)
             context = Context({'fields': working_class.get_wizard_fields(), 'complete_fields': all_fields, 'language_code': language.short_name})
             rendition = template.render(context)
             outfile = os.path.join(TEMPLATES_STATICS_PATH, wizard.short_name + '_' + language.short_name + '.html')
+            with open(outfile,'w') as o:
+                o.write(rendition.encode('utf-8'))
+            context = Context({'fields': [working_class.get_filtering_field()] + working_class.get_wizard_fields(), 'complete_fields': all_fields, 'language_code': language.short_name})
+            rendition = template.render(context)
+            outfile = os.path.join(TEMPLATES_STATICS_PATH, 'complete_' + wizard.short_name + '_' + language.short_name + '.html')
             with open(outfile,'w') as o:
                 o.write(rendition.encode('utf-8'))
                 

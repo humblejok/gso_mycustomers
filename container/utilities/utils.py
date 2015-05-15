@@ -126,7 +126,7 @@ def complete_fields_information(model_class, information, language_code='en'):
                     if information[field]['type']!='ForeignKey':
                         information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
                         information[field]['template_m2m'] = 'statics/' + classes.my_class_import('container.models.Attributes').objects.get(name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
-                        print information[field]['template_m2m']
+                        information[field]['template_m2m_complete'] = 'statics/complete_' + classes.my_class_import('container.models.Attributes').objects.get(name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
                     information[field]['datasource'] = '/container_filter.html?container_class=' + information[field]['target_class']
     return information
 
