@@ -20,15 +20,29 @@
 			}
 
 			function onedit_{{index}}(data) {
+				console.log(data);
 				clean_{{index}}();
 				if (data) {
-
+					{% for entry in data.data %}
+						$("#{{entry}}-{{index}}-id").val(data.id);
+						{% with current_field=complete_fields|get_dict_key:entry %}
+							{% for field in current_field.fields %}
+								$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}});
+							{% endfor %}
+						{% endwith %}
+					{% endfor %}
 				}
 			}
 
-			function clean_{{index}} {
-				$("#{{entry}}-{{index}}-id").val("");
-				{% with current_field=complete_fields|get_dict_key:entry%}{% for option in current_field.options %}$("#{{entry}}-{{index}}-{{option}}").val("");{% endfor %}% endwith %}
+			function clean_{{index}}() {
+				{% for entry in data.data %}
+					$("#{{entry}}-{{index}}-id").val("");
+					{% with current_field=complete_fields|get_dict_key:entry %}
+						{% for field in current_field.fields %}
+							$("#{{entry}}-{{index}}-{{field}}").val("");
+						{% endfor %}
+					{% endwith %}
+				{% endfor %}
 			}
 		</script>
 		<div class="modal fade" id="modal_define_{{index}}" tabindex="-1" role="dialog" aria-labelledby="modal_define_{{index}}_label" aria-hidden="true">

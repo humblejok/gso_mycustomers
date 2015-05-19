@@ -44,12 +44,17 @@
 			});
 		}
 
-		function sendItemForEdition(data, containerField) {
+		function sendItemForEdition(index, data, containerField) {
+			console.log(data);
 			$.each(data, function(field, value) {
 				if (value.hasOwnProperty('identifier')) {
 					$("#" + containerField + "-" + field).val(value.identifier);
 				} else {
 					$("#" + containerField + "-" + field).val(value);
+				}
+				console.log(window["onedit_" + index]);
+				if (typeof window["onedit_" + index] === "function") {
+					console.log("exists");
 				}
 			});
 		}
