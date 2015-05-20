@@ -29,7 +29,6 @@ def setup():
     generate_wizards()
     setup_menus()
     setup_global_menus()
-
 def setup_menus():
     MenuEntries.objects.all().delete()
     populate_model_from_xlsx('container.models.MenuEntries', os.path.join(RESOURCES_MAIN_PATH,'Repository Setup.xlsx'))
@@ -454,10 +453,25 @@ class Email(CoreModel):
     @staticmethod
     def get_displayed_fields(rendition_width):
         if rendition_width=='large':
-            return ['address_type.name', 'email_address']
+            return ['address_type.identifier', 'email_address']
         elif rendition_width=='small':
-            return ['address_type.name', 'email_address']
-    
+            return ['address_type.identifier', 'email_address']
+        
+    @staticmethod
+    def retrieve_or_create(parent, source, key, value):
+        if parent=='web':
+            emails = Email.objects.filter(address_type__identifier=value['address_type'], email_address=value['email_address'])
+            if emails.exists():
+                new_email = emails[0]
+            else:
+                new_email = Email()
+                new_email.address_type = Attributes.objects.get(active=True, identifier=value['address_type'])
+                new_email.email_address = value['email_address']
+                new_email.save()
+            return new_email
+        else:
+            return None
+        
 class Phone(CoreModel):
     line_type = models.ForeignKey(Attributes, limit_choices_to={'type':'phone_type'}, related_name='phone_type_rel', null=True)
     phone_number = models.TextField(max_length=32)
@@ -480,9 +494,24 @@ class Phone(CoreModel):
     @staticmethod
     def get_displayed_fields(rendition_width):
         if rendition_width=='large':
-            return ['line_type.name', 'phone_number']
+            return ['line_type.identifier', 'phone_number']
         elif rendition_width=='small':
-            return ['line_type.name', 'phone_number']
+            return ['line_type.identifier', 'phone_number']
+        
+    @staticmethod
+    def retrieve_or_create(parent, source, key, value):
+        if parent=='web':
+            emails = Email.objects.filter(address_type__identifier=value['line_type'], email_address=value['phone_number'])
+            if emails.exists():
+                new_phone = emails[0]
+            else:
+                new_phone = Email()
+                new_phone.address_type = Attributes.objects.get(active=True, identifier=value['line_type'])
+                new_phone.email_address = value['phone_numbers']
+                new_phone.save()
+            return new_phone
+        else:
+            return None
     
 class Alias(CoreModel):
     alias_type = models.ForeignKey(Attributes, limit_choices_to={'type':'alias_type'}, related_name='alias_type_rel', null=True)
@@ -511,9 +540,9 @@ class Alias(CoreModel):
     @staticmethod
     def get_displayed_fields(rendition_width):
         if rendition_width=='large':
-            return ['alias_type.name','alias_value','alias_additional']
+            return ['alias_type.identifier','alias_value','alias_additional']
         elif rendition_width=='small':
-            return ['alias_type.name','alias_value']
+            return ['alias_type.identifier','alias_value']
         
     @staticmethod
     def retrieve_or_create(parent, source, key, value):

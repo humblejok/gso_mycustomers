@@ -7,8 +7,8 @@
 						editedData[{{index}}] = {'id': $("#{{entry}}-{{index}}-id").val(), 'many-to-many': '{{entry}}'};
 					{% endif %}
 					{% with current_field=complete_fields|get_dict_key:entry%}
-						{% for option in current_field.options %}
-							editedData[{{index}}]['{{option}}'] = $("#{{entry}}-{{index}}-{{option}}").val();
+						{% for field in current_field.fields %}
+							editedData[{{index}}]['{{field}}'] = $("#{{entry}}-{{index}}-{{field}}").val();
 						{% endfor %}
 					{% endwith %}
 				{% endfor %}
@@ -27,7 +27,11 @@
 						$("#{{entry}}-{{index}}-id").val(data.id);
 						{% with current_field=complete_fields|get_dict_key:entry %}
 							{% for field in current_field.fields %}
-								$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}});
+								if (data.{{field}}.hasOwnProperty('identifier')) {
+									$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}}.identifier);
+								} else {
+									$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}});
+								}
 							{% endfor %}
 						{% endwith %}
 					{% endfor %}

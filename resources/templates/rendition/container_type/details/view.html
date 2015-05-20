@@ -45,18 +45,18 @@
 		}
 
 		function sendItemForEdition(index, data, containerField) {
-			console.log(data);
-			$.each(data, function(field, value) {
-				if (value.hasOwnProperty('identifier')) {
-					$("#" + containerField + "-" + field).val(value.identifier);
-				} else {
-					$("#" + containerField + "-" + field).val(value);
-				}
-				console.log(window["onedit_" + index]);
-				if (typeof window["onedit_" + index] === "function") {
-					console.log("exists");
-				}
-			});
+			if (typeof window["onedit_" + index] === "function") {
+				console.log("onedit_" + index);
+				window["onedit_" + index](data);
+			} else {
+				$.each(data, function(field, value) {
+					if (value.hasOwnProperty('identifier')) {
+						$("#" + containerField + "-" + field).val(value.identifier);
+					} else {
+						$("#" + containerField + "-" + field).val(value);
+					}
+				});
+			}
 		}
 
 		function addWidget(layout, index, callback) {
@@ -106,7 +106,7 @@
 				updateForm.append('container_custom','False');
 			}
 			$.ajax({
-				url: '/container_partial_save.html',
+				url: '/container/partial_save.html',
 				type: 'POST',
 				data: updateForm,
 				processData: false,
