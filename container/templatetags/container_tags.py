@@ -38,7 +38,6 @@ def get_translated_text(text_id, language):
 @register.filter()
 def try_translated_text(text_id, language):
     try:
-        LOGGER.info(text_id)
         return FieldLabel.objects.get(identifier=text_id, language=language).field_label
     except:
         return text_id

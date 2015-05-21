@@ -198,10 +198,12 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Univers <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 							
+							
 							<li><a href="/container/lists.html?item=CONT_UNIVERSE">Explorer</a></li>
 	
 							
 						
+							
 							
 							
 							<li><a href="/index.html">Utiliser</a></li>
@@ -214,10 +216,12 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Eléments <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 							
+							
 							<li role="presentation" class="dropdown-header">Compagnies</li><li><a href="/container/lists.html?item=CONT_COMPANY">Explorer</a></li>
 	
 							
 						
+							
 							
 							
 							<li role="presentation" class="dropdown-header">Personnes</li><li><a href="/container/lists.html?item=CONT_PERSON">Explorer</a></li>
@@ -230,46 +234,54 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuration <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 							
-							<li role="presentation" class="dropdown-header">Présentation</li><li><a href="/container/setup.html?item=container_type&type=creations">Créations d&#39;éléments</a></li>
+							{% if request.user.is_staff %}
+							<li role="presentation" class="dropdown-header">Présentation</li><li><a href="/container/setup.html?item=container_type&type=creations">Créations d&#39;éléments</a></li>{% endif %}
 	
 							
 						
 							
 							
-							<li><a href="/container/setup.html?item=container_type&type=details">Détails des éléments</a></li>
+							{% if request.user.is_staff %}
+							<li><a href="/container/setup.html?item=container_type&type=details">Détails des éléments</a></li>{% endif %}
 	
 							
 						
 							
 							
-							<li><a href="/container/setup.html?item=container_type&type=lists">Listes d&#39;éléments</a></li>
+							{% if request.user.is_staff %}
+							<li><a href="/container/setup.html?item=container_type&type=lists">Listes d&#39;éléments</a></li>{% endif %}
 	
 							
 						
 							
 							
-							<li><a href="/container/setup.html?item=container_type&type=menus">Menus des éléments</a></li>
+							{% if request.user.is_staff %}
+							<li><a href="/container/setup.html?item=container_type&type=menus">Menus des éléments</a></li>{% endif %}
 	
 							
 						
 							
 							
-							<li role="presentation" class="dropdown-header">Données</li><li><a href="/container/setup.html?item=container_type&type=fields">Champs des éléments</a></li>
+							{% if request.user.is_staff %}
+							<li role="presentation" class="dropdown-header">Données</li><li><a href="/container/setup.html?item=container_type&type=fields">Champs des éléments</a></li>{% endif %}
 	
 							
 						
 							
 							
-							<li><a href="/container/setup.html?item=object_type&type=fields">Définition des objets</a></li>
+							{% if request.user.is_staff %}
+							<li><a href="/container/setup.html?item=object_type&type=fields">Définition des objets</a></li>{% endif %}
 	
 							
 						
 							
 							
-							<li role="presentation" class="dropdown-header">Mon compre</li><li><a href="#" onclick="displayDynamicModal('/container/user/setup.html')">Mes préférences</a></li>
+							
+							<li role="presentation" class="dropdown-header">Mon compte</li><li><a href="#" onclick="displayDynamicModal('/container/user/setup.html')">Mes préférences</a></li>
 	
 							
 						
+							
 							
 							
 							<li><a href="#" onclick="displayDynamicModal('/container/user/remove.html')">Fermer mon compte</a></li>
@@ -278,7 +290,8 @@
 						
 							
 							
-							<li role="presentation" class="dropdown-header">Application</li><li><a href="/container/application/setup.html">Paramètres de l&#39;application</a></li>
+							{% if request.user.is_staff %}
+							<li role="presentation" class="dropdown-header">Application</li><li><a href="/container/application/setup.html">Paramètres de l&#39;application</a></li>{% endif %}
 	</ul></li>
 							
 						
