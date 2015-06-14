@@ -6,7 +6,7 @@
 		{% if entry.menu_type == 'link' %}
 		<li><a href="/container/{{entry.data_target}}.html?container_id={% templatetag openvariable %}container.id{% templatetag closevariable %}&container_type={% templatetag openvariable %}container.type.identifier{% templatetag closevariable %}">{{entry.language_identifier|get_translated_text:language_code}}</a></li>
 		{% elif entry.menu_type == 'modal' %}
-		<li><a href="#" type="button" data-toggle="modal" data-target="#modal_{{entry.data_target}}">{{entry.language_identifier|get_translated_text:language_code}}</a></li>
+		<li><a href="#" onclick="callModal('{{entry.data_target}}', {% templatetag openvariable %}container.id{% templatetag closevariable %})">{{entry.language_identifier|get_translated_text:language_code}}</a></li>
 		{% elif entry.menu_type == 'ajax' %}
 		<li><a href="#" onclick="proceedPageAjax('/container/{{entry.data_target}}.html?container_id={% templatetag openvariable %}container.id{% templatetag closevariable %}&container_type={% templatetag openvariable %}container.type.identifier{% templatetag closevariable %}', null, 'GET')">{{entry.language_identifier|get_translated_text:language_code}}</a></li>
 		{% elif entry.menu_type == 'provider' %}

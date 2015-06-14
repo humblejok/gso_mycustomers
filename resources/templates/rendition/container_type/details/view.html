@@ -25,6 +25,10 @@
 
 		var editedData = {};
 		
+		function callModal(modalId) {
+			window[modalId + "_initialize"](container);
+		}
+
 		function deleteItem(itemId, containerField) {
 			console.log(itemId);
 			var updateForm = new FormData();

@@ -8,6 +8,9 @@
 {% templatetag openblock %} endblock {% templatetag closeblock %}
 {% templatetag openblock %} block headeroptions {% templatetag closeblock %}
 <script>
+
+	var containers = [];
+
 	function filterList() {
 		var searchName = $("#searchName").val();
 		if (searchName && searchName!="") {
@@ -26,6 +29,10 @@
 			$('#resultTable tbody tr').show();
 		}
 
+	}
+
+	function callModal(modalId, containerId) {
+		window[modalId + "_initialize"](containers[containerId]);
 	}
 </script>
 {% templatetag openblock %} endblock {% templatetag closeblock %}
@@ -57,6 +64,7 @@
 					</tr>
 					{% templatetag openblock %} for container in containers {% templatetag closeblock %}
 					<tr>
+						<script>containers[{% templatetag openvariable %}container.id{% templatetag closevariable %}] = {% templatetag openvariable %}container|get_as_json_string|safe{% templatetag closevariable %};</script>
 						{% for field in fields %}
 						<td>{% templatetag openvariable %}container.{{field}}{% templatetag closevariable %}</td>
 						{% endfor %}

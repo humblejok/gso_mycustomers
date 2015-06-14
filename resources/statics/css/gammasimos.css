@@ -28,3 +28,14 @@ tbody tr.odd td {
 .ui-autocomplete {
     z-index: 999999;
 }
+
+.holder-small {
+  border: 10px dashed #ccc;
+  width: 400px;
+  height: 200px;
+  margin: 20px auto;
+}
+
+.holder-small.hover {
+  border: 10px dashed #333;
+}

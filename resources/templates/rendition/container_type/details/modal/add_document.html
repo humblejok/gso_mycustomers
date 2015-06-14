@@ -1,0 +1,115 @@
+{% load i18n %}
+			<script>
+
+				var add_document_container_id = urlParams['container_id'];
+				var add_document_container_type = urlParams['container_type'];
+				var add_document_currentItem = 0;
+
+				function add_document_initialize(container) {
+					add_document_container_id = container.id;
+					add_document_container_type = container.type.identifier;
+					$("#modal_add_document_label").text(container.name + " - {% blocktrans %}Add document(s){% endblocktrans %}");
+					$("#modal_add_document").modal();
+				}
+
+				function add_document() {
+					var updateForm = new FormData();
+					updateForm.append('container_id', add_document_container_id);
+					updateForm.append('container_type', add_document_container_type);
+					updateForm.append('price_date', $('#price_date').val());
+					updateForm.append('price_value', $('#price_value').val());
+					$.ajax({
+						url: '/container/add_document.html',
+						type: 'POST',
+						data: updateForm,
+						processData: false,
+						contentType: false,
+						success: containerFieldsSaved,
+						error: onCallError
+					});
+				}
+
+
+				function add_document_allow_drop(event) {
+					event.preventDefault();
+					$("#add_document_holder").removeClass("hover");
+					$("#add_document_holder").addClass("hover");
+					return false;
+				}
+
+				function add_document_end_drop(event) {
+					event.preventDefault();
+					$("#add_document_holder").removeClass("hover");
+					return false;					
+				}
+
+				function add_document_handle_drop(event) {
+					event.preventDefault();
+					$("#add_document_holder").removeClass("hover");
+					$.each(event.dataTransfer.files, function(index, currentFile) {
+						var file = currentFile;
+						var fileReader = new FileReader();
+						$("#add_document_holder_details").append("<tr class='file-item_" + add_document_currentItem + "'><td class='selected-file'>" + file.name + "</td><td><button class='btn btn-default' type='button' role='button' onclick='add_document_remove_file(" + add_document_currentItem + ")'><span class='glyphicon glyphicon-remove'/></button></td></tr>");
+						add_document_currentItem = add_document_currentItem + 1;
+						add_document_send_file(file);
+					});
+					return false;
+				}
+
+				function add_document_upload_handler(event) {
+					console.log(event);
+					$("#backgroundProgress").addClass("invisible");
+				};
+
+				function add_document_remove_file(itemIndex) {
+					console.log(".file-item_" + itemIndex);
+					$(".file-item_" + itemIndex).remove();
+				}
+
+				function add_document_send_file(file) {
+					$("#backgroundProgress").removeClass("invisible");
+					var tempForm = new FormData();
+					tempForm.append('uploaded_file', file);
+					$.ajax({
+						url: '/file_upload.html',
+						type: 'POST',
+						data: tempForm,
+						processData: false,
+						contentType: false,
+						success: console.log('Sent'),
+						complete: add_document_upload_handler
+					});
+				};
+
+			</script>
+
+			<div class="modal fade" id="modal_add_document" tabindex="-1" role="dialog" aria-labelledby="modal_add_document_label" aria-hidden="true">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="modal_add_document_label"></h4>
+						</div>
+						<form id="add_document" role="form" action="#" method="POST">{% csrf_token %}
+							<div class="modal-body">
+								<div class="row">
+									<div class="col-lg-12">
+										<div id="add_document_holder" ondragover="add_document_allow_drop(event)" ondragleave="add_document_end_drop(event)" ondrop="add_document_handle_drop(event)" class="holder-small"></div>
+									</div>
+								</div>
+								<div>
+									<div class="col-lg-12">
+										<table id="add_document_holder_details" class="table table-condensed">
+											<tr><th>{% blocktrans %}Filename{% endblocktrans %}</th><th>&nbsp;</th></tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Add document(s){% endblocktrans %}" onclick="add_document()" data-dismiss="modal">{% blocktrans %}Save{% endblocktrans %}</button>
+							<button type="button" class="btn btn-success" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
+						</div>
+					</div>
+				</div>
+			</div>

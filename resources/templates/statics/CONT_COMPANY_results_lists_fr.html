@@ -8,6 +8,9 @@
 {% endblock %}
 {% block headeroptions %}
 <script>
+
+	var containers = [];
+
 	function filterList() {
 		var searchName = $("#searchName").val();
 		if (searchName && searchName!="") {
@@ -26,6 +29,10 @@
 			$('#resultTable tbody tr').show();
 		}
 
+	}
+
+	function callModal(modalId, containerId) {
+		window[modalId + "_initialize"](containers[containerId]);
 	}
 </script>
 {% endblock %}
@@ -59,6 +66,7 @@
 					</tr>
 					{% for container in containers %}
 					<tr>
+						<script>containers[{{container.id}}] = {{container|get_as_json_string|safe}};</script>
 						
 						<td>{{container.name}}</td>
 						

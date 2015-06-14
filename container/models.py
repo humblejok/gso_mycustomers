@@ -645,6 +645,10 @@ class Container(CoreModel):
     class Meta:
         ordering = ['name']
         
+class ContainerDocument(Container):
+    containers = models.ManyToManyField("Container", related_name='container_document_rel')
+    last_uploader = models.ForeignKey(User, related_name='document_uploader_rel')
+        
 class Universe(Container):
     public = models.BooleanField()
     members = models.ManyToManyField("Container", related_name='universe_inventory_rel')

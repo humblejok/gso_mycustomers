@@ -11,7 +11,7 @@
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
-				<h1 class="">{% blocktrans %}{{ request.user.first_name }} {{ request.user.last_name }}'s universes{% endblocktrans %}</h1>
+				<h1 class="">{% blocktrans with first_name=request.user.first_name last_name=request.user.last_name %}{{first_name}} {{ last_name }}'s universes{% endblocktrans %}</h1>
 	  			<p class="lead">{% blocktrans %}Manage and explore your universes from here{% endblocktrans %}<br/>
 			</div>
 		</div>

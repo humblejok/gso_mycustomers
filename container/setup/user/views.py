@@ -16,8 +16,8 @@ def setup(request):
     return render(request, 'container/edit/user/setup.html', {'base_template': profile['base_template'], 'profile': profile})
 
 def save(request):
-    user = User.objects.get(id=request.user.id)
-    user.login = request.POST['login']
+    user = request.user
+    user.username = request.POST['login']
     user.first_name = request.POST['first_name']
     user.last_name = request.POST['last_name']
     user.email = request.POST['email']
