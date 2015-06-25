@@ -62,19 +62,23 @@ def base_edit(request):
     active_status = Attributes.objects.get(identifier='STATUS_ACTIVE')
     container_attribute = Attributes.objects.get(identifier=container_type)
     if request.POST.has_key('container_id'):
-        portfolio_id = request.POST['container_id']
+        container_id = request.POST['container_id']
         try:
-            source = effective_class.objects.get(Q(id=portfolio_id))
+            source = effective_class.objects.get(Q(id=container_id))
         except:
             # TODO: Return error message
-            return redirect('/lists.html?item=' + container_type)
+            return redirect(request.META.get('HTTP_REFERER'))
     else:
         source = effective_class()
     # Initial setup
     # TODO: Check if name already exists for that container type
     source.type = container_attribute
-    source.name = request.POST['name']
-    source.short_name = request.POST['short_name']
+    for post_field in request.POST.keys():
+        field_info = Attributes()
+        field_info.short_name = post_field
+        field_info.name = post_field
+        source.set_attribute('web', field_info, request.POST[post_field])
+
     source.status = active_status
     source.save()
     # Working on creations mandatory fields
@@ -83,12 +87,7 @@ def base_edit(request):
         creation_data = creation_data[container_type]
     else:
         creation_data = {}
-    print "********************************"
-    print creation_data
     creation_data = complete_fields_information(effective_class,  creation_data)
-    print "********************************"
-    print creation_data
-    print "********************************"
     for field in creation_data.keys():
         if creation_data[field]['type'] in ['ForeignKey', 'ManyToManyField']:
             if creation_data[field]['type']=='ForeignKey':
@@ -98,7 +97,6 @@ def base_edit(request):
                 target_class = classes.my_class_import(creation_data[field]['target_class'])
                 keys_set = [key for key in request.POST.keys() if key.startswith(field)]
                 index = 0
-                print keys_set
                 new_instances = []
                 while (field + "_" + str(index)) in keys_set:
                     base_key = field + "_" + str(index)
@@ -118,7 +116,7 @@ def base_edit(request):
         else:
             setattr(source, field, request.POST[field])
     source.save()
-    return redirect('/container/lists.html?item=' + container_type)
+    return redirect(request.META.get('HTTP_REFERER'))
 
 def delete(request):
     # TODO: Check user
@@ -222,6 +220,31 @@ def partial_save(request):
             container.set_attribute('web', field_info, container_data[field_key])
     container.save()
     return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
+
+def full_search(request):
+    profile = get_or_create_user_profile(request.user.id)
+    container_type = request.POST['container_type']
+    container_data = request.POST['container_data']
+    container_data = json.loads(container_data)
+    if container_data.has_key('type') and container_data['type']!=None and container_data['type']!='':
+        effective_class = get_effective_class(container_type)
+        foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
+        del container_data['many-to-many']
+        print container_data
+        query_filter = {(key + '__identifier' if all_fields.has_key(key) and all_fields[key]['type']=='ForeignKey' and all_fields[key]['target_class']=='container.models.Attributes' else key):container_data[key] for key in container_data.keys() if container_data[key]!='' and container_data[key]!=None}
+        query_filter = {(key + '__icontains' if all_fields.has_key(key) and all_fields[key]['type']=='FIELD_TYPE_TEXT' else key):query_filter[key] for key in query_filter.keys()}
+        query_Q = {key:container_data[key] for key in query_filter.keys() if all_fields.has_key(key) and all_fields[key]['type'] in ['ForeignKey','ManyToManyField']}
+        query_Q_filters = []
+        for key in query_Q.keys():
+            query_Q_filters.append(Q({key + '__name__icontains':container_data[key]}) | Q({key + '__short_name__icontains':container_data[key]}))
+            del query_filter[key]
+        print query_filter
+        print query_Q_filters
+        first = foreign.objects.filter(**query_filter)
+        print first
+        second = first.filter(*query_Q_filters)
+        print second
+
 
 def search(request):
     profile = get_or_create_user_profile(request.user.id)

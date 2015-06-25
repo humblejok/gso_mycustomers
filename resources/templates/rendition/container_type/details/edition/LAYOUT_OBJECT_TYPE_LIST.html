@@ -1,6 +1,21 @@
 {% load container_tags %}
 {% load i18n %}
 		<script>
+
+			function onsearch_{{index}}() {
+				{% for entry in data.data %}
+					{% if forloop.first %}
+						editedData[{{index}}] = {'id': $("#{{entry}}-{{index}}-id").val(), 'many-to-many': '{{entry}}'};
+					{% endif %}
+					{% with current_field=complete_fields|get_dict_key:entry%}
+						{% for field in current_field.fields %}
+							editedData[{{index}}]['{{field}}'] = $("#{{entry}}-{{index}}-{{field}}").val();
+						{% endfor %}
+					{% endwith %}
+				{% endfor %}
+				searchContainer({{index}});
+			}
+
 			function onchange_{{index}}(save) {
 				{% for entry in data.data %}
 					{% if forloop.first %}
@@ -63,6 +78,7 @@
 						</div>
 					</form>
 					<div class="modal-footer">
+						<button type="button" class="btn btn-info" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Search items with these information{% endblocktrans %}" onclick="onsearch_{{index}}()">{% blocktrans %}Search{% endblocktrans %}</button>
 						<button type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Save the modifications{% endblocktrans %}" onclick="onchange_{{index}}(true)" data-dismiss="modal">{% blocktrans %}Save{% endblocktrans %}</button>
 						<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Close the popup{% endblocktrans %}" onclick="onchange_{{index}}(false)" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
 					</div>

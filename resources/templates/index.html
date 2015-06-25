@@ -61,7 +61,9 @@
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 						<h4 class="modal-title" id="modal_create_label">{% blocktrans %}Create a new universe{% endblocktrans %}</h4>
 					</div>
-					<form id="create_form" role="form" action="/universe_base_edit.html" method="POST">{% csrf_token %}
+					<form id="create_form" role="form" action="/container/base_edit.html" method="POST">{% csrf_token %}
+						<input type="hidden" id="container_type" name="container_type" value="CONT_UNIVERSE"/>
+						<input type="hidden" id="owner" name="owner" value="{{request.user.id}}"/>
 						<div class="modal-body">
 							<div class="form-group">
 								<label for="name">{% blocktrans %}Name{% endblocktrans %}</label>

@@ -98,6 +98,25 @@
 			location.reload();
 		}
 
+		function fullSearchSuccess(event) {
+			console.log(event);
+		}
+
+		function searchContainer(index) {
+			var searchForm = new FormData();
+			searchForm.append('container_data', JSON.stringify(editedData[index]));
+			searchForm.append('container_type',urlParams['container_type']);
+			$.ajax({
+				url: '/container/full_search.html',
+				type: 'POST',
+				data: searchForm,
+				processData: false,
+				contentType: false,
+				success: fullSearchSuccess,
+				error: onCallError
+			});
+		}
+
 		function updateContainer(index, custom) {
 			var updateForm = new FormData();
 			updateForm.append('container_data', JSON.stringify(editedData[index]));

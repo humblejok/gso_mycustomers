@@ -21,7 +21,7 @@ urlpatterns = patterns(
     url(r'^get_filtering_entry.html', 'container.views.get_filtering_entry', name='get_filtering_entry'),
     url(r'^definition_save.html','container.views.definition_save', name='container_definition_save'),
     url(r'^partial_save.html','container.views.partial_save', name='container_partial_save'),
-    
+    url(r'^full_search.html','container.views.full_search', name='container_full_search'),    
     
     #########################
     # Rendition views       #

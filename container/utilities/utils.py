@@ -83,9 +83,9 @@ def batch(iterable, n = 1):
 def get_model_foreign_field_class(model_class, field):
     all_fields = get_static_fields(model_class)
     if all_fields[field].has_key('target_class'):
-        return classes.my_class_import(all_fields[field]['target_class'])
+        return classes.my_class_import(all_fields[field]['target_class']), all_fields
     else:
-        return None    
+        return None, None
     
 def complete_custom_fields_information(container_type, filtering_fields=None):
     all_data = {}
@@ -125,8 +125,8 @@ def complete_fields_information(model_class, information, language_code='en'):
                 else:
                     if information[field]['type']!='ForeignKey':
                         information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
-                        information[field]['template_m2m'] = 'statics/' + classes.my_class_import('container.models.Attributes').objects.get(name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
-                        information[field]['template_m2m_complete'] = 'statics/complete_' + classes.my_class_import('container.models.Attributes').objects.get(name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
+                        information[field]['template_m2m'] = 'statics/' + classes.my_class_import('container.models.Attributes').objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
+                        information[field]['template_m2m_complete'] = 'statics/complete_' + classes.my_class_import('container.models.Attributes').objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
                     information[field]['datasource'] = '/container_filter.html?container_class=' + information[field]['target_class']
     return information
 
