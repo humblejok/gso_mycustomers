@@ -20,7 +20,8 @@ urlpatterns = patterns(
     url(r'^fields_get.html', 'container.views.fields_get', name='fields_get'),
     url(r'^get_filtering_entry.html', 'container.views.get_filtering_entry', name='get_filtering_entry'),
     url(r'^definition_save.html','container.views.definition_save', name='container_definition_save'),
-    url(r'^partial_save.html','container.views.partial_save', name='container_partial_save'),
+    url(r'^element_save.html','container.views.element_save', name='container_element_save'),
+    url(r'^element_delete.html','container.views.element_delete', name='container_element_delete'),
     url(r'^full_search.html','container.views.full_search', name='container_full_search'),    
     
     #########################

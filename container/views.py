@@ -10,7 +10,6 @@ import logging
 import os
 
 from bson import json_util
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.forms.models import model_to_dict
@@ -18,7 +17,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from seq_common.utils import classes
 
-from container.models import Attributes, FieldLabel
+from container.models import Attributes, Container
 from container.settings import WORKING_PATH
 from container.utilities import setup_content, external_content
 from container.utilities.container_container import get_container_information, \
@@ -172,7 +171,7 @@ def filters(request):
     results = dumps([dict_to_json_compliance(model_to_dict(item)) for item in results], default=json_util.default)
     return HttpResponse('{"result": ' + results + ', "status_message": "Deleted"}',"json")
 
-def partial_delete(request):
+def element_delete(request):
     # TODO: Check user
     user = User.objects.get(id=request.user.id)
     container_id = request.POST['container_id']
@@ -182,14 +181,14 @@ def partial_delete(request):
     # TODO: Handle error
     effective_class = get_effective_class(container_type)
     container = get_effective_container(container_id)
-    foreign = get_model_foreign_field_class(effective_class, container_field)
+    foreign, all_fields = get_model_foreign_field_class(effective_class, container_field)
     if foreign!=None:
         entry = foreign.objects.get(id=item_id)
         getattr(container, container_field).remove(entry)
         container.save()
     return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
 
-def partial_save(request):
+def element_save(request):
     # TODO: Check user
     user = User.objects.get(id=request.user.id)
     container_id = request.POST['container_id']
@@ -201,9 +200,21 @@ def partial_save(request):
     effective_class = get_effective_class(container_type)
     container = get_effective_container(container_id)
     if container_data.has_key('many-to-many'):
-        foreign = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
+        foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
         if foreign!=None:
-            entry = foreign.retrieve_or_create('web', None, None, container_data)
+            if issubclass(foreign, Container):
+                try:
+                    entry = foreign.objects.get(id=container_data['id'])
+                except:
+                    entry = foreign()
+                    for field_key in [key for key in container_data.keys() if key not in ['many-to-many']]:
+                        field_info = Attributes()
+                        field_info.short_name = field_key
+                        field_info.name = field_key
+                        entry.set_attribute('web', field_info, container_data[field_key])
+                    entry.save()
+            else:
+                entry = foreign.retrieve_or_create('web', None, None, container_data)
             if container_data['id']!=None and container_data['id']!='':
                 getattr(container, container_data['many-to-many']).remove(foreign.objects.get(id=container_data['id']))
             getattr(container, container_data['many-to-many']).add(entry)
@@ -226,10 +237,13 @@ def full_search(request):
     container_type = request.POST['container_type']
     container_data = request.POST['container_data']
     container_data = json.loads(container_data)
+    results = []
+    context = {'base_template': profile['base_template'], 'profile': profile}
     if container_data.has_key('type') and container_data['type']!=None and container_data['type']!='':
         effective_class = get_effective_class(container_type)
         foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
         del container_data['many-to-many']
+        del container_data['id']
         print container_data
         query_filter = {(key + '__identifier' if all_fields.has_key(key) and all_fields[key]['type']=='ForeignKey' and all_fields[key]['target_class']=='container.models.Attributes' else key):container_data[key] for key in container_data.keys() if container_data[key]!='' and container_data[key]!=None}
         query_filter = {(key + '__icontains' if all_fields.has_key(key) and all_fields[key]['type']=='FIELD_TYPE_TEXT' else key):query_filter[key] for key in query_filter.keys()}
@@ -242,8 +256,9 @@ def full_search(request):
         print query_Q_filters
         first = foreign.objects.filter(**query_filter)
         print first
-        second = first.filter(*query_Q_filters)
-        print second
+        results = first.filter(*query_Q_filters)
+    context['results'] = results
+    return render(request, 'container/view/search_results.html', context)
 
 
 def search(request):

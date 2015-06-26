@@ -733,6 +733,10 @@ class CompanyMember(CoreModel):
             return ['person.last_name', 'person.first_name', 'person.birth_date']
         elif rendition_width=='small':
             return ['person.last_name', 'person.first_name']
+        
+    @staticmethod
+    def get_wizard_fields():
+        return ['person']
 
 class CompanyContainer(ThirdPartyContainer):
     members = models.ManyToManyField(CompanyMember)
@@ -777,6 +781,10 @@ class CompanySubsidiary(CoreModel):
             return ['company.name', 'company.inception_date', 'company.status.name']
         elif rendition_width=='small':
             return ['company.name']
+        
+    @staticmethod
+    def get_wizard_fields():
+        return ['company']
     
 class RelatedCompany(CoreModel):
     company = models.ForeignKey(CompanyContainer, null=True)

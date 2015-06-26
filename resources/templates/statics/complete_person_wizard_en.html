@@ -3,6 +3,17 @@
 
 
 <div class="form-group">
+	<label for="type">Type</label>
+	
+		<select id="{{prefix}}type" name="{{prefix}}type" class="form-control">
+		<option value='CONT_COMPANY' >Company</option><option value='CONT_CONTAINER' >Container</option><option value='CONT_DOCUMENT' >Document</option><option value='CONT_MAIL_CAMPAIGN' >Marketing Mailing Campaign</option><option value='CONT_PERSON' >Person</option><option value='CONT_UNIVERSE' >Universe</option>
+		</select>
+	
+</div>
+
+
+
+<div class="form-group">
 	<label for="name">Name</label>
 	
 	<input name="{{prefix}}name" type="text" class="form-control" id="{{prefix}}name" placeholder="Enter a name" value=""/>

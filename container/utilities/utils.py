@@ -122,7 +122,9 @@ def complete_fields_information(model_class, information, language_code='en'):
                 #    information[field]['options'] = getattr(current_class,'get_fields')()
                 if information[field]['target_class']=='container.models.Attributes':
                     information[field]['template'] = 'statics/' + information[field]['link']['type'] + '_' + language_code + '.html'
+                    information[field]['is_container'] = False
                 else:
+                    information[field]['is_container'] = issubclass(classes.my_class_import(information[field]['target_class']), classes.my_class_import('container.models.Container'))
                     if information[field]['type']!='ForeignKey':
                         information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
                         information[field]['template_m2m'] = 'statics/' + classes.my_class_import('container.models.Attributes').objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'

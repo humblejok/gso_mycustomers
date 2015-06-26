@@ -1,0 +1,14 @@
+{% load i18n %}
+{% load container_tags %}
+{% language profile.language_code %}
+<table class="table col-lg-12">
+	<tr>
+		<th colspan="2"><center>{% blocktrans %}Results{% endblocktrans %}</center></th>
+	</tr>
+	{% for entry in results %}
+	<tr>
+		<td class="col-lg-8" valign="middle">{{entry.name}}</td><td class="col-lg-4"><button class="btn btn-default" onclick="selectButtonClick({{entry|get_as_json_string}})">{% blocktrans %}Select{% endblocktrans %}</button></td>
+	</tr>
+	{% endfor %}
+</table>
+{% endlanguage %}

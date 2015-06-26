@@ -24,6 +24,8 @@
 		var gridster;
 
 		var editedData = {};
+
+		var currentWorkingIndex = -1;
 		
 		function callModal(modalId) {
 			window[modalId + "_initialize"](container);
@@ -38,7 +40,7 @@
 			updateForm.append('container_type',urlParams['container_type']);
 			updateForm.append('render_name','view');
 			$.ajax({
-				url: '/container/partial_delete.html',
+				url: '/container/element_delete.html',
 				type: 'POST',
 				data: updateForm,
 				processData: false,
@@ -98,12 +100,22 @@
 			location.reload();
 		}
 
-		function fullSearchSuccess(event) {
-			console.log(event);
+		function selectButtonClick(containerInfo) {
+			if (typeof window["onresultselect_" + currentWorkingIndex] === "function") {
+				window["onresultselect_" + currentWorkingIndex](containerInfo);
+			}
+		}
+
+		function fullSearchSuccess(results) {
+			console.log(results);
+			console.log("#results_" + currentWorkingIndex);
+			$("#results_" + currentWorkingIndex).empty();
+			$("#results_" + currentWorkingIndex).html(results);
 		}
 
 		function searchContainer(index) {
 			var searchForm = new FormData();
+			currentWorkingIndex = index;
 			searchForm.append('container_data', JSON.stringify(editedData[index]));
 			searchForm.append('container_type',urlParams['container_type']);
 			$.ajax({
@@ -119,6 +131,7 @@
 
 		function updateContainer(index, custom) {
 			var updateForm = new FormData();
+			currentWorkingIndex = index;
 			updateForm.append('container_data', JSON.stringify(editedData[index]));
 			updateForm.append('container_id',urlParams['container_id']);
 			updateForm.append('container_type',urlParams['container_type']);
@@ -129,7 +142,7 @@
 				updateForm.append('container_custom','False');
 			}
 			$.ajax({
-				url: '/container/partial_save.html',
+				url: '/container/element_save.html',
 				type: 'POST',
 				data: updateForm,
 				processData: false,

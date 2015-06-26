@@ -6,7 +6,7 @@ Created on 10 mars 2014
 from django import template
 from json import dumps
 from django.forms.models import model_to_dict
-from container.models import CoreModel, Attributes, FieldLabel
+from container.models import CoreModel, Attributes, FieldLabel, Container
 from container.utilities.utils import dict_to_json_compliance,\
     get_effective_class
 import logging
@@ -85,6 +85,10 @@ def get_value(data, field_chain):
 @register.filter()
 def get_jquery_id(identity):
     return identity.replace('.', '\\\\.')
+
+@register.filter()
+def is_container(entity):
+    return isinstance(entity, Container)
 
 @register.filter()
 def has_container_type(universe, container_type):
