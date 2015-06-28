@@ -20,6 +20,8 @@ client = MongoClient(MONGO_URL)
 
 setup = client.setup
 
+# TODO Make it dynamic
+available_data_sets = ['container_type_fields', 'object_type_fields', 'container_type_creations', 'container_type_details', 'container_type_lists', 'container_type_menus']
 
 def get_data(collection_name, searched_id=None):
     if searched_id==None:

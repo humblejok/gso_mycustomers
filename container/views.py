@@ -26,6 +26,7 @@ from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
     get_effective_container, get_or_create_user_profile, \
     get_model_foreign_field_class, get_static_fields, filter_custom_fields
+from django.utils.datastructures import MultiValueDictKeyError
 
 
 LOGGER = logging.getLogger(__name__)
@@ -91,7 +92,11 @@ def base_edit(request):
         if creation_data[field]['type'] in ['ForeignKey', 'ManyToManyField']:
             if creation_data[field]['type']=='ForeignKey':
                 # TODO: Implement not attribute
-                setattr(source, field, Attributes.objects.get(identifier=request.POST[field], active=True))
+                foreign_class, fields_information = get_model_foreign_field_class(effective_class, field)
+                if foreign_class==Attributes:
+                    setattr(source, field, Attributes.objects.get(identifier=request.POST[field], active=True))
+                else:
+                    setattr(source, field, foreign_class.objects.get(id=request.POST[field]))
             else:
                 target_class = classes.my_class_import(creation_data[field]['target_class'])
                 keys_set = [key for key in request.POST.keys() if key.startswith(field)]
@@ -113,7 +118,13 @@ def base_edit(request):
                 setattr(source, field,new_instances)
                 source.save()
         else:
-            setattr(source, field, request.POST[field])
+            try:
+                setattr(source, field, request.POST[field])
+            except MultiValueDictKeyError:
+                if creation_data[field]['type']=='FIELD_TYPE_CHOICE':
+                    setattr(source, field, False)
+                else:
+                    LOGGER.error(field + " - Received data are incomplete, it does not match the creation requirements!")
     source.save()
     return redirect(request.META.get('HTTP_REFERER'))
 
@@ -138,13 +149,38 @@ def get(request):
     fields = list(itertools.chain(*[filtering(working_data[container_type]['data'], k) for k in working_data[container_type]['data'].keys()]))
     custom_fields = complete_custom_fields_information(container_type)
     custom_data = get_container_information(container)
-    # TODO: Handle other langage and factorize with other views
     context = {'base_template': profile['base_template'], 'profile': profile, 
                'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}, profile['language_code']),
                'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
                'custom_data': custom_data,
                'container_type': container_type, 'layout': working_data[container_type]}
     return render(request,'rendition/container_type/details/view.html', context)
+
+def get_field_type(request):
+    profile = get_or_create_user_profile(request.user.id)
+    
+    container_type = request.POST['container_type']
+    current_field = request.POST['current_field']
+    
+    all_fields = get_static_fields(get_effective_class(container_type))
+    print  all_fields[current_field]['type']
+    return HttpResponse(all_fields[current_field]['type']) 
+
+def get_selectable_foreign(request):
+    profile = get_or_create_user_profile(request.user.id)
+    
+    container_type = request.POST['container_type']
+    foreign_field = request.POST['foreign_field']
+
+    foreign_class, fields_information = get_model_foreign_field_class(get_effective_class(container_type), foreign_field)
+    if foreign_class==Attributes:
+        return render(request, 'statics/' + fields_information[foreign_field]['link']['type'] + '_' + profile['language_code'] + '.html')
+    elif foreign_class==User:
+        # TODO Add visibility rules
+        users = User.objects.all()
+        return render(request, 'statics/application_users.html', {'users': users})
+    print foreign_class
+    print fields_information[foreign_field]
 
 def filters(request):
     user = User.objects.get(id=request.user.id)
@@ -154,10 +190,11 @@ def filters(request):
         effective_class_name = Attributes.objects.get(identifier=container_class, active=True).name
     else:
         effective_class_name = request.GET['container_class']
+    searching = request.GET['term']
     effective_class = classes.my_class_import(effective_class_name)
     if getattr(effective_class,'get_querying_class', None)!=None:
         effective_class = effective_class.get_querying_class()
-    searching = request.GET['term']
+    
     query_filter = None
     for field in effective_class.get_querying_fields():
         query_dict = {}
@@ -169,7 +206,7 @@ def filters(request):
             query_filter = query_filter | Q(**query_dict)
     results = effective_class.objects.filter(query_filter).distinct()
     results = dumps([dict_to_json_compliance(model_to_dict(item)) for item in results], default=json_util.default)
-    return HttpResponse('{"result": ' + results + ', "status_message": "Deleted"}',"json")
+    return HttpResponse('{"result": ' + results + ', "status_message": "Found"}',"json")
 
 def element_delete(request):
     # TODO: Check user

@@ -10,6 +10,8 @@ from container.models import CoreModel, Attributes, FieldLabel, Container
 from container.utilities.utils import dict_to_json_compliance,\
     get_effective_class
 import logging
+import urllib
+from django.contrib.auth.models import User
 
 LOGGER = logging.getLogger(__name__)
 
@@ -99,3 +101,7 @@ def log_me(text):
     LOGGER.debug(str(text))
     return ""
 
+@register.inclusion_tag('statics/application_users.html')
+def get_users(user_id, value):
+    users = User.objects.all()
+    return {'users': users, 'value': value}

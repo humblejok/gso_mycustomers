@@ -291,7 +291,14 @@
 							
 							
 							{% if request.user.is_staff %}
-							<li role="presentation" class="dropdown-header">Application</li><li><a href="/container/application/setup.html">Setup application</a></li>{% endif %}
+							<li role="presentation" class="dropdown-header">Application</li><li><a href="#" onclick="displayDynamicModal('/container/application/setup.html')">Setup application</a></li>{% endif %}
+	
+							
+						
+							
+							
+							{% if request.user.is_staff %}
+							<li><a href="#" onclick="displayDynamicModal('/container/application/reset_nosql.html')">Reset integration data</a></li>{% endif %}
 	</ul></li>
 							
 						

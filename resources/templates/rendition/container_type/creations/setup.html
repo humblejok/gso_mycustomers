@@ -15,6 +15,7 @@
 
 	var currentOption;
 	var currentOptionIndex = 0;
+	var isCurrentCheckbox = false;
 
 
 	function onCallError(e) {
@@ -109,7 +110,130 @@
 		});
 	}
 
-	function preparePopup(fieldName) {
+	function fieldDefaultChanged(event) {
+		foreignDefaultChanged(event);
+	}
+
+	function foreignDefaultChanged(event) {
+		if ($("#set_default").prop("checked")) {
+			$("#allow_changes").prop("disabled",false);
+			$("#default").prop("disabled",false);
+		} else {
+			$("#allow_changes").prop("disabled",true);
+			$("#default").prop("disabled",true);
+		}
+		allItems[$("#containerType").val()][currentOption].default = {
+			'set_default': $("#set_default").prop("checked")?'True':'False',
+			'allow_changes': $("#allow_changes").prop("checked")?'True':'False',
+			'value': isCurrentCheckbox?($("#default").prop("checked")?'True':'False'):$("#default").val()
+		};
+		saveListSetup();
+	}
+
+	function fillSelectForForeign(result) {
+		isCurrentCheckbox = false;
+		$("#default").empty();
+		$("#default").html(result);
+
+		$("#set_default").removeAttr("checked");
+		$("#default").val("");
+		$("#allow_changes").prop("checked",true);
+
+		if (allItems[$("#containerType").val()][currentOption].default) {
+			if (allItems[$("#containerType").val()][currentOption].default.set_default=="True") {
+				$("#set_default").prop("checked",true);
+			} else {
+				$("#set_default").prop("checked",false);
+			}
+			if (allItems[$("#containerType").val()][currentOption].default.allow_changes=="True") {
+				$("#allow_changes").prop("checked",true);
+			} else {
+				$("#allow_changes").prop("checked",false);
+			}
+			if (allItems[$("#containerType").val()][currentOption].default.value) {
+				$("#default").val(allItems[$("#containerType").val()][currentOption].default.value);
+			}
+		}
+		foreignDefaultChanged(null);
+	}
+
+	function fillTypeForField(result) {
+		if (result!="FIELD_TYPE_CHOICE") {
+			$("#defaultZone").html('<input name="default" type="text" class="form-control" id="default" placeholder="{% blocktrans %}Enter a value{% endblocktrans %}" value="" onchange="fieldDefaultChanged(event)" disabled/>');
+			isCurrentCheckbox = false;
+		} else {
+			$("#defaultZone").html('<label><input id="default" name="default" type="checkbox" value="True" onchange="fieldDefaultChanged(event)"> -</label>');
+			isCurrentCheckbox = true;
+		}
+
+		if (allItems[$("#containerType").val()][currentOption].default) {
+			if (allItems[$("#containerType").val()][currentOption].default.set_default=="True") {
+				$("#set_default").prop("checked",true);
+			} else {
+				$("#set_default").prop("checked",false);
+			}
+			if (allItems[$("#containerType").val()][currentOption].default.allow_changes=="True") {
+				$("#allow_changes").prop("checked",true);
+			} else {
+				$("#allow_changes").prop("checked",false);
+			}
+			if (allItems[$("#containerType").val()][currentOption].default.value) {
+				if (isCurrentCheckbox) {
+					$("#default").prop("checked",allItems[$("#containerType").val()][currentOption].default.value=="True");
+				} else {
+					$("#default").val(allItems[$("#containerType").val()][currentOption].default.value);
+				}
+			}
+		} else {
+			$("#set_default").prop("checked", false);
+			$("#default").val("");
+			$("#allow_changes").prop("checked", false);
+		}
+		if (result==="FIELD_TYPE_DATE") {
+			$("#default").datepicker({ dateFormat: "yy-mm-dd" });
+		}
+		fieldDefaultChanged(null);
+	}
+
+
+	function preparePopupField(fieldName) {
+		$("#defaultZone").empty();
+		var fieldForm = new FormData();
+		fieldForm.append('container_type', $("#containerType").val());
+		fieldForm.append('current_field', fieldName);
+		currentOption = fieldName;
+		console.log(allItems[$("#containerType").val()][currentOption].default);
+		$.ajax({
+			url: '/container/get_field_type.html',
+			type: 'POST',
+			data: fieldForm,
+			processData: false,
+			contentType: false,
+			success: fillTypeForField,
+			error: onCallError
+		});
+	}
+
+	function preparePopupForeign(fieldName) {
+		$("#defaultZone").empty();
+		$("#defaultZone").html("<select id='default' class='form-control' onchange='foreignDefaultChanged(event)'></select>");
+		var foreignForm = new FormData();
+		foreignForm.append('container_type', $("#containerType").val());
+		foreignForm.append('foreign_field', fieldName);
+		currentOption = fieldName;
+		console.log(allItems[$("#containerType").val()][currentOption].default);
+		$.ajax({
+			url: '/container/get_selectable_foreign.html',
+			type: 'POST',
+			data: foreignForm,
+			processData: false,
+			contentType: false,
+			success: fillSelectForForeign,
+			error: onCallError
+		});
+	}
+
+	function preparePopupMany(fieldName) {
 		$('#filtersList').empty();
 		$('#groupsList').empty();
 
@@ -147,9 +271,11 @@
 		} else {
 			$("#selectedfieldsList").append('<a class="list-group-item select-' + fieldName + '" onclick="onFieldClick(\'' + fieldName + '\')" role="button">' + fieldName + '</a>');
 			if (allFields[fieldName].type==='ManyToManyField') {
-				$("#selectedfieldsOptions").append('<a class="list-group-item select-' + fieldName + '" href="#modal_define_option" role="button" data-toggle="modal" data-placement="bottom" title="{% blocktrans %}Define the options regarding many to many relations{% endblocktrans %}" onclick="preparePopup(\'' + fieldName + '\')">{% blocktrans %}Define{% endblocktrans %}</a>')
+				$("#selectedfieldsOptions").append('<a class="list-group-item select-' + fieldName + '" href="#modal_define_option_many" role="button" data-toggle="modal" data-placement="bottom" title="{% blocktrans %}Define the options regarding many to many relations{% endblocktrans %}" onclick="preparePopupMany(\'' + fieldName + '\')">{% blocktrans %}Define{% endblocktrans %}</a>');
+			} else if (allFields[fieldName].type==='ForeignKey') {
+				$("#selectedfieldsOptions").append('<a class="list-group-item select-' + fieldName + '" href="#modal_define_option_field" role="button" data-toggle="modal" data-placement="bottom" title="{% blocktrans %}Define the options regarding simple relations{% endblocktrans %}" onclick="preparePopupForeign(\'' + fieldName + '\')">{% blocktrans %}Define{% endblocktrans %}</a>');
 			} else {
-				$("#selectedfieldsOptions").append('<div class="list-group-item select-' + fieldName + '">-</div>')
+				$("#selectedfieldsOptions").append('<a class="list-group-item select-' + fieldName + '" href="#modal_define_option_field" role="button" data-toggle="modal" data-placement="bottom" title="{% blocktrans %}Define the options regarding simple data fields{% endblocktrans %}" onclick="preparePopupField(\'' + fieldName + '\')">{% blocktrans %}Define{% endblocktrans %}</a>');
 			}
 			if (!allItems.hasOwnProperty($("#containerType").val())) {
 				allItems[$("#containerType").val()] = {};
@@ -210,8 +336,6 @@
 	}
 </script>
 {% endblock %}
-	</head>
-	<body>
 {% block content %}
 		<div class="row">
 			<div class="col-lg-11">
@@ -248,24 +372,65 @@
 			</div>
 			</b>
 		</div>
-		<div class="modal fade" id="modal_define_option" tabindex="-1" role="dialog" aria-labelledby="modal_define_option_label" aria-hidden="true">
+		<div class="modal fade" id="modal_define_option_many" tabindex="-1" role="dialog" aria-labelledby="modal_define_option_many_label" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="modal_create_internal_label">{% blocktrans %}Define the options regarding many to many relations{% endblocktrans %}</h4>
+						<h4 class="modal-title" id="modal_define_option_many_label">{% blocktrans %}Define the options regarding many to many relations{% endblocktrans %}</h4>
 					</div>
-					<form id="create_form_internal" role="form" action="#" method="POST">{% csrf_token %}
-						<div id="optionBody"  class="modal-body">
+					<form id="many_to_many_options" role="form" action="#" method="POST">
+						{% csrf_token %}
+						<div id="manyOptionBody" class="modal-body">
 							<div class="row">
 								<h4>{% blocktrans %}Create a new group and then drag a filtering option in that group{% endblocktrans %}</h4>
 								<h6>{% blocktrans %}Each group indicates a mandatory user input. All filters within a group are "OR" relations.{% endblocktrans %}</h6>
-							<div>
+							</div>
 							<div class="row"><a id="addButton" class="btn btn-default col-lg-10 col-lg-offset-1" onclick="addGroup(false)">{% blocktrans %}Add a group{% endblocktrans %}</a></div>
 							<div class="row">&nbsp;</div>
 							<div class="row">
 								<div id="filtersList" class="col-lg-4 col-lg-offset-1 list-group"></div>
 								<div id="groupsList" class="col-lg-4 col-lg-offset-2 list-group"></div>
+							</div>
+						</div>
+					</form>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Close the popup{% endblocktrans %}" onclick="" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="modal_define_option_field" tabindex="-1" role="dialog" aria-labelledby="modal_define_option_field_label" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="modal_define_option_field_label">{% blocktrans %}Define the options regarding simple data fields{% endblocktrans %}</h4>
+					</div>
+					<form id="field_options" role="form" action="#" method="POST">{% csrf_token %}
+						<div id="fieldOtionBody"  class="modal-body">
+							<div class="row">
+								<h4>{% blocktrans %}Define default value{% endblocktrans %}</h4>
+								<h6>{% blocktrans %}You can input the default value but also disallow its modification.{% endblocktrans %}</h6>
+							</div>
+							<div class="form-group">
+								<div class="checkbox">
+									<label>
+										<input id="set_default" name="set_default" type="checkbox" value="True" onchange="fieldDefaultChanged(event)"> {% blocktrans %}Set a default value{% endblocktrans %}
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="checkbox">
+									<label>
+										<input id="allow_changes" name="allow_changes" type="checkbox" value="True" onchange="fieldDefaultChanged(event)"> {% blocktrans %}Allow users to change the value{% endblocktrans %}
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="default">{% blocktrans %}Default value{% endblocktrans %}</label>
+								<div id="defaultZone">
+								</div>
 							</div>
 						</div>
 					</form>

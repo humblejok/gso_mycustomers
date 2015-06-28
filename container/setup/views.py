@@ -39,7 +39,7 @@ def save(request):
     profile = get_or_create_user_profile(request.user.id)
     container_setup = request.POST['container_setup']
     container_setup = json.loads(container_setup)
-    
+    print container_setup
     item = request.POST['item']
     item_view_type = request.POST['type']
     item_render_name = request.POST['render_name']

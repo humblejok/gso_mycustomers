@@ -16,9 +16,12 @@ urlpatterns = patterns(
     url(r'^get.html', 'container.views.get', name='container_get'),
     url(r'^search.html', 'container.views.search', name='container_search'),
     url(r'^base_edit.html', 'container.views.base_edit', name='container_base_edit'),
-    url(r'^filter.html', 'container.views.filters', name='container_filter'),
+    url(r'^filters.html', 'container.views.filters', name='container_filters'),
     url(r'^fields_get.html', 'container.views.fields_get', name='fields_get'),
     url(r'^get_filtering_entry.html', 'container.views.get_filtering_entry', name='get_filtering_entry'),
+    url(r'^get_selectable_foreign.html', 'container.views.get_selectable_foreign', name='get_selectable_foreign'),
+    url(r'^get_field_type.html', 'container.views.get_field_type', name='get_field_type'),
+    
     url(r'^definition_save.html','container.views.definition_save', name='container_definition_save'),
     url(r'^element_save.html','container.views.element_save', name='container_element_save'),
     url(r'^element_delete.html','container.views.element_delete', name='container_element_delete'),
@@ -45,7 +48,9 @@ urlpatterns = patterns(
     url(r'^user/setup.html', 'container.setup.user.views.setup', name='user_setup'),
     url(r'^user/remove.html', 'container.setup.user.views.remove', name='user_remove'),
     url(r'^user/save.html', 'container.setup.user.views.save', name='user_save'),
-    
+    url(r'^application/setup.html', 'container.setup.application.views.setup', name='application_setup'),
+    url(r'^application/reset_nosql.html', 'container.setup.application.views.reset_nosql', name='application_reset_nosql'),
+    url(r'^application/reset_nosql_execute.html', 'container.setup.application.views.reset_nosql_execute', name='application_reset_nosql_execute'),
     
     #########################
     # Custom views          #

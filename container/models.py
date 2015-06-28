@@ -730,13 +730,27 @@ class CompanyMember(CoreModel):
     @staticmethod
     def get_displayed_fields(rendition_width):
         if rendition_width=='large':
-            return ['person.last_name', 'person.first_name', 'person.birth_date']
+            return ['role.name', 'person.last_name', 'person.first_name', 'person.birth_date']
         elif rendition_width=='small':
-            return ['person.last_name', 'person.first_name']
+            return ['role.name', 'person.name']
         
     @staticmethod
     def get_wizard_fields():
         return ['person']
+    
+    @staticmethod
+    def retrieve_or_create(parent, source, key, value):
+        if parent=='web' and source==None and key==None and isinstance(value, dict):
+            print value
+            if value['id']!=None and value['id']!='':
+                member = CompanyMember.objects.get(id=value['id'])
+            else:
+                member = CompanyMember()
+            member.role = Attributes.objects.get(active=True, type='company_member_role', identifier=value['role'])
+            member.person = PersonContainer.objects.get(name=value['person'])
+            member.save()
+            return member
+            
 
 class CompanyContainer(ThirdPartyContainer):
     members = models.ManyToManyField(CompanyMember)
@@ -785,6 +799,19 @@ class CompanySubsidiary(CoreModel):
     @staticmethod
     def get_wizard_fields():
         return ['company']
+    
+    @staticmethod
+    def retrieve_or_create(parent, source, key, value):
+        if parent=='web' and source==None and key==None and isinstance(value, dict):
+            print value
+            if value['id']!=None and value['id']!='':
+                subsidiary = CompanySubsidiary.objects.get(id=value['id'])
+            else:
+                subsidiary = CompanySubsidiary()
+            subsidiary.role = Attributes.objects.get(active=True, type='company_subsidiary_role', identifier=value['role'])
+            subsidiary.company = CompanyContainer.objects.get(name=value['company'])
+            subsidiary.save()
+            return subsidiary
     
 class RelatedCompany(CoreModel):
     company = models.ForeignKey(CompanyContainer, null=True)

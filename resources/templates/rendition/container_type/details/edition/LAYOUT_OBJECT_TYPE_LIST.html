@@ -40,17 +40,18 @@
 			}
 
 			function onedit_{{index}}(data) {
-				console.log(data);
 				clean_{{index}}();
 				if (data) {
 					{% for entry in data.data %}
 						$("#{{entry}}-{{index}}-id").val(data.id);
 						{% with current_field=complete_fields|get_dict_key:entry %}
 							{% for field in current_field.fields %}
-								if (data.{{field}}!==null && data.{{field}}.hasOwnProperty('identifier')) {
-									$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}}.identifier);
-								} else {
-									$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}}!==null?data.{{field}}:"");
+								if ('{{field}}'!='id') {
+									if (data.{{field}}!==null && data.{{field}}.hasOwnProperty('identifier')) {
+										$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}}.identifier);
+									} else {
+										$("#{{entry}}-{{index}}-{{field}}").val(data.{{field}}!==null?data.{{field}}{% if not current_field.is_container %}.name{% endif %}:"");
+									}
 								}
 							{% endfor %}
 						{% endwith %}

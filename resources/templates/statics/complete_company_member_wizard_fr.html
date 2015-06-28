@@ -1,0 +1,22 @@
+
+<input id="{{prefix}}id" name="{{prefix}}id" type="hidden"/>
+
+
+<div class="form-group">
+	<label for="role">Rôle</label>
+	
+		<select id="{{prefix}}role" name="{{prefix}}role" class="form-control">
+		<option value='CMR_ANALYST' >Analyste</option><option value='CMR_BDO' >Responsable du développement</option><option value='CMR_CHAIRMAN' >Administrateur</option><option value='CMR_CEO' >Directeur exécutif</option><option value='CMR_CFO' >Directeur financier</option><option value='CMR_CIO' >Directeur des investissement</option><option value='CMR_COO' >Directeur des opérations</option><option value='CMR_CRO' >Direction du risque</option><option value='CMR_CTO' >Directeur informatique</option><option value='CMR_EMPLOYEE' >Employé</option><option value='CMR_EA' >Assistant</option><option value='CMR_FOUNDER' >Fondateur</option><option value='CMR_HOM' >Responsable du marketing</option><option value='CMR_AUDITOR' >Auditeur interne</option><option value='CMR_LAWYER' >Avocat</option><option value='CMR_MD' >Directeur et gérant</option><option value='CMR_MO' >Suivi de marché</option><option value='CMR_PARTNER' >Associé</option><option value='CMR_PM' >Gérant de portefeuille</option><option value='CMR_RM' >Gérant de clientèle</option><option value='CMR_SALES' >Vendeur</option><option value='CMR_SRM' >Gérant de clientèle (sénior)</option><option value='CMR_UNKNOWN' >Rôle inconnu</option>
+		</select>
+	
+</div>
+
+
+
+<div class="form-group">
+	<label for="person">Personne</label>
+	
+	<input name="{{prefix}}person" type="text" class="form-control with-autocomplete" id="{{prefix}}person" placeholder="Personne" datasource="/container/filters.html?container_type=CONT_PERSON"" value=""/>
+	
+</div>
+

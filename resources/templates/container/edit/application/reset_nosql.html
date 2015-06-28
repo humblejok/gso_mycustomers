@@ -1,0 +1,24 @@
+{% load i18n %}
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="dynamic_modal_label">{% blocktrans %}Reset integration data{% endblocktrans %}</h4>
+					</div>
+					<form id="dynamic_modal_form" role="form" action="/container/application/reset_nosql_execute.html" method="POST">{% csrf_token %}
+						<div class="modal-body">
+							<div class="form-group">
+								{% for data_set in data_sets %}
+								<div class="checkbox">
+									<label>
+										<input id="{{data_set}}" name="{{data_set}}" type="checkbox"> {{data_set}}
+									</label>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm your modifications{% endblocktrans %}" onclick="confirmDynamicModal('/container/application/reset_nosql_execute.html', document.getElementById('dynamic_modal_form'))">{% blocktrans %}Execute{% endblocktrans %}</button>
+						</div>
+					</form>
+				</div>
