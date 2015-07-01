@@ -1,0 +1,78 @@
+{% load container_tags %}
+{% load i18n %}
+		<script>
+			function onresultselect_{{index}}(data) {
+				$("#results_{{index}}").empty();
+				onedit_{{index}}(data);
+			}
+
+			function onsearch_{{index}}() {
+				editedData[{{index}}] = {'id': $("#{{key}}-{{index}}-id").val()};
+				{% for field in complete_fields|get_dict_key:key|get_dict_key:"fields" %}
+					editedData[{{index}}]['{{field}}'] = $("#{{key}}-{{index}}-{{field}}").val();
+				{% endfor %}
+				searchContainer({{index}});
+			}
+
+			function onchange_{{index}}(save) {
+				editedData[{{index}}] = {'id': $("#{{key}}-{{index}}-id").val()};
+				{% for field in complete_fields|get_dict_key:key|get_dict_key:"fields" %}
+					editedData[{{index}}]['{{field}}'] = $("#{{key}}-{{index}}-{{field}}").val();
+				{% endfor %}
+				if (save) {
+					updateContainer({{index}});
+				} else {
+					console.log(editedData[{{index}}]);
+				}
+			}
+
+			function onedit_{{index}}(data) {
+				clean_{{index}}();
+				if (data) {
+					$("#{{key}}-{{index}}-id").val(data.id);
+					{% for field in complete_fields|get_dict_key:key|get_dict_key:"fields" %}
+						if ('{{field}}'!='id') {
+							if (data.{{field}}!==null && data.{{field}}.hasOwnProperty('identifier')) {
+								$("#{{key}}-{{index}}-{{field}}").val(data.{{field}}.identifier);
+							} else {
+								$("#{{key}}-{{index}}-{{field}}").val(data.{{field}}!==null?data.{{field}}:"");
+							}
+						}
+					{% endfor %}
+					$("#saveButton_{{index}}").prop("disabled", false);
+				} else {
+					$("#saveButton_{{index}}").prop("disabled", true);
+				}
+			}
+
+			function clean_{{index}}() {
+				$("#saveButton_{{index}}").prop("disabled", true);
+				$("#{{key}}-{{index}}-id").val("");
+				{% for field in complete_fields|get_dict_key:key|get_dict_key:"fields" %}
+					$("#{{key}}-{{index}}-{{field}}").val("");
+				{% endfor %}
+			}
+		</script>
+		<div class="modal fade" id="modal_define_{{index}}" tabindex="-1" role="dialog" aria-labelledby="modal_define_{{index}}_label" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="modal_define_{{index}}_label">{{key|get_translated_text:language_code}} - {% blocktrans %}Add/edit information{% endblocktrans %}</h4>
+					</div>
+					<div id="optionBody" class="modal-body">
+						<form id="edit_form_{{index}}" role="form" action="#" method="POST">{% csrf_token %}
+							<div class="row">&nbsp;</div>
+							{% include complete_fields|get_dict_key:key|get_dict_key:"template_m2m_complete" with prefix=key|add:"-"|add:index|add:"-" %}
+						</form>
+						<div id="results_{{index}}" class="row">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="searchButton_{{index}}" type="button" class="btn btn-info" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Search containers with these information{% endblocktrans %}" onclick="onsearch_{{index}}()">{% blocktrans %}Search{% endblocktrans %}</button>
+						<button  id="saveButton_{{index}}" type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Save the modifications{% endblocktrans %}" onclick="onchange_{{index}}(true)" data-dismiss="modal" disabled="true">{% blocktrans %}Save{% endblocktrans %}</button>
+						<button  id="closeButton_{{index}}" type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Close the popup{% endblocktrans %}" onclick="onchange_{{index}}(false)" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
+					</div>
+				</div>
+			</div>
+		</div>

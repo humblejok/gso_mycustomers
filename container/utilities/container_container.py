@@ -3,9 +3,9 @@ Created on Apr 24, 2015
 
 @author: sdejonckheere
 '''
-from container.settings import MONGO_URL
 from container.models import Attributes
 from pymongo.mongo_client import MongoClient
+from container.setup.application.settings import MONGO_URL
 
 client = MongoClient(MONGO_URL)
 

@@ -1,0 +1,28 @@
+		var currentWorkingIndex = -1;
+
+		function fullSearchSuccess(results) {
+			$("#results_" + currentWorkingIndex).empty();
+			$("#results_" + currentWorkingIndex).html(results);
+		}
+
+		function searchContainer(index) {
+			var searchForm = new FormData();
+			currentWorkingIndex = index;
+			searchForm.append('container_data', JSON.stringify(editedData[index]));
+			searchForm.append('container_type',{{container_type_var}});
+			$.ajax({
+				url: '/container/full_search.html',
+				type: 'POST',
+				data: searchForm,
+				processData: false,
+				contentType: false,
+				success: fullSearchSuccess,
+				error: onCallError
+			});
+		}
+
+		function selectButtonClick(containerInfo) {
+			if (typeof window["onresultselect_" + currentWorkingIndex] === "function") {
+				window["onresultselect_" + currentWorkingIndex](containerInfo);
+			}
+		}

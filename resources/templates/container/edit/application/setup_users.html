@@ -1,0 +1,198 @@
+{% extends base_template %}
+{% load i18n %}
+{% block title %}{% blocktrans %}Users assigment{% endblocktrans %}{% endblock %}
+{% block readyoptions %}
+				$(".btn").not('#comment').tooltip();
+				$("#create_user").on('submit',onCreateEditUser);
+				containerChanged();
+{% endblock %}
+{% block headeroptions %}
+<script>
+	
+	var editedData = [];
+
+	var currentContainerType = "CONT_THIRD_PARTY";
+
+	function onCallError(e) {
+		alert(e.status);
+	}
+
+	function mappingLoaded(result) {
+		$("#currentMapping").html(result);
+		$(".btn").not('#comment').tooltip();
+	}
+
+	function userCreated(result) {
+		console.log(result);
+		$("#modal_create_user").modal('hide');
+		location.reload();
+	}
+
+	function containerChanged() {
+		$("#currentMapping").empty();
+		var usersForm = new FormData();
+		usersForm.append('user_id', $("#userId").val());
+		$.ajax({
+			url: '/container/application/get_user_assigment.html',
+			type: 'POST',
+			data: usersForm,
+			processData: false,
+			contentType: false,
+			success: mappingLoaded,
+			error: onCallError
+		});
+	}
+
+	function removeCurrentMapping(mapping_id) {
+		var usersForm = new FormData();
+		usersForm.append('mapping_id', mapping_id);
+		$.ajax({
+			url: '/container/application/remove_user_assigment.html',
+			type: 'POST',
+			data: usersForm,
+			processData: false,
+			contentType: false,
+			success: containerChanged,
+			error: onCallError
+		});
+	}
+	function onCreateEditUser(event) {
+		event.preventDefault();
+		var userForm = new FormData();
+		userForm.append('id', $("#id").val());
+		userForm.append('username', $("#username").val());
+		userForm.append('last_name', $("#last_name").val());
+		userForm.append('first_name', $("#first_name").val());
+		userForm.append('email', $("#email").val());
+		userForm.append('password', $("#password").val());
+		userForm.append('create_person', $("#create_person").prop("checked")?$("#create_person").val():"");
+		userForm.append('is_staff', $("#is_staff").prop("checked")?$("#is_staff").val():"");
+		userForm.append('is_active', $("#is_active").prop("checked")?$("#is_active").val():"");
+		$.ajax({
+			url: '/container/application/create_edit_user.html',
+			type: 'POST',
+			data: userForm,
+			processData: false,
+			contentType: false,
+			success: userCreated,
+			error: onCallError
+		});
+	}
+
+	function openCreateUser(user) {
+		$("#id").val("");
+		if (user) {
+			console.log(user);
+		}
+		$("#modal_create_user").modal({show: true});
+	}
+
+	function openSelectThird() {
+		$("#modal_define_0").modal({show: true});
+	}
+
+	{% include "rendition/container_type/details/script/search_script.html" with container_type_var="currentContainerType" %}
+
+	function updateContainer(index, custom) {
+		console.log(editedData[index].id);
+		var usersForm = new FormData();
+		usersForm.append('user_id', $("#userId").val());
+		usersForm.append('third_container_id', editedData[index].id);
+		$.ajax({
+			url: '/container/application/add_user_assigment.html',
+			type: 'POST',
+			data: usersForm,
+			processData: false,
+			contentType: false,
+			success: containerChanged,
+			error: onCallError
+		});
+	}
+
+</script>
+{% endblock %}
+{% block content %}
+		<div class="row">
+			<div class="col-lg-11">
+				<h1 class="">{% blocktrans %}Create and assign users to third parties{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Create users and define global users permissions by assigning them to various third parties.{% endblocktrans %}<br/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-11">
+				<select class="form-control no-enter" id="userId" name="containerType" onchange="containerChanged()">
+					{% for user in all_users %}<option value="{{user.id}}">{{user.username}} - {{user.last_name}} {{user.first_name}}{% if user.is_staff %} - Administrator{% endif %}</option>{% endfor %}
+				</select>
+			</div>
+			<button class="btn btn-default" data-toggle="tooltip" title="Create a new user" onclick="openCreateUser()"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></button>
+		</div>
+		<div class="row">&nbsp;</div>
+		<div id="currentMapping" class="row"></div>
+
+		{% include "rendition/container_type/details/modal/container_lookup_modal.html" with index="0" complete_fields=mapping_fields key="third_container" language_code=profile.language_code %}
+
+		<div class="modal fade" id="modal_create_user" tabindex="-1" role="dialog" aria-labelledby="modal_create_user_label" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="modal_create_user_label">{% blocktrans %}Create/edit a new user{% endblocktrans %}</h4>
+					</div>
+					<form id="create_user" role="form" action="#" method="POST">
+						{% csrf_token %}
+						<div class="modal-body">
+							<div class="row">
+								<h5>{% blocktrans %}Create or set the global parameters of the user account.{% endblocktrans %}</h6>
+							</div>
+							<input name="id" id="id" type="hidden"/>
+							<div class="form-group">
+								<label for="username">{% blocktrans %}Login{% endblocktrans %}</label>
+								<input name="username" type="text" class="form-control" id="username" placeholder="{% blocktrans %}Input an user identifier{% endblocktrans %}" value=""/>
+							</div>
+							<div class="form-group">
+								<label for="last_name">{% blocktrans %}Last name{% endblocktrans %}</label>
+								<input name="last_name" type="text" class="form-control" id="last_name" placeholder="{% blocktrans %}Input the last name{% endblocktrans %}" value=""/>
+							</div>
+							<div class="form-group">
+								<label for="first_name">{% blocktrans %}First name{% endblocktrans %}</label>
+								<input name="first_name" type="text" class="form-control" id="first_name" placeholder="{% blocktrans %}Input the first name{% endblocktrans %}" value=""/>
+							</div>
+							<div class="form-group">
+								<label for="email">{% blocktrans %}Email{% endblocktrans %}</label>
+								<input name="email" type="text" class="form-control" id="email" placeholder="{% blocktrans %}Input an email address{% endblocktrans %}" value=""/>
+							</div>
+							<div class="form-group">
+								<label for="password">{% blocktrans %}Password{% endblocktrans %}</label>
+								<input name="password" type="password" class="form-control" id="password" placeholder="{% blocktrans %}Input a password{% endblocktrans %}" value=""/>
+							</div>
+							<div class="form-group">
+								<div class="checkbox">
+									<label>
+										<input id="create_person" name="create_person" type="checkbox" value="True" checked="true"> {% blocktrans %}Create the associated person?{% endblocktrans %}
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="checkbox">
+									<label>
+										<input id="is_staff" name="is_staff" type="checkbox" value="True"> {% blocktrans %}Is the user an administrator?{% endblocktrans %}
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="checkbox">
+									<label>
+										<input id="is_active" name="is_active" type="checkbox" value="True" checked="true"> {% blocktrans %}Is the account active?{% endblocktrans %}
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Close the popup{% endblocktrans %}" onclick="" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
+							<button type="submit" class="btn btn-warning" role="submit" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Save the modification{% endblocktrans %}">{% blocktrans %}Save{% endblocktrans %}</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+{% endblock %}

@@ -49,8 +49,15 @@ urlpatterns = patterns(
     url(r'^user/remove.html', 'container.setup.user.views.remove', name='user_remove'),
     url(r'^user/save.html', 'container.setup.user.views.save', name='user_save'),
     url(r'^application/setup.html', 'container.setup.application.views.setup', name='application_setup'),
+    url(r'^application/save.html', 'container.setup.application.views.save', name='application_save'),
     url(r'^application/reset_nosql.html', 'container.setup.application.views.reset_nosql', name='application_reset_nosql'),
     url(r'^application/reset_nosql_execute.html', 'container.setup.application.views.reset_nosql_execute', name='application_reset_nosql_execute'),
+    url(r'^application/setup_users.html', 'container.setup.application.views.setup_users', name='application_setup_users'),
+    url(r'^application/create_edit_user.html', 'container.setup.application.views.create_edit_user', name='application_create_edit_user'),
+    url(r'^application/get_user_assigment.html', 'container.setup.application.views.get_user_assigment', name='application_get_user_assigment'),
+    url(r'^application/add_user_assigment.html', 'container.setup.application.views.add_user_assigment', name='application_add_user_assigment'),
+    url(r'^application/remove_user_assigment.html', 'container.setup.application.views.remove_user_assigment', name='application_remove_user_assigment'),
+    
     
     #########################
     # Custom views          #

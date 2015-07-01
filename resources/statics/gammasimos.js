@@ -51,6 +51,23 @@ $.fn.hasAttr = function(attributeName) {
     }
 }
 
+
+$.fn.serializeJSON = function () {
+    var result = {};
+    var as_array = this.serializeArray();
+    $.each(as_array, function () {
+        if (result[this.name] !== undefined) {
+            if (!result[this.name].push) {
+                result[this.name] = [result[this.name]];
+            }
+            result[this.name].push(this.value || '');
+        } else {
+            result[this.name] = this.value || '';
+        }
+    });
+    return result;
+};
+
 String.prototype.replaceAll = function(search, replace) {
     if (replace === undefined) {
         return this.toString();

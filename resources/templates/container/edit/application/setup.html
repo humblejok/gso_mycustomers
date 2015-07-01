@@ -1,39 +1,40 @@
 {% load i18n %}
+{% load container_tags %}
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="dynamic_modal_label">{% blocktrans %}Edit your account{% endblocktrans %}</h4>
+						<h4 class="modal-title" id="dynamic_modal_label">{% blocktrans %}Edit application setup{% endblocktrans %}</h4>
 					</div>
 					<form id="dynamic_modal_form" role="form" action="/container/user/save.html" method="POST">{% csrf_token %}
 						<div class="modal-body">
 							<div class="form-group">
-								<label for="login">{% blocktrans %}Login{% endblocktrans %}</label>
-								<input name="login" type="text" class="form-control" id="login" placeholder="Enter a login" value="{{request.user.username}}"/>
+								<label for="MONGO_URL">{% blocktrans %}URL to MongoDB{% endblocktrans %}</label>
+								<input name="MONGO_URL" type="text" class="form-control" id="MONGO_URL" placeholder="Enter a Mongo URL" value="{{application_settings.MONGO_URL|get_escaped_strings}}"/>
 							</div>
 							<div class="form-group">
-								<label for="last_name">{% blocktrans %}Last name{% endblocktrans %}</label>
-								<input name="last_name" type="text" class="form-control" id="last_name" placeholder="Enter your last name" value="{{request.user.last_name}}"/>
+								<label for="RESOURCES_MAIN_PATH">{% blocktrans %}Path to resources{% endblocktrans %}</label>
+								<input name="RESOURCES_MAIN_PATH" type="text" class="form-control" id="RESOURCES_MAIN_PATH" placeholder="Enter a valid folder path" value="{{application_settings.RESOURCES_MAIN_PATH|get_escaped_strings}}"/>
 							</div>
 							<div class="form-group">
-								<label for="first_name">{% blocktrans %}First name{% endblocktrans %}</label>
-								<input name="first_name" type="text" class="form-control" id="first_name" placeholder="Enter your first name" value="{{request.user.first_name}}"/>
+								<label for="MAIN_PATH">{% blocktrans %}Main application path{% endblocktrans %}</label>
+								<input name="MAIN_PATH" type="text" class="form-control" id="MAIN_PATH" placeholder="Enter a valid folder path" value="{{application_settings.MAIN_PATH|get_escaped_strings}}"/>
 							</div>
 							<div class="form-group">
-								<label for="email">{% blocktrans %}Email address{% endblocktrans %}</label>
-								<input name="email" type="text" class="form-control" id="email" placeholder="Enter your email address" value="{{request.user.email}}"/>
+								<label for="STATICS_PATH">{% blocktrans %}Static files path{% endblocktrans %}</label>
+								<input name="STATICS_PATH" type="text" class="form-control" id="STATICS_PATH" placeholder="Enter a valid folder path" value="{{application_settings.STATICS_PATH|get_escaped_strings}}"/>
 							</div>
 							<div class="form-group">
-								<label for="language">{% blocktrans %}Preferred language{% endblocktrans %}</label>
-								<select class='form-control no-enter' id='language' name='language'>
-									{% with value=profile.language %}
-										{% include 'statics/available_language_en.html' %}
-									{% endwith %}
-								</select>
+								<label for="TEMPLATES_STATICS_PATH">{% blocktrans %}Static files within templates path{% endblocktrans %}</label>
+								<input name="TEMPLATES_STATICS_PATH" type="text" class="form-control" id="TEMPLATES_STATICS_PATH" placeholder="Enter a valid folder path" value="{{application_settings.TEMPLATES_STATICS_PATH|get_escaped_strings}}"/>
+							</div>
+							<div class="form-group">
+								<label for="WORKING_PATH">{% blocktrans %}Temporary/working folder{% endblocktrans %}</label>
+								<input name="WORKING_PATH" type="text" class="form-control" id="WORKING_PATH" placeholder="Enter a valid folder path" value="{{application_settings.WORKING_PATH|get_escaped_strings}}"/>
 							</div>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm your modifications{% endblocktrans %}" onclick="confirmDynamicModal('/container/user/save.html', document.getElementById('dynamic_modal_form'))">{% blocktrans %}Save{% endblocktrans %}</button>
+							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm your modifications{% endblocktrans %}" onclick="confirmDynamicModal('/container/application/save.html', document.getElementById('dynamic_modal_form'))">{% blocktrans %}Save{% endblocktrans %}</button>
 						</div>
 					</form>
 				</div>

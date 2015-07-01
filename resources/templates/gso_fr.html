@@ -204,13 +204,6 @@
 							
 						
 							
-							
-							
-							<li><a href="/index.html">Utiliser</a></li>
-	
-							
-						
-							
 							</ul></li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Eléments <b class="caret"></b></a>
@@ -299,6 +292,13 @@
 							
 							{% if request.user.is_staff %}
 							<li><a href="#" onclick="displayDynamicModal('/container/application/reset_nosql.html')">Réinitialiser des données d&#39;intégration</a></li>{% endif %}
+	
+							
+						
+							
+							
+							{% if request.user.is_staff %}
+							<li><a href="/container/application/setup_users.html">Gérer les utilisateurs</a></li>{% endif %}
 	</ul></li>
 							
 						

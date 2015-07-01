@@ -12,8 +12,8 @@ from django.template.context import Context
 from pymongo.mongo_client import MongoClient
 from seq_common.utils.dates import epoch_time
 
-from container.settings import MONGO_URL, STATICS_PATH
 from seq_common.utils import classes
+from container.setup.application.settings import MONGO_URL, STATICS_PATH
 
 
 client = MongoClient(MONGO_URL)

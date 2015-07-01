@@ -18,7 +18,6 @@ from django.shortcuts import render, redirect
 from seq_common.utils import classes
 
 from container.models import Attributes, Container
-from container.settings import WORKING_PATH
 from container.utilities import setup_content, external_content
 from container.utilities.container_container import get_container_information, \
     set_container_information
@@ -27,6 +26,7 @@ from container.utilities.utils import complete_fields_information, \
     get_effective_container, get_or_create_user_profile, \
     get_model_foreign_field_class, get_static_fields, filter_custom_fields
 from django.utils.datastructures import MultiValueDictKeyError
+from container.setup.application.settings import WORKING_PATH
 
 
 LOGGER = logging.getLogger(__name__)
@@ -278,8 +278,12 @@ def full_search(request):
     context = {'base_template': profile['base_template'], 'profile': profile}
     if container_data.has_key('type') and container_data['type']!=None and container_data['type']!='':
         effective_class = get_effective_class(container_type)
-        foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
-        del container_data['many-to-many']
+        if container_data.has_key('many-to-many'):
+            foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
+            del container_data['many-to-many']
+        else:
+            foreign = effective_class
+            all_fields = get_static_fields(foreign)
         del container_data['id']
         print container_data
         query_filter = {(key + '__identifier' if all_fields.has_key(key) and all_fields[key]['type']=='ForeignKey' and all_fields[key]['target_class']=='container.models.Attributes' else key):container_data[key] for key in container_data.keys() if container_data[key]!='' and container_data[key]!=None}

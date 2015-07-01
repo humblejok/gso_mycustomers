@@ -4,7 +4,11 @@
 			function onchange_{{index}}(save) {
 				editedData[{{index}}] = {};
 				{% for entry in data.data %}
+					{% if complete_fields|get_dict_key:entry|get_dict_key:'type' == 'FIELD_TYPE_CHOICE' %}
+					editedData[{{index}}]['{{entry}}'] = $("#{{entry|get_jquery_id}}").prop("checked")?$("#{{entry|get_jquery_id}}").val():"False";
+					{% else %}
 					editedData[{{index}}]['{{entry}}'] = $("#{{entry|get_jquery_id}}").val();
+					{% endif %}
 					{% if current_field.filter %}
 					editedData[{{index}}]['{{entry}}-{{current_field.filter}}'] = $("#{{entry|get_jquery_id}}-{{current_field.filter|get_jquery_id}}").val();
 					{% endif %}
@@ -30,12 +34,22 @@
 								<label for="{{entry}}">{{entry|get_translated_text:language_code}}</label>
 								{% if current_field.template %}
 									<select id="{{entry}}" name="{{entry}}" class="form-control">
-									{% with value=container|get_value:entry active_list=option %}
-										{% include current_field.template %}
-									{% endwith %}
+									{% if current_field.target_class == 'django.contrib.auth.models.User' %}
+										{% get_users request.user.id container|get_value:entry|get_value:'id' %}
+									{% else %}
+										{% with value=container|get_value:entry active_list=option %}
+											{% include current_field.template %}
+										{% endwith %}
+									{% endif %}
 									</select>
 								{% else %}
-								<input name="{{entry}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" value="{{container|get_value:entry}}"/>
+									{% if current_field.type == 'FIELD_TYPE_CHOICE' %}
+									<div>
+									<label ><input id="{{entry}}" name="{{entry}}" type="checkbox" value="True" {% if container|get_value:entry|slugify == 'true' %}checked{% endif %}> <small>{{entry|add:'.placeholder'|get_translated_text:language_code}}</small></label>
+									</div>
+									{% else %}
+									<input name="{{entry}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" value="{{container|get_value:entry}}"/>
+									{% endif %}
 								{% endif %}
 							</div>
 							{% endwith %}

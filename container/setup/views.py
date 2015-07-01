@@ -15,10 +15,10 @@ from django.template.context import Context
 from seq_common.utils import classes
 
 from container.models import Attributes, MenuEntries
-from container.settings import TEMPLATES_STATICS_PATH
 from container.utilities import setup_content
 from container.utilities.utils import complete_fields_information, get_or_create_user_profile
 import logging
+from container.setup.application.settings import TEMPLATES_STATICS_PATH
 
 LOGGER = logging.getLogger(__name__)
 

@@ -13,10 +13,11 @@ from openpyxl.reader.excel import load_workbook
 from seq_common.utils import classes
 
 import container
-from container.settings import RESOURCES_MAIN_PATH, TEMPLATES_STATICS_PATH
 from container.utilities.utils import get_static_fields, \
     complete_fields_information
 from gso_mycustomers.settings import TEMPLATE_DIRS
+from container.setup.application.settings import RESOURCES_MAIN_PATH,\
+    TEMPLATES_STATICS_PATH
 
 
 LOGGER = logging.getLogger(__name__)
@@ -311,6 +312,8 @@ class CoreModel(models.Model):
                         else:
                             LOGGER.warn('Cannot find foreign key instance on ' + str(self) + '.' + field_info.short_name + ' for value [' + string_value + '] and relation ' + str(linked_to))
                 else:
+                    if self._meta.get_field(field_info.short_name).get_internal_type()=='BooleanField':
+                        string_value = string_value=='True'
                     setattr(self, field_info.short_name, string_value)
         except FieldDoesNotExist:
             #traceback.print_exc()
@@ -521,9 +524,9 @@ class Phone(CoreModel):
             if emails.exists():
                 new_phone = emails[0]
             else:
-                new_phone = Email()
-                new_phone.address_type = Attributes.objects.get(active=True, identifier=value['line_type'])
-                new_phone.email_address = value['phone_numbers']
+                new_phone = Phone()
+                new_phone.line_type = Attributes.objects.get(active=True, identifier=value['line_type'])
+                new_phone.phone_number = value['phone_number']
                 new_phone.save()
             return new_phone
         else:
@@ -925,3 +928,7 @@ class RelatedThird(CoreModel):
         new_relation.third = third
         new_relation.save()
         return new_relation
+    
+class UserMapping(models.Model):
+    third_container = models.ForeignKey(ThirdPartyContainer, related_name='user_related_third', null=False)
+    related_user = models.ForeignKey(User, related_name='related_third_user', null=False)

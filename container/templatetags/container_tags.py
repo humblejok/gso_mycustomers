@@ -85,6 +85,10 @@ def get_value(data, field_chain):
     return data if data!=None else ''
 
 @register.filter()
+def get_escaped_strings(string_value):
+    return string_value.replace('\\', '\\\\')
+
+@register.filter()
 def get_jquery_id(identity):
     return identity.replace('.', '\\\\.')
 

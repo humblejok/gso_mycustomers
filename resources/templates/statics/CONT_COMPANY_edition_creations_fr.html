@@ -2,18 +2,34 @@
 
 	
 		
-			<div class="form-group">
-				<label for="status">Statut</label>
+			
 				
-					<select id="status" name="status" class="form-control" >
+				<div class="form-group">
+					<label for="phones_0">Téléphones</label>
 					
-						
-							<option value='STATUS_ACTIVE' >Actif</option><option value='STATUS_CLOSED' >Fermé</option><option value='STATUS_CLOSING' >En cours de fermeture</option><option value='STATUS_TO_BE_VALIDATED' selected>A valider</option>
-						
+						<select id="phones_0" name="phones_0" class="form-control">
+						<option value='PHONE_LAND_CONTACT' >Contact Landline</option><option value='PHONE_MOB_CONTACT' >Numéro mobile de contact</option><option value='PHONE_LAND_WORK' >Ligne fixe professionnelle</option><option value='PHONE_MOB_WORK' >Numéro mobile professionnel</option>
+						</select>
 					
-					</select>
+				</div>
+				<blockquote id="phones_0blockquote">
+				<h6>
+				
+<input id="phones_0.id" name="phones_0.id" type="hidden"/>
+
+
+<div class="form-group">
+	<label for="phone_number">Numéro de téléphone</label>
+	
+	<input name="phones_0.phone_number" type="text" class="form-control " id="phones_0.phone_number" placeholder="Entrer un numéro de téléphone" " value=""/>
+	
+</div>
+
+
+				</h6>
+				</blockquote>
 				
-			</div>
+			
 		
 	
 
@@ -25,7 +41,7 @@
 					<label for="addresses_0">Adresses</label>
 					
 						<select id="addresses_0" name="addresses_0" class="form-control">
-						<option value='ADR_MAIN_OFFICE' >Bureau principal</option>
+						<option value='ADR_MAIN_OFFICE' >Bureau principal</option><option value='ADR_SUBSI_OFFICE' >Bureau secondaire</option><option value='ADR_WEB' >Adresse internet</option>
 						</select>
 					
 				</div>
@@ -38,7 +54,7 @@
 <div class="form-group">
 	<label for="line_1">Adresse</label>
 	
-	<input name="addresses_0.line_1" type="text" class="form-control" id="addresses_0.line_1" placeholder="Entrer une adresse" value=""/>
+	<input name="addresses_0.line_1" type="text" class="form-control " id="addresses_0.line_1" placeholder="Entrer une adresse" " value=""/>
 	
 </div>
 
@@ -47,7 +63,7 @@
 <div class="form-group">
 	<label for="line_2">Complément</label>
 	
-	<input name="addresses_0.line_2" type="text" class="form-control" id="addresses_0.line_2" placeholder="Entrer un complément d&#39;adresse" value=""/>
+	<input name="addresses_0.line_2" type="text" class="form-control " id="addresses_0.line_2" placeholder="Entrer un complément d&#39;adresse" " value=""/>
 	
 </div>
 
@@ -56,7 +72,7 @@
 <div class="form-group">
 	<label for="zip_code">Code postal</label>
 	
-	<input name="addresses_0.zip_code" type="text" class="form-control" id="addresses_0.zip_code" placeholder="Entrer un code postal" value=""/>
+	<input name="addresses_0.zip_code" type="text" class="form-control " id="addresses_0.zip_code" placeholder="Entrer un code postal" " value=""/>
 	
 </div>
 
@@ -65,7 +81,7 @@
 <div class="form-group">
 	<label for="city">Ville</label>
 	
-	<input name="addresses_0.city" type="text" class="form-control" id="addresses_0.city" placeholder="Entrer une ville" value=""/>
+	<input name="addresses_0.city" type="text" class="form-control " id="addresses_0.city" placeholder="Entrer une ville" " value=""/>
 	
 </div>
 

@@ -25,8 +25,6 @@
 
 		var editedData = {};
 
-		var currentWorkingIndex = -1;
-		
 		function callModal(modalId) {
 			window[modalId + "_initialize"](container);
 		}
@@ -100,34 +98,7 @@
 			location.reload();
 		}
 
-		function selectButtonClick(containerInfo) {
-			if (typeof window["onresultselect_" + currentWorkingIndex] === "function") {
-				window["onresultselect_" + currentWorkingIndex](containerInfo);
-			}
-		}
-
-		function fullSearchSuccess(results) {
-			console.log(results);
-			console.log("#results_" + currentWorkingIndex);
-			$("#results_" + currentWorkingIndex).empty();
-			$("#results_" + currentWorkingIndex).html(results);
-		}
-
-		function searchContainer(index) {
-			var searchForm = new FormData();
-			currentWorkingIndex = index;
-			searchForm.append('container_data', JSON.stringify(editedData[index]));
-			searchForm.append('container_type',urlParams['container_type']);
-			$.ajax({
-				url: '/container/full_search.html',
-				type: 'POST',
-				data: searchForm,
-				processData: false,
-				contentType: false,
-				success: fullSearchSuccess,
-				error: onCallError
-			});
-		}
+		{% include "rendition/container_type/details/script/search_script.html" with container_type_var="urlParams['container_type']" %}
 
 		function updateContainer(index, custom) {
 			var updateForm = new FormData();
@@ -151,6 +122,7 @@
 				error: onCallError
 			});
 		}
+
 
 	</script>
 {% endblock %}
@@ -181,7 +153,7 @@
 		</div>
 	{% for index in layout|get_dict_key:"data" %}
 		{% with template_name=layout|get_dict_key:"data"|get_dict_key:index|get_dict_key:"type" %}
-			{% include 'rendition/container_type/details/edition/'|add:template_name|add:".html" with index=index complete_fields=complete_fields custom_fields=custom_fields data=layout|get_dict_key:"data"|get_dict_key:index labels=labels container=container custom_data=custom_data language_code=profile.language_code %}
+			{% include 'rendition/container_type/details/edition/'|add:template_name|add:".html" with index=index complete_fields=complete_fields custom_fields=custom_fields data=layout|get_dict_key:"data"|get_dict_key:index container=container custom_data=custom_data language_code=profile.language_code %}
 		{% endwith %}
 	{% endfor %}
 

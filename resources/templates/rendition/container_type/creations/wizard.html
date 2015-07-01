@@ -9,7 +9,7 @@
 		{% include current_field.template %}
 		</select>
 	{% else %}
-	<input name="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %} {% if current_field.is_container%}with-autocomplete{% endif %}" id="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" {% if current_field.is_container%}datasource="/container/filters.html?container_type={{current_field.container_type}}"{% endif %}" value=""/>
+	<input name="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %} {% if current_field.is_container%}with-autocomplete{% endif %}" id="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" {% if current_field.is_container%}datasource="/container/filters.html?container_type={{current_field.container_type}}"{% endif %} value=""/>
 	{% endif %}
 </div>
 {% endwith %}

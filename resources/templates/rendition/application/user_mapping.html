@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load container_tags %}
+{% language language_code %}
+<div class="col-lg-11">
+	<table class="table">
+		<tr><th class="col-lg-2">{% blocktrans %}Type{% endblocktrans %}</th><th class="col-lg-9">{% blocktrans %}Name{% endblocktrans %}</th><th class="col-lg-1">{% blocktrans %}Actions{% endblocktrans %}</th></tr>
+	{% for third in thirds %}<tr><td>{{third.third_container.type.identifier|get_translated_text:language_code}}</td><td>{{third.third_container.name}}</td><td><button class="btn btn-default btn-sm" onclick="removeCurrentMapping({{third.id}})"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td></tr>{% endfor %}
+	</table>
+</div>
+<button class="btn btn-default" data-toggle="tooltip" data-target="#modal_add_third" title="{% blocktrans %}Select a new third party and add it to the current account{% endblocktrans %}" onclick="openSelectThird()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+{% endlanguage %}

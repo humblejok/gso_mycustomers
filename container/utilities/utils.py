@@ -130,14 +130,14 @@ def complete_fields_information(model_class, information, language_code='en'):
                     information[field]['is_container'] = False
                 else:
                     information[field]['is_container'] = issubclass(classes.my_class_import(information[field]['target_class']), classes.my_class_import('container.models.Container'))
-                    print information[field]['is_container']
-                    print information[field]['target_class']
+                    information[field]['is_container']
+                    information[field]['target_class']
                     if information[field]['is_container']:
                         information[field]['container_type'] = attributes_class.objects.get(active=True, type='container_type_class', name=information[field]['target_class']).identifier.replace('_CLASS','')
-                    if information[field]['type']!='ForeignKey':
-                        information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
-                        information[field]['template_m2m'] = 'statics/' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
-                        information[field]['template_m2m_complete'] = 'statics/complete_' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
+#                    if information[field]['type']!='ForeignKey':
+                    information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
+                    information[field]['template_m2m'] = 'statics/' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
+                    information[field]['template_m2m_complete'] = 'statics/complete_' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
                     information[field]['datasource'] = '/container_filter.html?container_class=' + information[field]['target_class']
     return information
 
