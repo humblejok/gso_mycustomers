@@ -21,7 +21,12 @@ client = MongoClient(MONGO_URL)
 setup = client.setup
 
 # TODO Make it dynamic
-available_data_sets = ['container_type_fields', 'object_type_fields', 'container_type_creations', 'container_type_details', 'container_type_lists', 'container_type_menus']
+available_data_sets = {'container_type_fields': True, 'object_type_fields': True,
+                       'container_type_creations': True, 'container_type_details': True,
+                       'container_type_lists': True, 'container_type_menus': True,
+                       'user_profiles': False}
+
+
 
 def get_data(collection_name, searched_id=None):
     if searched_id==None:
@@ -33,7 +38,7 @@ def get_data(collection_name, searched_id=None):
         return results[0]
     else:
         return {}
-    
+
 def set_data(collection_name, data, historize=True):
     if historize:
         data['_id'] = epoch_time(datetime.datetime.today())
@@ -44,6 +49,9 @@ def set_data(collection_name, data, historize=True):
         getattr(setup,collection_name).update({'_id': data['_id']}, data, True)
     if globals().has_key(collection_name + '_callback'):
         globals()[collection_name + '_callback'](data)
+
+def drop_collection(collection_name):
+    getattr(setup,collection_name).drop()
         
 def object_type_callback(data):
     all_types = classes.my_import('containet.models.Attributes').objects.filter(active=True, type='object_type')

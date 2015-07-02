@@ -17,7 +17,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from seq_common.utils import classes
 
-from container.models import Attributes, Container
+from container.models import Attributes, Container, Universe
 from container.utilities import setup_content, external_content
 from container.utilities.container_container import get_container_information, \
     set_container_information
@@ -33,11 +33,23 @@ LOGGER = logging.getLogger(__name__)
 
 def lists(request):
     # TODO: Check user
+    if not request.user.is_authenticated():
+        redirect('/account/login')
     profile = get_or_create_user_profile(request.user.id)
     container_type = request.GET['item']
     # TODO: Handle error
     effective_class = get_effective_class(container_type)
-    results = effective_class.objects.all().order_by('name')
+    if effective_class==Universe:
+        if profile['is_staff']:
+            filter_query = {}
+        else:
+            filter_query = Q(owner__id=profile['_id']) | Q(public=True)
+    else:
+        filter_query = {}
+    if isinstance(filter_query, dict):
+        results = effective_class.objects.filter(**filter_query)
+    else:
+        results = effective_class.objects.filter(filter_query).order_by('name')
     request.session['django_language'] = profile['language_code']
     context = {'base_template': profile['base_template'], 'profile': profile, 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
     return render(request, 'statics/' + container_type + '_results_lists_en.html', context)

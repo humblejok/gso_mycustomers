@@ -43,21 +43,23 @@ def save(request):
 def reset_nosql(request):
     profile = get_or_create_user_profile(request.user.id)
     # TODO Check permissions
-    return render(request, 'container/edit/application/reset_nosql.html', {'base_template': profile['base_template'], 'profile': profile, 'data_sets': available_data_sets})
+    return render(request, 'container/edit/application/reset_nosql.html', {'base_template': profile['base_template'], 'profile': profile, 'data_sets': available_data_sets.keys()})
 
 def reset_nosql_execute(request):
     profile = get_or_create_user_profile(request.user.id)
     # TODO Check permissions
     for key_set in request.POST.keys():
-        LOGGER.info("Cleaning " + key_set)
-        if key_set in available_data_sets:
-            setup_content.set_data(key_set, {})
+        if key_set in available_data_sets.keys():
+            LOGGER.info("Cleaning " + key_set)
+            if available_data_sets[key_set]:
+                setup_content.set_data(key_set, {})
+            else:
+                setup_content.drop_collection(key_set)
     return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
 
 def setup_users(request):
     profile = get_or_create_user_profile(request.user.id)
     all_users = User.objects.all().order_by('username')
-    simulated_layout_data = {'data':[{'third':{}}]}
     # TODO Check permissions
     print complete_fields_information(UserMapping, get_static_fields(UserMapping), profile['language_code'])
     return render(request, 'container/edit/application/setup_users.html',

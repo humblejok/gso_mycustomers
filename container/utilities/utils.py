@@ -6,6 +6,8 @@ from seq_common.utils import classes
 
 from container.utilities import setup_content
 import re
+from django.contrib.auth.models import User
+from seq_common.utils.classes import my_class_import
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,11 +37,52 @@ class StripWhitespaceMiddleware(object):
         else:
             return response    
 
+def recurse_company_structure(container):
+    print "->" + str(container)
+    company = get_effective_container(container.id)
+    structure = [{'third_id':company.id, 'third_name': company.name, 'third_short_name': company.short_name}]
+    if len(company.subsidiary.all())>0:
+        for sub_company in company.members.all():
+            structure += recurse_company_structure(sub_company)
+    else:
+        return structure
+    
+
 def get_or_create_user_profile(user_id):
     profile = setup_content.get_data('user_profiles', user_id)
+    current_user = User.objects.get(id=user_id)
+    universe_class = my_class_import('container.models.Universe')
+    attributes_class = my_class_import('container.models.Attributes')
+    mapping_class = my_class_import('container.models.UserMapping')
+    administrator = User.objects.filter(is_active=True, is_superuser=True).order_by('id')[0]
     if profile==None or not profile:
         language_attribute = classes.my_class_import('container.models.Attributes').objects.get(active=True, identifier='AVAIL_LANGUAGE_EN')
-        profile = {'_id': user_id, 'language':language_attribute.identifier, 'base_template': 'gso_' + language_attribute.short_name + '.html', 'language_code': language_attribute.short_name}
+        profile = {'_id': user_id, 'user_name': current_user.username, 'language':language_attribute.identifier, 'base_template': 'gso_' + language_attribute.short_name + '.html', 'language_code': language_attribute.short_name}
+    if not profile.has_key('user_name') or profile['user_name']!=current_user.username:
+        profile['user_name'] = current_user.username
+    profile['is_staff'] = current_user.is_staff or current_user.is_superuser
+    if not universe_class.objects.filter(public=False, owner=administrator, short_name=profile['user_name']).exists():
+        profile_universe = universe_class()
+        profile_universe.owner = administrator
+        profile_universe.public = False
+        profile_universe.description = 'Technical universe that allows the management of the global permissions for user:' + profile['user_name'] + '.'
+        profile_universe.name = 'Ownership - ' + profile['user_name']
+        profile_universe.short_name = profile['user_name']
+        profile_universe.type = attributes_class.objects.get(active=True, type='container_type', identifier='CONT_UNIVERSE')
+        profile_universe.inception_date = datetime.date.today()
+        profile_universe.closed_date = None
+        profile_universe.status = attributes_class.objects.get(active=True, type='status', identifier='STATUS_ACTIVE')
+        profile_universe.save()
+        profile['universe_id'] = profile_universe.id
+    # TODO Cache that
+    mappings = mapping_class.objects.filter(related_user__id=user_id)
+    profile['available_work_places'] = []
+    for mapping in mappings:
+        if mapping.third_container.type.identifier=='CONT_COMPANY':
+            profile['available_work_places'] += recurse_company_structure(mapping.third_container)
+        else:
+            profile['available_work_places'].append({'third_id':mapping.third_container.id, 'third_name': mapping.third_container.name, 'third_short_name': mapping.third_container.short_name})
+    print profile['available_work_places']
     setup_content.set_data('user_profiles', profile, False)
     return profile
 
