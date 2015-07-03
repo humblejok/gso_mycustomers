@@ -34,7 +34,7 @@ LOGGER = logging.getLogger(__name__)
 def lists(request):
     # TODO: Check user
     if not request.user.is_authenticated():
-        redirect('/account/login')
+        return redirect('/accounts/login')
     profile = get_or_create_user_profile(request.user.id)
     container_type = request.GET['item']
     # TODO: Handle error

@@ -42,7 +42,8 @@ def recurse_company_structure(container):
     company = get_effective_container(container.id)
     structure = [{'third_id':company.id, 'third_name': company.name, 'third_short_name': company.short_name}]
     if len(company.subsidiary.all())>0:
-        for sub_company in company.members.all():
+        for sub_company in company.subsidiary.all():
+            print company.members
             structure += recurse_company_structure(sub_company)
     else:
         return structure
