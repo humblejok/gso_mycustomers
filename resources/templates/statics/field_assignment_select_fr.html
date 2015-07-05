@@ -1,9 +1,9 @@
 <select class="form-control">
 
-	<option value='FIELD_ASSIGNMENT_LIMITED'>Plusieurs instances par élément (limitées)</option>
+	{% if not active_list or "FIELD_ASSIGNMENT_LIMITED" in active_list %}<option value='FIELD_ASSIGNMENT_LIMITED'{% if value == 'FIELD_ASSIGNMENT_LIMITED' %} selected{% endif %}>Plusieurs instances par élément (limitées)</option>{% endif %}
 
-	<option value='FIELD_ASSIGNMENT_MULTIPLE'>Plusieurs instances par élément</option>
+	{% if not active_list or "FIELD_ASSIGNMENT_MULTIPLE" in active_list %}<option value='FIELD_ASSIGNMENT_MULTIPLE'{% if value == 'FIELD_ASSIGNMENT_MULTIPLE' %} selected{% endif %}>Plusieurs instances par élément</option>{% endif %}
 
-	<option value='FIELD_ASSIGNMENT_SINGLE'>Une instance par élément</option>
+	{% if not active_list or "FIELD_ASSIGNMENT_SINGLE" in active_list %}<option value='FIELD_ASSIGNMENT_SINGLE'{% if value == 'FIELD_ASSIGNMENT_SINGLE' %} selected{% endif %}>Une instance par élément</option>{% endif %}
 
 </select>

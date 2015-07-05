@@ -1,19 +1,19 @@
 <select class="form-control">
 
-	<option value='FIELD_TYPE_CHOICE'>Choix</option>
+	{% if not active_list or "FIELD_TYPE_CHOICE" in active_list %}<option value='FIELD_TYPE_CHOICE'{% if value == 'FIELD_TYPE_CHOICE' %} selected{% endif %}>Choix</option>{% endif %}
 
-	<option value='FIELD_TYPE_DATE'>Date</option>
+	{% if not active_list or "FIELD_TYPE_DATE" in active_list %}<option value='FIELD_TYPE_DATE'{% if value == 'FIELD_TYPE_DATE' %} selected{% endif %}>Date</option>{% endif %}
 
-	<option value='FIELD_TYPE_DOCUMENT'>Document</option>
+	{% if not active_list or "FIELD_TYPE_DOCUMENT" in active_list %}<option value='FIELD_TYPE_DOCUMENT'{% if value == 'FIELD_TYPE_DOCUMENT' %} selected{% endif %}>Document</option>{% endif %}
 
-	<option value='FIELD_TYPE_FLOAT'>Flottant</option>
+	{% if not active_list or "FIELD_TYPE_FLOAT" in active_list %}<option value='FIELD_TYPE_FLOAT'{% if value == 'FIELD_TYPE_FLOAT' %} selected{% endif %}>Flottant</option>{% endif %}
 
-	<option value='FIELD_TYPE_INTEGER'>Nombre</option>
+	{% if not active_list or "FIELD_TYPE_INTEGER" in active_list %}<option value='FIELD_TYPE_INTEGER'{% if value == 'FIELD_TYPE_INTEGER' %} selected{% endif %}>Nombre</option>{% endif %}
 
-	<option value='FIELD_TYPE_PERCENT'>Pourcentage</option>
+	{% if not active_list or "FIELD_TYPE_PERCENT" in active_list %}<option value='FIELD_TYPE_PERCENT'{% if value == 'FIELD_TYPE_PERCENT' %} selected{% endif %}>Pourcentage</option>{% endif %}
 
-	<option value='FIELD_TYPE_TEXT'>Texte</option>
+	{% if not active_list or "FIELD_TYPE_TEXT" in active_list %}<option value='FIELD_TYPE_TEXT'{% if value == 'FIELD_TYPE_TEXT' %} selected{% endif %}>Texte</option>{% endif %}
 
-	<option value='FIELD_TYPE_DATETIME'>Horodatage</option>
+	{% if not active_list or "FIELD_TYPE_DATETIME" in active_list %}<option value='FIELD_TYPE_DATETIME'{% if value == 'FIELD_TYPE_DATETIME' %} selected{% endif %}>Horodatage</option>{% endif %}
 
 </select>

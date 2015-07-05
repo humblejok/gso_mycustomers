@@ -1,9 +1,9 @@
 <select class="form-control">
 
-	<option value='EMAIL_CONTACT'>Email de contact</option>
+	{% if not active_list or "EMAIL_CONTACT" in active_list %}<option value='EMAIL_CONTACT'{% if value == 'EMAIL_CONTACT' %} selected{% endif %}>Email de contact</option>{% endif %}
 
-	<option value='EMAIL_PERSONAL'>Email privé</option>
+	{% if not active_list or "EMAIL_PERSONAL" in active_list %}<option value='EMAIL_PERSONAL'{% if value == 'EMAIL_PERSONAL' %} selected{% endif %}>Email privé</option>{% endif %}
 
-	<option value='EMAIL_WORK'>Email professionnel</option>
+	{% if not active_list or "EMAIL_WORK" in active_list %}<option value='EMAIL_WORK'{% if value == 'EMAIL_WORK' %} selected{% endif %}>Email professionnel</option>{% endif %}
 
 </select>

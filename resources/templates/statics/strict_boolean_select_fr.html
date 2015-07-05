@@ -1,7 +1,7 @@
 <select class="form-control">
 
-	<option value='STRICT_BOOLEAN_FALSE'>Non</option>
+	{% if not active_list or "STRICT_BOOLEAN_FALSE" in active_list %}<option value='STRICT_BOOLEAN_FALSE'{% if value == 'STRICT_BOOLEAN_FALSE' %} selected{% endif %}>Non</option>{% endif %}
 
-	<option value='STRICT_BOOLEAN_TRUE'>Oui</option>
+	{% if not active_list or "STRICT_BOOLEAN_TRUE" in active_list %}<option value='STRICT_BOOLEAN_TRUE'{% if value == 'STRICT_BOOLEAN_TRUE' %} selected{% endif %}>Oui</option>{% endif %}
 
 </select>

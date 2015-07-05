@@ -1,15 +1,13 @@
 <select class="form-control">
 
-	<option value='CONT_COMPANY_CLASS'>container.models.CompanyContainer</option>
+	{% if not active_list or "CONT_COMPANY_CLASS" in active_list %}<option value='CONT_COMPANY_CLASS'{% if value == 'CONT_COMPANY_CLASS' %} selected{% endif %}>container.models.CompanyContainer</option>{% endif %}
 
-	<option value='CONT_CONTAINER_CLASS'>container.models.Container</option>
+	{% if not active_list or "CONT_CONTAINER_CLASS" in active_list %}<option value='CONT_CONTAINER_CLASS'{% if value == 'CONT_CONTAINER_CLASS' %} selected{% endif %}>container.models.Container</option>{% endif %}
 
-	<option value='CONT_MAIL_CAMPAIGN_CLASS'>container.models.MailCampaignContainer</option>
+	{% if not active_list or "CONT_MAIL_CAMPAIGN_CLASS" in active_list %}<option value='CONT_MAIL_CAMPAIGN_CLASS'{% if value == 'CONT_MAIL_CAMPAIGN_CLASS' %} selected{% endif %}>container.models.MailCampaignContainer</option>{% endif %}
 
-	<option value='CONT_PERSON_CLASS'>container.models.PersonContainer</option>
+	{% if not active_list or "CONT_PERSON_CLASS" in active_list %}<option value='CONT_PERSON_CLASS'{% if value == 'CONT_PERSON_CLASS' %} selected{% endif %}>container.models.PersonContainer</option>{% endif %}
 
-	<option value='CONT_THIRD_PARTY_CLASS'>NO TRANSLATION</option>
-
-	<option value='CONT_UNIVERSE_CLASS'>container.models.Universe</option>
+	{% if not active_list or "CONT_UNIVERSE_CLASS" in active_list %}<option value='CONT_UNIVERSE_CLASS'{% if value == 'CONT_UNIVERSE_CLASS' %} selected{% endif %}>container.models.Universe</option>{% endif %}
 
 </select>

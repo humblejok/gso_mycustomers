@@ -1,13 +1,13 @@
 <select class="form-control">
 
-	<option value='DURATION_UNIT_BUSINESS_DAY'>Jour ouvrable</option>
+	{% if not active_list or "DURATION_UNIT_BUSINESS_DAY" in active_list %}<option value='DURATION_UNIT_BUSINESS_DAY'{% if value == 'DURATION_UNIT_BUSINESS_DAY' %} selected{% endif %}>Jour ouvrable</option>{% endif %}
 
-	<option value='DURATION_UNIT_DAY'>Jour</option>
+	{% if not active_list or "DURATION_UNIT_DAY" in active_list %}<option value='DURATION_UNIT_DAY'{% if value == 'DURATION_UNIT_DAY' %} selected{% endif %}>Jour</option>{% endif %}
 
-	<option value='DURATION_UNIT_MONTH'>Mois</option>
+	{% if not active_list or "DURATION_UNIT_MONTH" in active_list %}<option value='DURATION_UNIT_MONTH'{% if value == 'DURATION_UNIT_MONTH' %} selected{% endif %}>Mois</option>{% endif %}
 
-	<option value='DURATION_UNIT_WEEK'>Semaine</option>
+	{% if not active_list or "DURATION_UNIT_WEEK" in active_list %}<option value='DURATION_UNIT_WEEK'{% if value == 'DURATION_UNIT_WEEK' %} selected{% endif %}>Semaine</option>{% endif %}
 
-	<option value='DURATION_UNIT_YEAR'>Années</option>
+	{% if not active_list or "DURATION_UNIT_YEAR" in active_list %}<option value='DURATION_UNIT_YEAR'{% if value == 'DURATION_UNIT_YEAR' %} selected{% endif %}>Années</option>{% endif %}
 
 </select>

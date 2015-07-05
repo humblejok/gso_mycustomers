@@ -1,7 +1,7 @@
 <select class="form-control">
 
-	<option value='NUM_STATUS_ESTIMATED'>Estimated</option>
+	{% if not active_list or "NUM_STATUS_ESTIMATED" in active_list %}<option value='NUM_STATUS_ESTIMATED'{% if value == 'NUM_STATUS_ESTIMATED' %} selected{% endif %}>Estimated</option>{% endif %}
 
-	<option value='NUM_STATUS_FINAL'>Final</option>
+	{% if not active_list or "NUM_STATUS_FINAL" in active_list %}<option value='NUM_STATUS_FINAL'{% if value == 'NUM_STATUS_FINAL' %} selected{% endif %}>Final</option>{% endif %}
 
 </select>

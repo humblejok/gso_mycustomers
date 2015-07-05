@@ -1,7 +1,7 @@
 <select class="form-control">
 
-	<option value='STR_IM'>Responsable des investissement</option>
+	{% if not active_list or "STR_IM" in active_list %}<option value='STR_IM'{% if value == 'STR_IM' %} selected{% endif %}>Responsable des investissement</option>{% endif %}
 
-	<option value='STR_RM'>Gérant de clientèle</option>
+	{% if not active_list or "STR_RM" in active_list %}<option value='STR_RM'{% if value == 'STR_RM' %} selected{% endif %}>Gérant de clientèle</option>{% endif %}
 
 </select>

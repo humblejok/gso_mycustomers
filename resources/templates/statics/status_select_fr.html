@@ -1,11 +1,11 @@
 <select class="form-control">
 
-	<option value='STATUS_ACTIVE'>Actif</option>
+	{% if not active_list or "STATUS_ACTIVE" in active_list %}<option value='STATUS_ACTIVE'{% if value == 'STATUS_ACTIVE' %} selected{% endif %}>Actif</option>{% endif %}
 
-	<option value='STATUS_CLOSED'>Fermé</option>
+	{% if not active_list or "STATUS_CLOSED" in active_list %}<option value='STATUS_CLOSED'{% if value == 'STATUS_CLOSED' %} selected{% endif %}>Fermé</option>{% endif %}
 
-	<option value='STATUS_CLOSING'>En cours de fermeture</option>
+	{% if not active_list or "STATUS_CLOSING" in active_list %}<option value='STATUS_CLOSING'{% if value == 'STATUS_CLOSING' %} selected{% endif %}>En cours de fermeture</option>{% endif %}
 
-	<option value='STATUS_TO_BE_VALIDATED'>A valider</option>
+	{% if not active_list or "STATUS_TO_BE_VALIDATED" in active_list %}<option value='STATUS_TO_BE_VALIDATED'{% if value == 'STATUS_TO_BE_VALIDATED' %} selected{% endif %}>A valider</option>{% endif %}
 
 </select>

@@ -1,13 +1,13 @@
 <select class="form-control">
 
-	<option value='PRICE_TYPE_BUY'>Achat</option>
+	{% if not active_list or "PRICE_TYPE_BUY" in active_list %}<option value='PRICE_TYPE_BUY'{% if value == 'PRICE_TYPE_BUY' %} selected{% endif %}>Achat</option>{% endif %}
 
-	<option value='PRICE_TYPE_CLOSE'>Fin de journée</option>
+	{% if not active_list or "PRICE_TYPE_CLOSE" in active_list %}<option value='PRICE_TYPE_CLOSE'{% if value == 'PRICE_TYPE_CLOSE' %} selected{% endif %}>Fin de journée</option>{% endif %}
 
-	<option value='PRICE_TYPE_INTRADAY'>En cours de journée</option>
+	{% if not active_list or "PRICE_TYPE_INTRADAY" in active_list %}<option value='PRICE_TYPE_INTRADAY'{% if value == 'PRICE_TYPE_INTRADAY' %} selected{% endif %}>En cours de journée</option>{% endif %}
 
-	<option value='PRICE_TYPE_OFFICIAL'>Officiel</option>
+	{% if not active_list or "PRICE_TYPE_OFFICIAL" in active_list %}<option value='PRICE_TYPE_OFFICIAL'{% if value == 'PRICE_TYPE_OFFICIAL' %} selected{% endif %}>Officiel</option>{% endif %}
 
-	<option value='PRICE_TYPE_SELL'>Vente</option>
+	{% if not active_list or "PRICE_TYPE_SELL" in active_list %}<option value='PRICE_TYPE_SELL'{% if value == 'PRICE_TYPE_SELL' %} selected{% endif %}>Vente</option>{% endif %}
 
 </select>

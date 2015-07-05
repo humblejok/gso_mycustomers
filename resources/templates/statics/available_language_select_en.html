@@ -1,7 +1,7 @@
 <select class="form-control">
 
-	<option value='AVAIL_LANGUAGE_EN'>English</option>
+	{% if not active_list or "AVAIL_LANGUAGE_EN" in active_list %}<option value='AVAIL_LANGUAGE_EN'{% if value == 'AVAIL_LANGUAGE_EN' %} selected{% endif %}>English</option>{% endif %}
 
-	<option value='AVAIL_LANGUAGE_FR'>French</option>
+	{% if not active_list or "AVAIL_LANGUAGE_FR" in active_list %}<option value='AVAIL_LANGUAGE_FR'{% if value == 'AVAIL_LANGUAGE_FR' %} selected{% endif %}>French</option>{% endif %}
 
 </select>

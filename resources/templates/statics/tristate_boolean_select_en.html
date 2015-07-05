@@ -1,9 +1,9 @@
 <select class="form-control">
 
-	<option value='TRISTATE_BOOLEAN_FALSE'>No</option>
+	{% if not active_list or "TRISTATE_BOOLEAN_FALSE" in active_list %}<option value='TRISTATE_BOOLEAN_FALSE'{% if value == 'TRISTATE_BOOLEAN_FALSE' %} selected{% endif %}>No</option>{% endif %}
 
-	<option value='TRISTATE_BOOLEAN_UNDEFINED'>To be defined</option>
+	{% if not active_list or "TRISTATE_BOOLEAN_UNDEFINED" in active_list %}<option value='TRISTATE_BOOLEAN_UNDEFINED'{% if value == 'TRISTATE_BOOLEAN_UNDEFINED' %} selected{% endif %}>To be defined</option>{% endif %}
 
-	<option value='TRISTATE_BOOLEAN_TRUE'>Yes</option>
+	{% if not active_list or "TRISTATE_BOOLEAN_TRUE" in active_list %}<option value='TRISTATE_BOOLEAN_TRUE'{% if value == 'TRISTATE_BOOLEAN_TRUE' %} selected{% endif %}>Yes</option>{% endif %}
 
 </select>

@@ -1,7 +1,7 @@
 <select class="form-control">
 
-	<option value='ALIAS_ISIN'>ISIN</option>
+	{% if not active_list or "ALIAS_ISIN" in active_list %}<option value='ALIAS_ISIN'{% if value == 'ALIAS_ISIN' %} selected{% endif %}>ISIN</option>{% endif %}
 
-	<option value='ALIAS_TICKER'>Ticker</option>
+	{% if not active_list or "ALIAS_TICKER" in active_list %}<option value='ALIAS_TICKER'{% if value == 'ALIAS_TICKER' %} selected{% endif %}>Ticker</option>{% endif %}
 
 </select>

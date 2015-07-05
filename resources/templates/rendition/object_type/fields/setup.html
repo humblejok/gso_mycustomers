@@ -1,6 +1,6 @@
 {% extends base_template %}
 {% load i18n %}
-{% block title %}MyCustomers - {% blocktrans %}Setup{% endblocktrans %}{% endblock %}
+{% block title %}MyCustomers - {% blocktrans %}Create your own objects{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				if (urlParams.newObjectType) {
@@ -185,14 +185,16 @@
 			reindexFieldEntries();
 		}
 
-		function fieldTypeChanged(index) {
+		function fieldTypeChanged(index, launch) {
 			if ($("#fieldTypeId_" + index + " > select").val()!='FIELD_TYPE_CHOICE') {
 				$('#editButton_' + index).attr("disabled", true);
 				$('#attributeType_' + index).val("");
 			} else {
 				currentIndex = index;
 				$('#editButton_' + index).removeAttr("disabled");
-				$('#modal_select_attribute').modal({});
+				if (launch) {
+					$('#modal_select_attribute').modal({});
+				}
 			}
 		}
 
@@ -210,10 +212,11 @@
 		function addField(index, value) {
 			currentRow = index;
 			$("#fieldsTable").append('<tr><td><input id="attributeType_' + index + '" name="attributeType_' + index + '" type="hidden" value="' + (value?value.attribute:"") + '"><input type="text" class="form-control" id="fieldName_' + index + '" value="' + (value?value.name:"") + '"/></td><td id="fieldTypeId_' + index + '"></td><td><button type="button" class="btn btn-default btn-sm edit-btn" id="editButton_' + index + '" onclick="changeChoice(' + index +')"><span class="glyphicon glyphicon-edit" ></span></button>&nbsp;&nbsp;<button type="button" class="btn btn-default btn-sm up-btn"><span class="glyphicon glyphicon-arrow-up" onclick="moveFieldEntry(' + index +',-1)"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm down-btn" onclick="moveFieldEntry(' + index +',1)"><span class="glyphicon glyphicon-arrow-down"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm remove-btn" onclick="removeFieldEntry(' + index + ')"><span class="glyphicon glyphicon-remove"></span></button></td></tr>');
-			$("#fieldTypeId_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "field_type_select", "selected_value": value}, function() {
+			$("#fieldTypeId_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "field_type_select", "selected_value": value==null?value:value['type']}, function() {
 				$("#fieldTypeId_" + index + " > select").attr('id','fieldSelectTypeId_' + index);
 				$("#fieldTypeId_" + index + " > select").attr('name','fieldSelectTypeId_' + index);
-				$("#fieldTypeId_" + index + " > select").attr('onchange','fieldTypeChanged(' + index + ')');
+				$("#fieldTypeId_" + index + " > select").attr('onchange','fieldTypeChanged(' + index + ', true)');
+				fieldTypeChanged(index, false);
 			});
 			reindexFieldEntries();
 		}

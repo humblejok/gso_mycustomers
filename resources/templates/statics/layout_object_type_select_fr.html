@@ -1,19 +1,19 @@
 <select class="form-control">
 
-	<option value='LAYOUT_OBJECT_CUSTOM_TEMPLATE'>Canevas personnalisé</option>
+	{% if not active_list or "LAYOUT_OBJECT_CUSTOM_TEMPLATE" in active_list %}<option value='LAYOUT_OBJECT_CUSTOM_TEMPLATE'{% if value == 'LAYOUT_OBJECT_CUSTOM_TEMPLATE' %} selected{% endif %}>Canevas personnalisé</option>{% endif %}
 
-	<option value='LAYOUT_OBJECT_CUSTOM_HISTORY'>Historique personnalisé</option>
+	{% if not active_list or "LAYOUT_OBJECT_CUSTOM_HISTORY" in active_list %}<option value='LAYOUT_OBJECT_CUSTOM_HISTORY'{% if value == 'LAYOUT_OBJECT_CUSTOM_HISTORY' %} selected{% endif %}>Historique personnalisé</option>{% endif %}
 
-	<option value='LAYOUT_OBJECT_CUSTOM_STANDARD'>Champs simples personnalisés</option>
+	{% if not active_list or "LAYOUT_OBJECT_CUSTOM_STANDARD" in active_list %}<option value='LAYOUT_OBJECT_CUSTOM_STANDARD'{% if value == 'LAYOUT_OBJECT_CUSTOM_STANDARD' %} selected{% endif %}>Champs simples personnalisés</option>{% endif %}
 
-	<option value='LAYOUT_DISTRIBUTION_CHART'>Graphe de distribution</option>
+	{% if not active_list or "LAYOUT_DISTRIBUTION_CHART" in active_list %}<option value='LAYOUT_DISTRIBUTION_CHART'{% if value == 'LAYOUT_DISTRIBUTION_CHART' %} selected{% endif %}>Graphe de distribution</option>{% endif %}
 
-	<option value='LAYOUT_HISTORY_CHART'>Graphe historique</option>
+	{% if not active_list or "LAYOUT_HISTORY_CHART" in active_list %}<option value='LAYOUT_HISTORY_CHART'{% if value == 'LAYOUT_HISTORY_CHART' %} selected{% endif %}>Graphe historique</option>{% endif %}
 
-	<option value='LAYOUT_HISTORICAL_DISTRIBUTION_CHART'>Graphe historique de distribution</option>
+	{% if not active_list or "LAYOUT_HISTORICAL_DISTRIBUTION_CHART" in active_list %}<option value='LAYOUT_HISTORICAL_DISTRIBUTION_CHART'{% if value == 'LAYOUT_HISTORICAL_DISTRIBUTION_CHART' %} selected{% endif %}>Graphe historique de distribution</option>{% endif %}
 
-	<option value='LAYOUT_OBJECT_TYPE_LIST'>Liste</option>
+	{% if not active_list or "LAYOUT_OBJECT_TYPE_LIST" in active_list %}<option value='LAYOUT_OBJECT_TYPE_LIST'{% if value == 'LAYOUT_OBJECT_TYPE_LIST' %} selected{% endif %}>Liste</option>{% endif %}
 
-	<option value='LAYOUT_OBJECT_TYPE_SINGLES'>Champs simples</option>
+	{% if not active_list or "LAYOUT_OBJECT_TYPE_SINGLES" in active_list %}<option value='LAYOUT_OBJECT_TYPE_SINGLES'{% if value == 'LAYOUT_OBJECT_TYPE_SINGLES' %} selected{% endif %}>Champs simples</option>{% endif %}
 
 </select>

@@ -1,11 +1,11 @@
 <select class="form-control">
 
-	<option value='OPE_STATUS_CANCELLED'>Cancelled</option>
+	{% if not active_list or "OPE_STATUS_CANCELLED" in active_list %}<option value='OPE_STATUS_CANCELLED'{% if value == 'OPE_STATUS_CANCELLED' %} selected{% endif %}>Cancelled</option>{% endif %}
 
-	<option value='OPE_STATUS_CONFIRMED'>Confirmed</option>
+	{% if not active_list or "OPE_STATUS_CONFIRMED" in active_list %}<option value='OPE_STATUS_CONFIRMED'{% if value == 'OPE_STATUS_CONFIRMED' %} selected{% endif %}>Confirmed</option>{% endif %}
 
-	<option value='OPE_STATUS_EXECUTED'>Executed</option>
+	{% if not active_list or "OPE_STATUS_EXECUTED" in active_list %}<option value='OPE_STATUS_EXECUTED'{% if value == 'OPE_STATUS_EXECUTED' %} selected{% endif %}>Executed</option>{% endif %}
 
-	<option value='OPE_STATUS_PENDING'>Pending</option>
+	{% if not active_list or "OPE_STATUS_PENDING" in active_list %}<option value='OPE_STATUS_PENDING'{% if value == 'OPE_STATUS_PENDING' %} selected{% endif %}>Pending</option>{% endif %}
 
 </select>

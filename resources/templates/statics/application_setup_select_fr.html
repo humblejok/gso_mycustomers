@@ -1,25 +1,25 @@
 <select class="form-control">
 
-	<option value='SETUP_STATICS_PATH'>Django Statics files path</option>
+	{% if not active_list or "SETUP_STATICS_PATH" in active_list %}<option value='SETUP_STATICS_PATH'{% if value == 'SETUP_STATICS_PATH' %} selected{% endif %}>Django Statics files path</option>{% endif %}
 
-	<option value='SETUP_TEMPLATES_STATICS_PATH'>Django Templates files path</option>
+	{% if not active_list or "SETUP_TEMPLATES_STATICS_PATH" in active_list %}<option value='SETUP_TEMPLATES_STATICS_PATH'{% if value == 'SETUP_TEMPLATES_STATICS_PATH' %} selected{% endif %}>Django Templates files path</option>{% endif %}
 
-	<option value='SETUP_MAILGUN_DEFAULT_CAMPAIGN'>Mailgun default campaign</option>
+	{% if not active_list or "SETUP_MAILGUN_DEFAULT_CAMPAIGN" in active_list %}<option value='SETUP_MAILGUN_DEFAULT_CAMPAIGN'{% if value == 'SETUP_MAILGUN_DEFAULT_CAMPAIGN' %} selected{% endif %}>Mailgun default campaign</option>{% endif %}
 
-	<option value='SETUP_MAILGUN_DOMAIN'>Mailgun domain</option>
+	{% if not active_list or "SETUP_MAILGUN_DOMAIN" in active_list %}<option value='SETUP_MAILGUN_DOMAIN'{% if value == 'SETUP_MAILGUN_DOMAIN' %} selected{% endif %}>Mailgun domain</option>{% endif %}
 
-	<option value='SETUP_MAILGUN_ENABLE'>Mailgun enable</option>
+	{% if not active_list or "SETUP_MAILGUN_ENABLE" in active_list %}<option value='SETUP_MAILGUN_ENABLE'{% if value == 'SETUP_MAILGUN_ENABLE' %} selected{% endif %}>Mailgun enable</option>{% endif %}
 
-	<option value='SETUP_MAILGUN_KEY'>Mailgun key</option>
+	{% if not active_list or "SETUP_MAILGUN_KEY" in active_list %}<option value='SETUP_MAILGUN_KEY'{% if value == 'SETUP_MAILGUN_KEY' %} selected{% endif %}>Mailgun key</option>{% endif %}
 
-	<option value='SETUP_MAILGUN_FROM'>Mailgun sender</option>
+	{% if not active_list or "SETUP_MAILGUN_FROM" in active_list %}<option value='SETUP_MAILGUN_FROM'{% if value == 'SETUP_MAILGUN_FROM' %} selected{% endif %}>Mailgun sender</option>{% endif %}
 
-	<option value='SETUP_MAIN_PATH'>Main application path</option>
+	{% if not active_list or "SETUP_MAIN_PATH" in active_list %}<option value='SETUP_MAIN_PATH'{% if value == 'SETUP_MAIN_PATH' %} selected{% endif %}>Main application path</option>{% endif %}
 
-	<option value='SETUP_RESOURCES_MAIN_PATH'>Resources main path</option>
+	{% if not active_list or "SETUP_RESOURCES_MAIN_PATH" in active_list %}<option value='SETUP_RESOURCES_MAIN_PATH'{% if value == 'SETUP_RESOURCES_MAIN_PATH' %} selected{% endif %}>Resources main path</option>{% endif %}
 
-	<option value='SETUP_WORKING_PATH'>Temporary working path</option>
+	{% if not active_list or "SETUP_WORKING_PATH" in active_list %}<option value='SETUP_WORKING_PATH'{% if value == 'SETUP_WORKING_PATH' %} selected{% endif %}>Temporary working path</option>{% endif %}
 
-	<option value='SETUP_MONGO_URL'>URL MongoDB</option>
+	{% if not active_list or "SETUP_MONGO_URL" in active_list %}<option value='SETUP_MONGO_URL'{% if value == 'SETUP_MONGO_URL' %} selected{% endif %}>URL MongoDB</option>{% endif %}
 
 </select>

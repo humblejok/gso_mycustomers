@@ -1,19 +1,19 @@
 <select class="form-control">
 
-	<option value='PHONE_LAND_CONTACT'>Contact Landline</option>
+	{% if not active_list or "PHONE_LAND_CONTACT" in active_list %}<option value='PHONE_LAND_CONTACT'{% if value == 'PHONE_LAND_CONTACT' %} selected{% endif %}>Contact Landline</option>{% endif %}
 
-	<option value='PHONE_MOB_CONTACT'>Numéro mobile de contact</option>
+	{% if not active_list or "PHONE_MOB_CONTACT" in active_list %}<option value='PHONE_MOB_CONTACT'{% if value == 'PHONE_MOB_CONTACT' %} selected{% endif %}>Numéro mobile de contact</option>{% endif %}
 
-	<option value='PHONE_FAX_HONE'>Fax privé</option>
+	{% if not active_list or "PHONE_FAX_HONE" in active_list %}<option value='PHONE_FAX_HONE'{% if value == 'PHONE_FAX_HONE' %} selected{% endif %}>Fax privé</option>{% endif %}
 
-	<option value='PHONE_LAND_PERSONAL'>Ligne fixe privée</option>
+	{% if not active_list or "PHONE_LAND_PERSONAL" in active_list %}<option value='PHONE_LAND_PERSONAL'{% if value == 'PHONE_LAND_PERSONAL' %} selected{% endif %}>Ligne fixe privée</option>{% endif %}
 
-	<option value='PHONE_MOB_PERSONAL'>Numéro mobile privé</option>
+	{% if not active_list or "PHONE_MOB_PERSONAL" in active_list %}<option value='PHONE_MOB_PERSONAL'{% if value == 'PHONE_MOB_PERSONAL' %} selected{% endif %}>Numéro mobile privé</option>{% endif %}
 
-	<option value='PHONE_FAX_WORK'>Fax professionnel</option>
+	{% if not active_list or "PHONE_FAX_WORK" in active_list %}<option value='PHONE_FAX_WORK'{% if value == 'PHONE_FAX_WORK' %} selected{% endif %}>Fax professionnel</option>{% endif %}
 
-	<option value='PHONE_LAND_WORK'>Ligne fixe professionnelle</option>
+	{% if not active_list or "PHONE_LAND_WORK" in active_list %}<option value='PHONE_LAND_WORK'{% if value == 'PHONE_LAND_WORK' %} selected{% endif %}>Ligne fixe professionnelle</option>{% endif %}
 
-	<option value='PHONE_MOB_WORK'>Numéro mobile professionnel</option>
+	{% if not active_list or "PHONE_MOB_WORK" in active_list %}<option value='PHONE_MOB_WORK'{% if value == 'PHONE_MOB_WORK' %} selected{% endif %}>Numéro mobile professionnel</option>{% endif %}
 
 </select>

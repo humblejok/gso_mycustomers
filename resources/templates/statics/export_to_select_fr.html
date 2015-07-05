@@ -1,7 +1,7 @@
 <select class="form-control">
 
-	<option value='EXPORT_TO_EXCEL'>Exporter vers Excel</option>
+	{% if not active_list or "EXPORT_TO_EXCEL" in active_list %}<option value='EXPORT_TO_EXCEL'{% if value == 'EXPORT_TO_EXCEL' %} selected{% endif %}>Exporter vers Excel</option>{% endif %}
 
-	<option value='EXPORT_TO_CSV'>Exporter en CSV</option>
+	{% if not active_list or "EXPORT_TO_CSV" in active_list %}<option value='EXPORT_TO_CSV'{% if value == 'EXPORT_TO_CSV' %} selected{% endif %}>Exporter en CSV</option>{% endif %}
 
 </select>

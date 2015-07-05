@@ -7,7 +7,7 @@ from container.models import Attributes
 from seq_common.utils import classes
 from django.shortcuts import render
 from container.utilities.utils import complete_custom_fields_information,\
-    get_or_create_user_profile
+    get_or_create_user_profile, clean_post_value
 from container.utilities.container_container import get_container_information,\
     enhance_container_information
     
@@ -98,10 +98,11 @@ def render_many_to_many(request):
 
 def render_template_for_load(request):
     profile = get_or_create_user_profile(request.user.id)
-    template_name = request.POST['template_name']
+    template_name = clean_post_value(request.POST['template_name'])
     if request.POST.has_key('selected_value'):
-        selected_value = request.POST['selected_value']
+        selected_value = clean_post_value(request.POST['selected_value'])
     else:
         selected_value = ''
+    print request.POST
     context = {'value': selected_value}
     return render(request, 'statics/' + template_name + '_' + profile['language_code'] + '.html', context)

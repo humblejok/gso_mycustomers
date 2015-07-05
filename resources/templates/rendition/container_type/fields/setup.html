@@ -41,7 +41,9 @@
 		var container = $("#container").val();
 		$("#associatedObjectsTable").empty();
 		allValues = [];
-		$.each(allItems[container], addObjectDefinition);
+		if (allItems.hasOwnProperty(container)) {
+			$.each(allItems[container], addObjectDefinition);
+		}
 	}
 
 	function reindexDefinitionEntries() {

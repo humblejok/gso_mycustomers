@@ -1,17 +1,17 @@
 <select class="form-control">
 
-	<option value='NUM_TYPE_PF_BMV'>Valeur de marché au départ</option>
+	{% if not active_list or "NUM_TYPE_PF_BMV" in active_list %}<option value='NUM_TYPE_PF_BMV'{% if value == 'NUM_TYPE_PF_BMV' %} selected{% endif %}>Valeur de marché au départ</option>{% endif %}
 
-	<option value='NUM_TYPE_PF_FLOWS'>Flux monétaire sur la période</option>
+	{% if not active_list or "NUM_TYPE_PF_FLOWS" in active_list %}<option value='NUM_TYPE_PF_FLOWS'{% if value == 'NUM_TYPE_PF_FLOWS' %} selected{% endif %}>Flux monétaire sur la période</option>{% endif %}
 
-	<option value='NUM_TYPE_PF_EMV'>Valeur de marché à l&#39;arrivée</option>
+	{% if not active_list or "NUM_TYPE_PF_EMV" in active_list %}<option value='NUM_TYPE_PF_EMV'{% if value == 'NUM_TYPE_PF_EMV' %} selected{% endif %}>Valeur de marché à l&#39;arrivée</option>{% endif %}
 
-	<option value='NUM_TYPE_PF_IRR'>Rendement interne</option>
+	{% if not active_list or "NUM_TYPE_PF_IRR" in active_list %}<option value='NUM_TYPE_PF_IRR'{% if value == 'NUM_TYPE_PF_IRR' %} selected{% endif %}>Rendement interne</option>{% endif %}
 
-	<option value='NUM_TYPE_PF_MDIETZ'>Modified Dietz</option>
+	{% if not active_list or "NUM_TYPE_PF_MDIETZ" in active_list %}<option value='NUM_TYPE_PF_MDIETZ'{% if value == 'NUM_TYPE_PF_MDIETZ' %} selected{% endif %}>Modified Dietz</option>{% endif %}
 
-	<option value='NUM_TYPE_PF_MWR'>Rendement pondéré par la masse sous gestion</option>
+	{% if not active_list or "NUM_TYPE_PF_MWR" in active_list %}<option value='NUM_TYPE_PF_MWR'{% if value == 'NUM_TYPE_PF_MWR' %} selected{% endif %}>Rendement pondéré par la masse sous gestion</option>{% endif %}
 
-	<option value='NUM_TYPE_PF_TWR'>Rendement pondéré par la durée</option>
+	{% if not active_list or "NUM_TYPE_PF_TWR" in active_list %}<option value='NUM_TYPE_PF_TWR'{% if value == 'NUM_TYPE_PF_TWR' %} selected{% endif %}>Rendement pondéré par la durée</option>{% endif %}
 
 </select>

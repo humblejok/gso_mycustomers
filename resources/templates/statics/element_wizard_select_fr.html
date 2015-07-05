@@ -1,21 +1,19 @@
 <select class="form-control">
 
-	<option value='SETUP_RENDERED_ADDRESS'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_ADDRESS" in active_list %}<option value='SETUP_RENDERED_ADDRESS'{% if value == 'SETUP_RENDERED_ADDRESS' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
-	<option value='SETUP_RENDERED_ALIAS'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_ALIAS" in active_list %}<option value='SETUP_RENDERED_ALIAS'{% if value == 'SETUP_RENDERED_ALIAS' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
-	<option value='SETUP_RENDERED_COMPANY_MEMBER'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_COMPANY_MEMBER" in active_list %}<option value='SETUP_RENDERED_COMPANY_MEMBER'{% if value == 'SETUP_RENDERED_COMPANY_MEMBER' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
-	<option value='SETUP_RENDERED_COMPANY_SUBSIDIARY'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_COMPANY_SUBSIDIARY" in active_list %}<option value='SETUP_RENDERED_COMPANY_SUBSIDIARY'{% if value == 'SETUP_RENDERED_COMPANY_SUBSIDIARY' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
-	<option value='SETUP_RENDERED_CONTAINER'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_CONTAINER" in active_list %}<option value='SETUP_RENDERED_CONTAINER'{% if value == 'SETUP_RENDERED_CONTAINER' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
-	<option value='SETUP_RENDERED_EMAIL'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_EMAIL" in active_list %}<option value='SETUP_RENDERED_EMAIL'{% if value == 'SETUP_RENDERED_EMAIL' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
-	<option value='SETUP_RENDERED_PERSON'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_PERSON" in active_list %}<option value='SETUP_RENDERED_PERSON'{% if value == 'SETUP_RENDERED_PERSON' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
-	<option value='SETUP_RENDERED_PHONE'>NO TRANSLATION</option>
-
-	<option value='SETUP_RENDERED_THIRD_PARTY'>NO TRANSLATION</option>
+	{% if not active_list or "SETUP_RENDERED_PHONE" in active_list %}<option value='SETUP_RENDERED_PHONE'{% if value == 'SETUP_RENDERED_PHONE' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
 </select>

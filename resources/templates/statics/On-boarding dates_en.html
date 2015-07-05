@@ -1,0 +1,48 @@
+
+<form id="object_form" role="form" action="/object_instanciante.html" method="POST">
+	
+		<div class="form-group">
+			<label for="on-boarding_date">On-boarding date</label>
+			<input name="on-boarding_date" type="text" class="form-control no-enter" id="on-boarding_date" placeholder="Enter a on-boarding date" value=""/>
+		</div>
+		<script>
+			
+				$("#on-boarding_date").datepicker({ dateFormat: "yy-mm-dd" });
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="last_audit_date">Last audit date</label>
+			<input name="last_audit_date" type="text" class="form-control no-enter" id="last_audit_date" placeholder="Enter a last audit date" value=""/>
+		</div>
+		<script>
+			
+				$("#last_audit_date").datepicker({ dateFormat: "yy-mm-dd" });
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="last_invoice_date">Last invoice date</label>
+			<input name="last_invoice_date" type="text" class="form-control no-enter" id="last_invoice_date" placeholder="Enter a last invoice date" value=""/>
+		</div>
+		<script>
+			
+				$("#last_invoice_date").datepicker({ dateFormat: "yy-mm-dd" });
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="last_update">Last update</label>
+			<input name="last_update" type="text" class="form-control no-enter" id="last_update" placeholder="Enter a last update" value=""/>
+		</div>
+		<script>
+			
+				$("#last_update").datepicker({ dateFormat: "yy-mm-dd" });
+			
+		</script>
+	
+	<div class="row">
+		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Create the On-boarding dates and save it">Continue</button>
+	</div>
+</form>
