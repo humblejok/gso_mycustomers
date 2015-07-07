@@ -2,8 +2,18 @@
 <form id="object_form" role="form" action="/object_instanciante.html" method="POST">
 	
 		<div class="form-group">
-			<label for="documents_are_up-to-date">Documents are up-to-date</label>
-			<input name="documents_are_up-to-date" type="text" class="form-control no-enter" id="documents_are_up-to-date" placeholder="Enter a documents are up-to-date" value=""/>
+			<label for="on-boarding_date">On-boarding date</label>
+			<input name="on-boarding_date" type="text" class="form-control no-enter" id="on-boarding_date" placeholder="Enter a on-boarding date" value=""/>
+		</div>
+		<script>
+			
+				$("#on-boarding_date").datepicker({ dateFormat: "yy-mm-dd" });
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="current_aum">Current AUM</label>
+			<input name="current_aum" type="text" class="form-control no-enter" id="current_aum" placeholder="Enter a current aum" value=""/>
 		</div>
 		<script>
 			
@@ -18,10 +28,12 @@
 		</script>
 	
 		<div class="form-group">
-			<label for="compliance_officer_approval">Compliance officer approval</label>
-			<input name="compliance_officer_approval" type="text" class="form-control no-enter" id="compliance_officer_approval" placeholder="Enter a compliance officer approval" value=""/>
+			<label for="last_update_date">Last update date</label>
+			<input name="last_update_date" type="text" class="form-control no-enter" id="last_update_date" placeholder="Enter a last update date" value=""/>
 		</div>
 		<script>
+			
+				$("#last_update_date").datepicker({ dateFormat: "yy-mm-dd" });
 			
 		</script>
 	

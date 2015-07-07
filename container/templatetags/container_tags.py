@@ -12,6 +12,7 @@ from container.utilities.utils import dict_to_json_compliance,\
 import logging
 import urllib
 from django.contrib.auth.models import User
+from container.utilities import setup_content
 
 LOGGER = logging.getLogger(__name__)
 
@@ -104,6 +105,15 @@ def has_container_type(universe, container_type):
 def log_me(text):
     LOGGER.debug(str(text))
     return ""
+
+
+@register.inclusion_tag('statics/objects_lists.html')
+def get_objects_lists(language_code):
+    objects_lists = setup_content.get_data('object_type_fields')
+    del objects_lists['_id']
+    print objects_lists
+    return {'objects_lists': objects_lists, 'language_code': language_code}
+
 
 @register.inclusion_tag('statics/application_users.html')
 def get_users(user_id, value):

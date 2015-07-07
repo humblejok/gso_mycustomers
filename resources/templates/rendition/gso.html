@@ -1,4 +1,5 @@
 {% load container_tags %}
+{% templatetag openblock %} load container_tags {% templatetag closeblock %}
 {% templatetag openblock %} load socialaccount {% templatetag closeblock %}
 {% templatetag openblock %} load i18n {% templatetag closeblock %}
 <!DOCTYPE html>
@@ -205,8 +206,9 @@
 						{% endfor %}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
+						{% verbatim %}<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{profile.default_work_as}} <b class="caret"></b></a><ul class="dropdown-menu">{% for third in profile|get_dict_key:'available_work_places' %}<li><a href="#" onclick="setWorkAs({{third.third_id}})">{{third.third_name}}</a></li>{% endfor %}</ul></li></li><li>&nbsp;</li>{% endverbatim %}
 						<li>
-							<a href="" class="btn btn-default" role="button" data-toggle="tooltip" data-placement="bottom" title="Log off">
+							<a href="/accounts/logout" class="btn btn-default" role="button" data-toggle="tooltip" data-placement="bottom" title="Log off">
 								<span class="glyphicon glyphicon-off"></span>
 							</a>
 						</li>

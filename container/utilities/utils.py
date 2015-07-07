@@ -38,13 +38,10 @@ class StripWhitespaceMiddleware(object):
             return response    
 
 def recurse_company_structure(container):
-    print "->" + str(container)
     company = get_effective_container(container.id)
     structure = [{'third_id':company.id, 'third_name': company.name, 'third_short_name': company.short_name}]
-    if len(company.subsidiary.all())>0:
-        for sub_company in company.subsidiary.all():
-            print company.members
-            structure += recurse_company_structure(sub_company)
+    for sub_company in company.subsidiary.all():
+        structure += recurse_company_structure(sub_company.company)
     else:
         return structure
     
@@ -78,11 +75,11 @@ def get_or_create_user_profile(user_id):
     # TODO Cache that
     mappings = mapping_class.objects.filter(related_user__id=user_id)
     profile['available_work_places'] = []
+    
     for mapping in mappings:
         if mapping.third_container.type.identifier=='CONT_COMPANY':
             profile['available_work_places'] += recurse_company_structure(mapping.third_container)
-        else:
-            profile['available_work_places'].append({'third_id':mapping.third_container.id, 'third_name': mapping.third_container.name, 'third_short_name': mapping.third_container.short_name})
+        else:            profile['available_work_places'].append({'third_id':mapping.third_container.id, 'third_name': mapping.third_container.name, 'third_short_name': mapping.third_container.short_name})
     print profile['available_work_places']
     setup_content.set_data('user_profiles', profile, False)
     return profile

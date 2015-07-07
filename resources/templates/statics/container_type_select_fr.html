@@ -10,6 +10,8 @@
 
 	{% if not active_list or "CONT_PERSON" in active_list %}<option value='CONT_PERSON'{% if value == 'CONT_PERSON' %} selected{% endif %}>Personne</option>{% endif %}
 
+	{% if not active_list or "CONT_THIRD_PARTY" in active_list %}<option value='CONT_THIRD_PARTY'{% if value == 'CONT_THIRD_PARTY' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
+
 	{% if not active_list or "CONT_UNIVERSE" in active_list %}<option value='CONT_UNIVERSE'{% if value == 'CONT_UNIVERSE' %} selected{% endif %}>Univers</option>{% endif %}
 
 </select>

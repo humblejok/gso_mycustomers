@@ -16,8 +16,8 @@ DATABASES = {
         # The following settings are not used with sqlite3:
         'USER': 'gso_mycustomers',
         'PASSWORD': 'boudux',
-        'HOST': '192.168.1.11',
-        'PORT': 5342
+        'HOST': 'localhost',
+        'PORT': 5432                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
     },
 }
 

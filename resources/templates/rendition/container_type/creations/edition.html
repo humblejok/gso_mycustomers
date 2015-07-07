@@ -39,7 +39,7 @@
 				{% if current_field.template %}
 					<select id="{{current_field.field}}" name="{{current_field.field}}" class="form-control" {% if current_field.default.set_default == 'True' and current_field.default.allow_changes == 'False' %}disabled{% endif %}>
 					{% if current_field.target_class == 'django.contrib.auth.models.User' %}
-						{% get_users request.user.id current_field.default.value %}
+						{% templatetag openblock %} get_users request.user.id current_field.default.value {% templatetag closeblock %}
 					{% else %}
 						{% if current_field.default.set_default == 'True' %}
 							{% include current_field.template with value=current_field.default.value %}

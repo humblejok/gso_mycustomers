@@ -1,0 +1,6 @@
+{% load container_tags %}
+var objectsSelectionHTML = {
+{% for key in objects_lists %}
+	"{{key}}": "{% with objects=objects_lists|get_dict_key:key %}{% for obj in objects %}<option val='{{obj|get_dict_key:"name"}}'>{{obj|get_dict_key:"name"}}</option>{% endfor %}{% endwith %}",
+{% endfor %}
+};

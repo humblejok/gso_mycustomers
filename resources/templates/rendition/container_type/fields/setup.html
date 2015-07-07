@@ -1,5 +1,6 @@
 {% extends base_template %}
 {% load i18n %}
+{% load container_tags %}
 {% block title %}{% blocktrans %}Container Extended Fields Setup{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
@@ -11,6 +12,8 @@
 	var allItems = {{global|safe}};
 	var currentRow = -1;
 	var allValues = [];
+
+	{% get_objects_lists 'en' %}
 
 	function onCallError(e) {
 		alert(e.status);
@@ -44,6 +47,8 @@
 		if (allItems.hasOwnProperty(container)) {
 			$.each(allItems[container], addObjectDefinition);
 		}
+		$("#objectDefinition").empty();
+		$("#objectDefinition").html(objectsSelectionHTML[$('#objectType').val()]);
 	}
 
 	function reindexDefinitionEntries() {
@@ -93,7 +98,7 @@
 	function objectTypeChanged() {
 		var objectType = $("#objectType").val();
 		$("#objectDefinition").empty();
-		$("#objectDefinition").load("/container/rendition/render_template_for_load.html", {"template_name": objectType});
+		$("#objectDefinition").html(objectsSelectionHTML[$('#objectType').val()]);
 	}
 
 	function addObjectDefinition(index, value) {

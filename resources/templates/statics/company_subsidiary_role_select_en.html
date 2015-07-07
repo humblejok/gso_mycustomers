@@ -6,4 +6,6 @@
 
 	{% if not active_list or "CSR_RO" in active_list %}<option value='CSR_RO'{% if value == 'CSR_RO' %} selected{% endif %}>Representative Office</option>{% endif %}
 
+	{% if not active_list or "CSR_SUBSIDIARY" in active_list %}<option value='CSR_SUBSIDIARY'{% if value == 'CSR_SUBSIDIARY' %} selected{% endif %}>Subsidiary</option>{% endif %}
+
 </select>

@@ -99,6 +99,7 @@ def save(request):
                                "container" : container_setup["type"],
                                "language_code": profile['language_code']})
             template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
+            print 'rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html'
             rendition = template.render(context)
             outfile = os.path.join(TEMPLATES_STATICS_PATH, container_setup["type"] + '_' + item_render_name + '_' + item_view_type + '_' + language.short_name + '.html')
             with open(outfile,'w') as o:
