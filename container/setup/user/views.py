@@ -6,11 +6,11 @@ Created on Apr 30, 2015
 from django.shortcuts import render
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
-from container.utilities.utils import clean_post_value,\
-    get_or_create_user_profile
+from container.utilities.utils import clean_post_value
 from container.utilities import setup_content
 from container.models import Attributes
 import logging
+from container.utilities.security import get_or_create_user_profile
 
 LOGGER = logging.getLogger(__name__)
 

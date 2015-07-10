@@ -3,8 +3,7 @@ Created on 26 juin 2015
 
 @author: humble_jok
 '''
-from container.utilities.utils import get_or_create_user_profile,\
-    complete_fields_information, get_static_fields, get_effective_container,\
+from container.utilities.utils import complete_fields_information, get_static_fields, get_effective_container,\
     clean_post_value
 from django.shortcuts import render
 from django.http.response import HttpResponse
@@ -17,6 +16,7 @@ from django.template.context import Context
 from container.models import UserMapping, ThirdPartyContainer, PersonContainer,\
     Attributes, Email
 from django.contrib.auth.models import User
+from container.utilities.security import get_or_create_user_profile
 
 LOGGER = logging.getLogger(__name__)
 

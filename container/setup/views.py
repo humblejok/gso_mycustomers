@@ -16,9 +16,10 @@ from seq_common.utils import classes
 
 from container.models import Attributes, MenuEntries
 from container.utilities import setup_content
-from container.utilities.utils import complete_fields_information, get_or_create_user_profile
+from container.utilities.utils import complete_fields_information
 import logging
 from container.setup.application.settings import TEMPLATES_STATICS_PATH
+from container.utilities.security import get_or_create_user_profile
 
 LOGGER = logging.getLogger(__name__)
 

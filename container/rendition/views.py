@@ -6,10 +6,10 @@ Created on Apr 27, 2015
 from container.models import Attributes
 from seq_common.utils import classes
 from django.shortcuts import render
-from container.utilities.utils import complete_custom_fields_information,\
-    get_or_create_user_profile, clean_post_value
+from container.utilities.utils import complete_custom_fields_information,clean_post_value
 from container.utilities.container_container import get_container_information,\
     enhance_container_information
+from container.utilities.security import get_or_create_user_profile
     
 def render_singles_list(request):
     # TODO: Check user

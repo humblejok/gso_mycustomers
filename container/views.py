@@ -13,7 +13,7 @@ from bson import json_util
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.forms.models import model_to_dict
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from seq_common.utils import classes
 
@@ -23,11 +23,11 @@ from container.utilities.container_container import get_container_information, \
     set_container_information
 from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
-    get_effective_container, get_or_create_user_profile, \
-    get_model_foreign_field_class, get_static_fields, filter_custom_fields,\
-    get_or_create_ownership_universes
+    get_effective_container, get_model_foreign_field_class, get_static_fields, filter_custom_fields
 from django.utils.datastructures import MultiValueDictKeyError
 from container.setup.application.settings import WORKING_PATH
+from container.utilities.security import get_or_create_user_profile,get_or_create_ownership_universes,\
+    container_visible
 
 
 LOGGER = logging.getLogger(__name__)
@@ -167,20 +167,24 @@ def get(request):
     profile = get_or_create_user_profile(request.user.id)
     container_id = request.GET['container_id']
     container_type = request.GET['container_type']
-    # TODO: Handle error
-    effective_class = get_effective_class(container_type)
-    container = get_effective_container(container_id)
-    filtering = lambda d, k: d[k]['data']
-    working_data = setup_content.get_data('container_type_details')
-    fields = list(itertools.chain(*[filtering(working_data[container_type]['data'], k) for k in working_data[container_type]['data'].keys()]))
-    custom_fields = complete_custom_fields_information(container_type)
-    custom_data = get_container_information(container)
-    context = {'base_template': profile['base_template'], 'profile': profile, 
-               'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}, profile['language_code']),
-               'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
-               'custom_data': custom_data,
-               'container_type': container_type, 'layout': working_data[container_type]}
-    return render(request,'rendition/container_type/details/view.html', context)
+    if container_visible(container_id, profile):
+        # TODO: Handle error
+        effective_class = get_effective_class(container_type)
+        container = get_effective_container(container_id)
+        filtering = lambda d, k: d[k]['data']
+        working_data = setup_content.get_data('container_type_details')
+        fields = list(itertools.chain(*[filtering(working_data[container_type]['data'], k) for k in working_data[container_type]['data'].keys()]))
+        custom_fields = complete_custom_fields_information(container_type)
+        custom_data = get_container_information(container)
+        context = {'base_template': profile['base_template'], 'profile': profile, 
+                   'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}, profile['language_code']),
+                   'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
+                   'custom_data': custom_data,
+                   'container_type': container_type, 'layout': working_data[container_type]}
+        return render(request,'rendition/container_type/details/view.html', context)
+    else:
+        return HttpResponseForbidden()
+        
 
 def get_field_type(request):
     profile = get_or_create_user_profile(request.user.id)
@@ -205,13 +209,11 @@ def get_selectable_foreign(request):
         # TODO Add visibility rules
         users = User.objects.all()
         return render(request, 'statics/application_users.html', {'users': users})
-    elif issubclass(foreign_class, Container):
-        return render(request,'')
     print foreign_class
     print fields_information[foreign_field]
 
 def filters(request):
-    user = User.objects.get(id=request.user.id)
+    profile = get_or_create_user_profile(request.user.id)
     if request.GET.has_key('container_type'):
         container_type = request.GET['container_type']
         container_class = container_type + '_CLASS'
@@ -233,69 +235,78 @@ def filters(request):
         else:
             query_filter = query_filter | Q(**query_dict)
     results = effective_class.objects.filter(query_filter).distinct()
+    # TODO Optimize
+    results = [result for result in results if container_visible(result.id, profile)]
     results = dumps([dict_to_json_compliance(model_to_dict(item)) for item in results], default=json_util.default)
     return HttpResponse('{"result": ' + results + ', "status_message": "Found"}',"json")
 
 def element_delete(request):
     # TODO: Check user
-    user = User.objects.get(id=request.user.id)
+    profile = get_or_create_user_profile(request.user.id)
     container_id = request.POST['container_id']
     container_type = request.POST['container_type']
     container_field = request.POST['container_field']
     item_id = request.POST['item_id']
-    # TODO: Handle error
-    effective_class = get_effective_class(container_type)
-    container = get_effective_container(container_id)
-    foreign, all_fields = get_model_foreign_field_class(effective_class, container_field)
-    if foreign!=None:
-        entry = foreign.objects.get(id=item_id)
-        getattr(container, container_field).remove(entry)
-        container.save()
-    return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
+    if container_visible(container_id, profile):
+        # TODO: Handle error
+        effective_class = get_effective_class(container_type)
+        container = get_effective_container(container_id)
+        foreign, all_fields = get_model_foreign_field_class(effective_class, container_field)
+        if foreign!=None:
+            entry = foreign.objects.get(id=item_id)
+            getattr(container, container_field).remove(entry)
+            container.save()
+        return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
+    else:
+        return HttpResponseForbidden()
 
 def element_save(request):
     # TODO: Check user
+    profile = get_or_create_user_profile(request.user.id)
     user = User.objects.get(id=request.user.id)
     container_id = request.POST['container_id']
     container_custom = request.POST['container_custom']=='True'
     container_data = request.POST['container_data']
     container_data = json.loads(container_data)
     container_type = request.POST['container_type']
-    # TODO: Handle error
-    effective_class = get_effective_class(container_type)
-    container = get_effective_container(container_id)
-    if container_data.has_key('many-to-many'):
-        foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
-        if foreign!=None:
-            if issubclass(foreign, Container):
-                try:
-                    entry = foreign.objects.get(id=container_data['id'])
-                except:
-                    entry = foreign()
-                    for field_key in [key for key in container_data.keys() if key not in ['many-to-many']]:
-                        field_info = Attributes()
-                        field_info.short_name = field_key
-                        field_info.name = field_key
-                        entry.set_attribute('web', field_info, container_data[field_key])
-                    entry.save()
-            else:
-                entry = foreign.retrieve_or_create('web', None, None, container_data)
-            if container_data['id']!=None and container_data['id']!='':
-                getattr(container, container_data['many-to-many']).remove(foreign.objects.get(id=container_data['id']))
-            getattr(container, container_data['many-to-many']).add(entry)
-            container.save()
-    elif container_custom:
-        for entry in container_data.keys():
-            set_container_information(container, entry, container_data[entry], None)
+    if container_visible(container_id, profile):
+        # TODO: Handle error
+        effective_class = get_effective_class(container_type)
+        container = get_effective_container(container_id)
+        if container_data.has_key('many-to-many'):
+            foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
+            if foreign!=None:
+                if issubclass(foreign, Container):
+                    try:
+                        entry = foreign.objects.get(id=container_data['id'])
+                    except:
+                        entry = foreign()
+                        for field_key in [key for key in container_data.keys() if key not in ['many-to-many']]:
+                            field_info = Attributes()
+                            field_info.short_name = field_key
+                            field_info.name = field_key
+                            entry.set_attribute('web', field_info, container_data[field_key])
+                        entry.save()
+                else:
+                    entry = foreign.retrieve_or_create('web', None, None, container_data)
+                if container_data['id']!=None and container_data['id']!='':
+                    getattr(container, container_data['many-to-many']).remove(foreign.objects.get(id=container_data['id']))
+                getattr(container, container_data['many-to-many']).add(entry)
+                container.save()
+        elif container_custom:
+            for entry in container_data.keys():
+                set_container_information(container, entry, container_data[entry], None)
+        else:
+            for field_key in container_data.keys():
+                #TODO Handle relation
+                field_info = Attributes()
+                field_info.short_name = field_key.split('.')[0]
+                field_info.name = field_key.split('.')[0]
+                container.set_attribute('web', field_info, container_data[field_key])
+        container.save()
+        return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
     else:
-        for field_key in container_data.keys():
-            #TODO Handle relation
-            field_info = Attributes()
-            field_info.short_name = field_key.split('.')[0]
-            field_info.name = field_key.split('.')[0]
-            container.set_attribute('web', field_info, container_data[field_key])
-    container.save()
-    return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
+        return HttpResponseForbidden()
 
 def full_search(request):
     profile = get_or_create_user_profile(request.user.id)
