@@ -48,6 +48,7 @@ urlpatterns = patterns(
     url(r'^user/setup.html', 'container.setup.user.views.setup', name='user_setup'),
     url(r'^user/remove.html', 'container.setup.user.views.remove', name='user_remove'),
     url(r'^user/save.html', 'container.setup.user.views.save', name='user_save'),
+    url(r'^user/set_work_as.html', 'container.setup.user.views.set_work_as', name='user_set_work_as'),
     url(r'^application/setup.html', 'container.setup.application.views.setup', name='application_setup'),
     url(r'^application/save.html', 'container.setup.application.views.save', name='application_save'),
     url(r'^application/reset_nosql.html', 'container.setup.application.views.reset_nosql', name='application_reset_nosql'),

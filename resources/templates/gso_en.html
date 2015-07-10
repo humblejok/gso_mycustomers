@@ -115,16 +115,33 @@
 				$("#dynamic_modal_content").load(modal_url + (url_arguments?"?" + url_arguments:""), function() {console.log("LOADED");$("#dynamic_modal").modal({"show": true});});
 			}
 
-			function confirmDynamicModal(confirm_url, modal_form) {
+			function confirmDynamicModal(event) {
+				event.preventDefault();
+				modal_form = document.getElementById('dynamic_modal_form');
 				$("#dynamic_modal").modal({"show": false});
 				var asArray = $(modal_form).serializeArray();
 				var dynamicData = new FormData();
 				for (var index = 0; index<asArray.length;index++) {
 					dynamicData.append(String(asArray[index].name), String(asArray[index].value));
 				}
-				proceedFormAjax(confirm_url, dynamicData, 'POST');
+				proceedFormAjax($(modal_form).attr("action"), dynamicData, 'POST');
 				return true;
 			}
+
+			function setWorkAs(third_id) {
+				var workAsForm = new FormData();
+				workAsForm.append('third_id', third_id);
+				$.ajax({
+					url: '/container/user/set_work_as.html',
+					type: 'POST',
+					data: workAsForm,
+					processData: false,
+					contentType: false,
+					success: taskFinished,
+					error: taskFailed
+				});
+			}
+
 		</script>
 		<script>
 			$(document).ready(function () {
@@ -228,43 +245,43 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Setup <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 							
-							{% if request.user.is_staff %}
-							<li role="presentation" class="dropdown-header">Presentation</li><li><a href="/container/setup.html?item=container_type&type=creations">Containers creations</a></li>{% endif %}
+							
+							<li role="presentation" class="dropdown-header">Presentation</li><li><a href="/container/setup.html?item=container_type&type=creations">Containers creations</a></li>
 	
 							
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li><a href="/container/setup.html?item=container_type&type=details">Containers details</a></li>{% endif %}
+							
+							<li><a href="/container/setup.html?item=container_type&type=details">Containers details</a></li>
 	
 							
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li><a href="/container/setup.html?item=container_type&type=lists">Containers lists</a></li>{% endif %}
+							
+							<li><a href="/container/setup.html?item=container_type&type=lists">Containers lists</a></li>
 	
 							
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li><a href="/container/setup.html?item=container_type&type=menus">Containers menus</a></li>{% endif %}
+							
+							<li><a href="/container/setup.html?item=container_type&type=menus">Containers menus</a></li>
 	
 							
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li role="presentation" class="dropdown-header">Data</li><li><a href="/container/setup.html?item=container_type&type=fields">Containers fields</a></li>{% endif %}
+							
+							<li role="presentation" class="dropdown-header">Data</li><li><a href="/container/setup.html?item=container_type&type=fields">Containers fields</a></li>
 	
 							
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li><a href="/container/setup.html?item=object_type&type=fields">Objects definition</a></li>{% endif %}
+							
+							<li><a href="/container/setup.html?item=object_type&type=fields">Objects definition</a></li>
 	
 							
 						
@@ -284,28 +301,28 @@
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li role="presentation" class="dropdown-header">Application</li><li><a href="#" onclick="displayDynamicModal('/container/application/setup.html')">Setup application</a></li>{% endif %}
+							
+							<li role="presentation" class="dropdown-header">Application</li><li><a href="#" onclick="displayDynamicModal('/container/application/setup.html')">Setup application</a></li>
 	
 							
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li><a href="#" onclick="displayDynamicModal('/container/application/reset_nosql.html')">Reset integration data</a></li>{% endif %}
+							
+							<li><a href="#" onclick="displayDynamicModal('/container/application/reset_nosql.html')">Reset integration data</a></li>
 	
 							
 						
 							
 							
-							{% if request.user.is_staff %}
-							<li><a href="/container/application/setup_users.html">Manage users</a></li>{% endif %}
+							
+							<li><a href="/container/application/setup_users.html">Manage users</a></li>
 	</ul></li>
 							
 						
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{profile.default_work_as}} <b class="caret"></b></a><ul class="dropdown-menu">{% for third in profile|get_dict_key:'available_work_places' %}<li><a href="#" onclick="setWorkAs({{third.third_id}})">{{third.third_name}}</a></li>{% endfor %}</ul></li></li><li>&nbsp;</li>
+						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{% if profile.current_work_as.third_name %}{{profile.current_work_as.third_name}}{% else %}{{profile.current_work_as}}{% endif %}{% if profile|get_dict_key:'available_work_places'|length > 1 %} <b class="caret"></b>{% endif %}</a><ul class="dropdown-menu">{% for third in profile|get_dict_key:'available_work_places' %}<li><a href="#" onclick="setWorkAs({{third.third_id}})">{{third.third_name}}</a></li>{% endfor %}</ul></li></li><li>&nbsp;</li>
 						<li>
 							<a href="/accounts/logout" class="btn btn-default" role="button" data-toggle="tooltip" data-placement="bottom" title="Log off">
 								<span class="glyphicon glyphicon-off"></span>

@@ -10,6 +10,9 @@ from container.utilities.utils import clean_post_value,\
     get_or_create_user_profile
 from container.utilities import setup_content
 from container.models import Attributes
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 def setup(request):
     profile = get_or_create_user_profile(request.user.id)
@@ -25,7 +28,29 @@ def save(request):
     
     language = clean_post_value(request.POST['language'])
     language_attribute = Attributes.objects.get(active=True, identifier=language)
-    setup_content.set_data('user_profiles', {'_id': user.id, 'base_template': 'gso_' + language_attribute.short_name + '.html', 'language_code': language_attribute.short_name,'language': language}, False)
+    profile = get_or_create_user_profile(user.id)
+    profile['base_template'] = 'gso_' + language_attribute.short_name + '.html'
+    profile['language_code'] = language_attribute.short_name
+    profile['language'] = language
+    if request.POST['default_work_place'].lower()!='administrator':
+        try:
+            profile['default_work_place'] = next(data for (index, data) in enumerate(profile['available_work_places']) if data['third_name'] == request.POST['default_work_place'])
+        except StopIteration:
+            LOGGER.error("Could not find work place " + request.POST['default_work_place'] + " for user " + user.username)
+    else:
+        profile['default_work_place'] = 'administrator'
+    if profile.has_key('current_work_as'):
+        del profile['current_work_as']
+    setup_content.set_data('user_profiles', profile, False)
+    return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
+
+def set_work_as(request):
+    profile = get_or_create_user_profile(request.user.id)
+    try:
+        profile['current_work_as'] = next(data for (index, data) in enumerate(profile['available_work_places']) if str(data['third_id']) == request.POST['third_id'])
+        setup_content.set_data('user_profiles', profile, False)
+    except StopIteration:
+        LOGGER.error("Could not find work place with " + request.POST['third_id'] + " for user " + request.user.username)
     return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
 
 def remove(request):

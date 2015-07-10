@@ -5,9 +5,7 @@
 <div class="form-group">
 	<label for="company">Compagnie</label>
 	
-		<select id="{{prefix}}company" name="{{prefix}}company" class="form-control">
-		<option value='CONT_COMPANY' >Compagnie</option><option value='CONT_CONTAINER' >Container</option><option value='CONT_DOCUMENT' >Document</option><option value='CONT_MAIL_CAMPAIGN' >Campagne de mails</option><option value='CONT_PERSON' >Personne</option><option value='CONT_THIRD_PARTY' >NO TRANSLATION</option><option value='CONT_UNIVERSE' >Univers</option>
-		</select>
+	<input name="{{prefix}}company" type="text" class="form-control with-autocomplete" id="{{prefix}}company" placeholder="Compagnie" datasource="/container/filters.html?container_type=CONT_COMPANY" value=""/>
 	
 </div>
 

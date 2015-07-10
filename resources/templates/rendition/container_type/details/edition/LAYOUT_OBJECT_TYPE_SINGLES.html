@@ -32,7 +32,7 @@
 							{% with current_field=complete_fields|get_dict_key:entry%}
 							<div class="form-group">
 								<label for="{{entry}}">{{entry|get_translated_text:language_code}}</label>
-								{% if current_field.template %}
+								{% if current_field.template and not current_field.is_container %}
 									<select id="{{entry}}" name="{{entry}}" class="form-control">
 									{% if current_field.target_class == 'django.contrib.auth.models.User' %}
 										{% get_users request.user.id container|get_value:entry|get_value:'id' %}
@@ -42,6 +42,8 @@
 										{% endwith %}
 									{% endif %}
 									</select>
+								{% elif current_field.is_container %}
+									<input name="{{entry}}" type="text" class="form-control with-autocomplete" id="{{entry}}" placeholder="{{entry|add:'.placeholder'|get_translated_text:language_code}}" datasource="/container/filters.html?container_type={{current_field.container_type}}" value="{{container|get_value:entry|get_value:'name'}}"/>
 								{% else %}
 									{% if current_field.type == 'FIELD_TYPE_CHOICE' %}
 									<div>

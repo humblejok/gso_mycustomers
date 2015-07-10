@@ -46,41 +46,76 @@ def recurse_company_structure(container):
         return structure
     
 
+def get_or_create_ownership_universes(working_as):
+    universe_class = my_class_import('container.models.Universe')
+    attributes_class = my_class_import('container.models.Attributes')
+    third_class = my_class_import('container.models.ThirdPartyContainer')
+    
+    third_id = working_as['third_id']
+    third = third_class.objects.get(id=third_id)
+    universe = universe_class.objects.filter(public=False, owner=third, short_name=third_id)
+    if not universe.exists():
+        universe = universe_class()
+        universe.owner = third
+        universe.public = False
+        universe.description = 'Technical universe that allows the management of the global permissions for user:' + third.name + '.'
+        universe.name = 'Ownership - ' + third.name
+        universe.short_name = third_id
+        universe.type = attributes_class.objects.get(active=True, type='container_type', identifier='CONT_UNIVERSE')
+        universe.inception_date = datetime.date.today()
+        universe.closed_date = None
+        universe.status = attributes_class.objects.get(active=True, type='status', identifier='STATUS_ACTIVE')
+        universe.save()
+    else:
+        universe = universe[0]
+    effective_third = get_effective_instance(third)
+    all_sub_universes = [universe]
+    if effective_third.type.identifier=='CONT_COMPANY':
+        # TODO Control that there are no loops
+        for subsidiary in effective_third.subsidiary.all():
+            sub_universe = get_or_create_ownership_universes({'third_id': subsidiary.company.id})
+            all_sub_universes += sub_universe
+        for member in effective_third.members.all():
+            sub_universe = get_or_create_ownership_universes({'third_id': member.person.id})
+            all_sub_universes += sub_universe
+    print all_sub_universes
+    return all_sub_universes
+
 def get_or_create_user_profile(user_id):
     profile = setup_content.get_data('user_profiles', user_id)
     current_user = User.objects.get(id=user_id)
-    universe_class = my_class_import('container.models.Universe')
-    attributes_class = my_class_import('container.models.Attributes')
     mapping_class = my_class_import('container.models.UserMapping')
-    administrator = User.objects.filter(is_active=True, is_superuser=True).order_by('id')[0]
     if profile==None or not profile:
         language_attribute = classes.my_class_import('container.models.Attributes').objects.get(active=True, identifier='AVAIL_LANGUAGE_EN')
         profile = {'_id': user_id, 'user_name': current_user.username, 'language':language_attribute.identifier, 'base_template': 'gso_' + language_attribute.short_name + '.html', 'language_code': language_attribute.short_name}
     if not profile.has_key('user_name') or profile['user_name']!=current_user.username:
         profile['user_name'] = current_user.username
     profile['is_staff'] = current_user.is_staff or current_user.is_superuser
-    if not universe_class.objects.filter(public=False, owner=administrator, short_name=profile['user_name']).exists():
-        profile_universe = universe_class()
-        profile_universe.owner = administrator
-        profile_universe.public = False
-        profile_universe.description = 'Technical universe that allows the management of the global permissions for user:' + profile['user_name'] + '.'
-        profile_universe.name = 'Ownership - ' + profile['user_name']
-        profile_universe.short_name = profile['user_name']
-        profile_universe.type = attributes_class.objects.get(active=True, type='container_type', identifier='CONT_UNIVERSE')
-        profile_universe.inception_date = datetime.date.today()
-        profile_universe.closed_date = None
-        profile_universe.status = attributes_class.objects.get(active=True, type='status', identifier='STATUS_ACTIVE')
-        profile_universe.save()
-        profile['universe_id'] = profile_universe.id
     # TODO Cache that
     mappings = mapping_class.objects.filter(related_user__id=user_id)
     profile['available_work_places'] = []
-    
     for mapping in mappings:
         if mapping.third_container.type.identifier=='CONT_COMPANY':
             profile['available_work_places'] += recurse_company_structure(mapping.third_container)
-        else:            profile['available_work_places'].append({'third_id':mapping.third_container.id, 'third_name': mapping.third_container.name, 'third_short_name': mapping.third_container.short_name})
-    print profile['available_work_places']
+        else:
+            profile['available_work_places'].append({'third_id':mapping.third_container.id, 'third_name': mapping.third_container.name, 'third_short_name': mapping.third_container.short_name})
+    if not profile.has_key('current_work_as'):
+        # TODO Reset at login and clean the mess of tests
+        if profile.has_key('default_work_place') and profile['default_work_place']!='administrator':
+            try:
+                profile['current_work_as'] = next(data for (index, data) in enumerate(profile['available_work_places']) if data['third_name'] == profile['default_work_place']['third_name'])
+            except StopIteration:
+                if len(profile['available_work_places'])>0:
+                    profile['current_work_as'] = profile['available_work_places'][0]
+                else:
+                    LOGGER.error('Invalid profile setup for user ' + current_user.username)
+        elif profile.has_key('default_work_place') and profile['default_work_place']=='administrator':
+            profile['current_work_as'] = profile['default_work_place']
+        else:
+            if len(profile['available_work_places'])>0:
+                profile['current_work_as'] = profile['available_work_places'][0]
+            else:
+                LOGGER.error('Invalid profile setup for user ' + current_user.username)
     setup_content.set_data('user_profiles', profile, False)
     return profile
 
@@ -171,7 +206,6 @@ def complete_fields_information(model_class, information, language_code='en'):
                     information[field]['is_container'] = False
                 else:
                     information[field]['is_container'] = issubclass(classes.my_class_import(information[field]['target_class']), classes.my_class_import('container.models.Container'))
-                    information[field]['is_container']
                     information[field]['target_class']
                     if information[field]['is_container']:
                         information[field]['container_type'] = attributes_class.objects.get(active=True, type='container_type_class', name=information[field]['target_class']).identifier.replace('_CLASS','')
@@ -179,7 +213,8 @@ def complete_fields_information(model_class, information, language_code='en'):
                     information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
                     information[field]['template_m2m'] = 'statics/' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
                     information[field]['template_m2m_complete'] = 'statics/complete_' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
-                    information[field]['datasource'] = '/container_filter.html?container_class=' + information[field]['target_class']
+                    print field, information[field]['target_class'], information[field]['is_container'], information[field]['template_m2m_complete']
+                    information[field]['datasource'] = '/container/filter.html?container_class=' + information[field]['target_class']
     return information
 
 def get_static_fields(clazz, trail = []):

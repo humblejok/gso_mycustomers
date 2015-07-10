@@ -186,11 +186,12 @@ def populate_model_from_xlsx(model_name, xlsx_file):
     while row_index<=sheet.get_highest_row():
         instance = model()
         for i in range(0,len(header)):
-            value = sheet.cell(row = row_index, column=i+1).value
-            field_info = Attributes()
-            field_info.short_name = header[i]
-            field_info.name = header[i]
-            instance.set_attribute('excel', field_info, value)
+            if sheet.cell(row = row_index, column=i+1).internal_value!=None:
+                value = sheet.cell(row = row_index, column=i+1).value
+                field_info = Attributes()
+                field_info.short_name = header[i]
+                field_info.name = header[i]
+                instance.set_attribute('excel', field_info, value)
         instance.save()
         row_index += 1
         
@@ -682,7 +683,7 @@ class ContainerDocument(Container):
 class Universe(Container):
     public = models.BooleanField()
     members = models.ManyToManyField("Container", related_name='universe_inventory_rel')
-    owner = models.ForeignKey(User, related_name='universe_owner_rel')
+    owner = models.ForeignKey('ThirdPartyContainer', related_name='universe_owner_rel')
     description = models.TextField(null=True, blank=True)
     
     

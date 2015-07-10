@@ -4,6 +4,8 @@
 
 	{% if not active_list or "SETUP_RENDERED_ALIAS" in active_list %}<option value='SETUP_RENDERED_ALIAS'{% if value == 'SETUP_RENDERED_ALIAS' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
+	{% if not active_list or "SETUP_RENDERED_COMPANY" in active_list %}<option value='SETUP_RENDERED_COMPANY'{% if value == 'SETUP_RENDERED_COMPANY' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
+
 	{% if not active_list or "SETUP_RENDERED_COMPANY_MEMBER" in active_list %}<option value='SETUP_RENDERED_COMPANY_MEMBER'{% if value == 'SETUP_RENDERED_COMPANY_MEMBER' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
 
 	{% if not active_list or "SETUP_RENDERED_COMPANY_SUBSIDIARY" in active_list %}<option value='SETUP_RENDERED_COMPANY_SUBSIDIARY'{% if value == 'SETUP_RENDERED_COMPANY_SUBSIDIARY' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}

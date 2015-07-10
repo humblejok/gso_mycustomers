@@ -115,16 +115,33 @@
 				$("#dynamic_modal_content").load(modal_url + (url_arguments?"?" + url_arguments:""), function() {console.log("LOADED");$("#dynamic_modal").modal({"show": true});});
 			}
 
-			function confirmDynamicModal(confirm_url, modal_form) {
+			function confirmDynamicModal(event) {
+				event.preventDefault();
+				modal_form = document.getElementById('dynamic_modal_form');
 				$("#dynamic_modal").modal({"show": false});
 				var asArray = $(modal_form).serializeArray();
 				var dynamicData = new FormData();
 				for (var index = 0; index<asArray.length;index++) {
 					dynamicData.append(String(asArray[index].name), String(asArray[index].value));
 				}
-				proceedFormAjax(confirm_url, dynamicData, 'POST');
+				proceedFormAjax($(modal_form).attr("action"), dynamicData, 'POST');
 				return true;
 			}
+
+			function setWorkAs(third_id) {
+				var workAsForm = new FormData();
+				workAsForm.append('third_id', third_id);
+				$.ajax({
+					url: '/container/user/set_work_as.html',
+					type: 'POST',
+					data: workAsForm,
+					processData: false,
+					contentType: false,
+					success: taskFinished,
+					error: taskFailed
+				});
+			}
+
 		</script>
 		<script>
 			$(document).ready(function () {
@@ -206,7 +223,7 @@
 						{% endfor %}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						{% verbatim %}<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{profile.default_work_as}} <b class="caret"></b></a><ul class="dropdown-menu">{% for third in profile|get_dict_key:'available_work_places' %}<li><a href="#" onclick="setWorkAs({{third.third_id}})">{{third.third_name}}</a></li>{% endfor %}</ul></li></li><li>&nbsp;</li>{% endverbatim %}
+						{% verbatim %}<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{% if profile.current_work_as.third_name %}{{profile.current_work_as.third_name}}{% else %}{{profile.current_work_as}}{% endif %}{% if profile|get_dict_key:'available_work_places'|length > 1 %} <b class="caret"></b>{% endif %}</a><ul class="dropdown-menu">{% for third in profile|get_dict_key:'available_work_places' %}<li><a href="#" onclick="setWorkAs({{third.third_id}})">{{third.third_name}}</a></li>{% endfor %}</ul></li></li><li>&nbsp;</li>{% endverbatim %}
 						<li>
 							<a href="/accounts/logout" class="btn btn-default" role="button" data-toggle="tooltip" data-placement="bottom" title="Log off">
 								<span class="glyphicon glyphicon-off"></span>

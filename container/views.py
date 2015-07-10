@@ -24,7 +24,8 @@ from container.utilities.container_container import get_container_information, \
 from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
     get_effective_container, get_or_create_user_profile, \
-    get_model_foreign_field_class, get_static_fields, filter_custom_fields
+    get_model_foreign_field_class, get_static_fields, filter_custom_fields,\
+    get_or_create_ownership_universes
 from django.utils.datastructures import MultiValueDictKeyError
 from container.setup.application.settings import WORKING_PATH
 
@@ -39,17 +40,21 @@ def lists(request):
     container_type = request.GET['item']
     # TODO: Handle error
     effective_class = get_effective_class(container_type)
-    if effective_class==Universe:
-        if profile['is_staff']:
-            filter_query = {}
-        else:
-            filter_query = Q(owner__id=profile['_id']) | Q(public=True)
+    if profile['is_staff'] or str(profile['current_work_as']).lower()=='administrator':
+        results = effective_class.objects.all()
+    elif effective_class==Universe:
+        filter_query = Q(owner__id=profile['current_work_as']['third_id']) | Q(public=True)
+        results = effective_class.objects.filter(filter_query)
     else:
-        filter_query = {}
-    if isinstance(filter_query, dict):
-        results = effective_class.objects.filter(**filter_query)
-    else:
-        results = effective_class.objects.filter(filter_query).order_by('name')
+        all_universes = get_or_create_ownership_universes(profile['current_work_as'])
+        print all_universes
+        results = None
+        for universe in all_universes:
+            if results==None:
+                results = universe.members.filter(type__identifier=container_type)
+            else:
+                results = results | universe.members.filter(type__identifier=container_type)
+    results = [get_effective_container(result.id) for result in results]
     request.session['django_language'] = profile['language_code']
     context = {'base_template': profile['base_template'], 'profile': profile, 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
     return render(request, 'statics/' + container_type + '_results_lists_en.html', context)
@@ -67,6 +72,7 @@ def definition_save(request):
 
 def base_edit(request):
     # TODO: Check user
+    profile = get_or_create_user_profile(request.user.id)
     container_type = request.POST['container_type']
     # TODO: Handle error
     effective_class = get_effective_class(container_type)
@@ -81,6 +87,7 @@ def base_edit(request):
             # TODO: Return error message
             return redirect(request.META.get('HTTP_REFERER'))
     else:
+        container_id = None
         source = effective_class()
     # Initial setup
     # TODO: Check if name already exists for that container type
@@ -108,7 +115,10 @@ def base_edit(request):
                 if foreign_class==Attributes:
                     setattr(source, field, Attributes.objects.get(identifier=request.POST[field], active=True))
                 else:
-                    setattr(source, field, foreign_class.objects.get(id=request.POST[field]))
+                    try:
+                        setattr(source, field, foreign_class.objects.get(id=request.POST[field]))
+                    except ValueError:
+                        setattr(source, field, foreign_class.objects.get(Q(name=request.POST[field])|Q(short_name=request.POST[field])))
             else:
                 target_class = classes.my_class_import(creation_data[field]['target_class'])
                 keys_set = [key for key in request.POST.keys() if key.startswith(field)]
@@ -138,6 +148,10 @@ def base_edit(request):
                 else:
                     LOGGER.error(field + " - Received data are incomplete, it does not match the creation requirements!")
     source.save()
+    if container_id==None and profile.has_key('current_work_as') and str(profile['current_work_as']).lower()!='administrator':
+        # Assign to universe
+        working_universes = get_or_create_ownership_universes(profile['current_work_as'])
+        working_universes[0].members.add(source)
     return redirect(request.META.get('HTTP_REFERER'))
 
 def delete(request):
@@ -191,6 +205,8 @@ def get_selectable_foreign(request):
         # TODO Add visibility rules
         users = User.objects.all()
         return render(request, 'statics/application_users.html', {'users': users})
+    elif issubclass(foreign_class, Container):
+        return render(request,'')
     print foreign_class
     print fields_information[foreign_field]
 

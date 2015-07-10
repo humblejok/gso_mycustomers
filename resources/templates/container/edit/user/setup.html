@@ -1,4 +1,6 @@
 {% load i18n %}
+{% load container_tags %}
+{% language profile.language_code %}
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -25,15 +27,22 @@
 							<div class="form-group">
 								<label for="language">{% blocktrans %}Preferred language{% endblocktrans %}</label>
 								<select class='form-control no-enter' id='language' name='language'>
-									{% with value=profile.language %}
-										{% include 'statics/available_language_en.html' %}
+									{% with template='statics/available_language_'|add:profile.language_code|add:'.html' %}
+										{% include template with value=profile.language %}
 									{% endwith %}
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="default_work_place">{% blocktrans %}Preferred work place{% endblocktrans %}</label>
+								<select class='form-control no-enter' id='default_work_place' name='default_work_place'>
+								{% for third in profile|get_dict_key:'available_work_places' %}<option val="{{third.third_name}}" {% if third.third_name == profile.default_work_place.third_name %}selected="true"{% endif %}>{{third.third_name}}</option>{% empty %}{% if request.user.is_staff %}<option val="administrator">{% blocktrans %}Administrator{% endblocktrans %}</option>{% endif %}{% endfor %}
 								</select>
 							</div>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm your modifications{% endblocktrans %}" onclick="confirmDynamicModal('/container/user/save.html', document.getElementById('dynamic_modal_form'))">{% blocktrans %}Save{% endblocktrans %}</button>
+							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm your modifications{% endblocktrans %}" onclick="confirmDynamicModal(event)">{% blocktrans %}Save{% endblocktrans %}</button>
 						</div>
 					</form>
 				</div>
+{% endlanguage %}

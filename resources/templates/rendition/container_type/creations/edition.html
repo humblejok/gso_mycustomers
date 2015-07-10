@@ -36,7 +36,7 @@
 		{% else %}
 			<div class="form-group">
 				<label for="{{current_field.field}}">{{current_field.field|get_translated_text:language_code}}</label>
-				{% if current_field.template %}
+				{% if current_field.template%}
 					<select id="{{current_field.field}}" name="{{current_field.field}}" class="form-control" {% if current_field.default.set_default == 'True' and current_field.default.allow_changes == 'False' %}disabled{% endif %}>
 					{% if current_field.target_class == 'django.contrib.auth.models.User' %}
 						{% templatetag openblock %} get_users request.user.id current_field.default.value {% templatetag closeblock %}
@@ -48,6 +48,8 @@
 						{% endif %}
 					{% endif %}
 					</select>
+				{% elif current_field.is_container %}
+					<input name="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{current_field.field}}" type="text" class="form-control with-autocomplete" id="{% templatetag openvariable %}prefix{% templatetag closevariable %}{{current_field.field}}" placeholder="{{current_field.field|add:'.placeholder'|get_translated_text:language_code}}" datasource="/container/filters.html?container_type={{current_field.container_type}}" value=""/>
 				{% else %}
 					{% if current_field.type == 'FIELD_TYPE_CHOICE' %}
 					<div>
