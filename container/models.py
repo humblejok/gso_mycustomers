@@ -676,9 +676,15 @@ class Container(CoreModel):
     class Meta:
         ordering = ['name']
         
-class ContainerDocument(Container):
+class DocumentContainer(Container):
+    last_technical_updater = models.ForeignKey(User, related_name='document_tech_updt_rel')
+    last_updater = models.ForeignKey("ThirdPartyContainer", related_name='document_updt_rel', null=True, blank=True)
+    document_version_high = models.IntegerField()
+    document_version_low = models.IntegerField()
+    document_uid = models.PositiveIntegerField()
+    document_phid = models.PositiveIntegerField()
+    document_mime = models.CharField(max_length=512)
     containers = models.ManyToManyField("Container", related_name='container_document_rel')
-    last_uploader = models.ForeignKey(User, related_name='document_uploader_rel')
         
 class Universe(Container):
     public = models.BooleanField()

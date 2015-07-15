@@ -20,6 +20,8 @@
 		var currentName;
 		var currentIndex = 0;
 
+		var currentMaxRuleIndex = 0;
+
 		function onCallError(e) {
 			alert(e.status);
 		}
@@ -201,6 +203,7 @@
 
 		function changeChoice(index) {
 			currentIndex = index;
+			currentMaxRuleIndex = 0;
 			$('#attributeType').val($('#attributeType_' + index).val());
 			$('#modal_select_attribute').modal({});
 		}
@@ -220,6 +223,39 @@
 				fieldTypeChanged(index, false);
 			});
 			reindexFieldEntries();
+		}
+
+		function saveRule() {
+
+			discardRule();
+		}
+
+		function discardRule() {
+			$("#addRuleButton").prop("disabled", false);
+			$("#ruleWizard").empty();
+		}
+
+		function sourceFieldChanged() {
+			$("#ruleDefinition").empty();
+			var ruleSourceIndex = $("#sourceField").val();
+			console.log(ruleSourceIndex);
+			console.log(currentObject.fields[ruleSourceIndex]);
+			if (currentObject.fields[ruleSourceIndex].type==="FIELD_TYPE_CHOICE") {
+				$("#ruleDefinition").html("test");
+			}
+		}
+
+		function addRule() {
+			$("#addRuleButton").prop("disabled", true);
+			$("#ruleWizard").empty();
+							
+			$("#ruleWizard").html("<div class='row'>&nbsp;</div><div class='form-group'><label for='sourceField'>{% blocktrans %}Source field{% endblocktrans %}</label><select name='sourceField' class='form-control' id='sourceField' value='' onchange='sourceFieldChanged()'/></div><div id='ruleDefinition' class='row'></div><button class='btn btn-danger col-lg-5'>{% blocktrans %}Save rule{% endblocktrans %}</button><button class='btn btn-warning col-lg-offset-2 col-lg-5' onclick='discardRule()'>{% blocktrans %}Discard{% endblocktrans %}</button><div class='row'>&nbsp;</div>");
+			$.each(currentObject.fields, function(index, field){
+				if(index!==currentIndex) {
+					$("#sourceField").append("<option value='" + index + "'>" + field.name + "</option>");
+				}
+			});
+			sourceFieldChanged();
 		}
 	</script>
 {% endblock %}
@@ -241,7 +277,7 @@
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
-			<button data-target="#modal_create_object" class="btn btn-default col-lg-3" type="button" data-toggle="modal" data-placement="bottom" title="Create a new object">{% blocktrans %}Create{% endblocktrans %}</button>
+			<button data-target="#modal_create_object" class="btn btn-default col-lg-3" type="button" data-toggle="modal" data-placement="bottom" title="{% blocktrans %}Create a new object{% endblocktrans %}">{% blocktrans %}Create{% endblocktrans %}</button>
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
@@ -251,7 +287,7 @@
 			</div>
 			<div id="objectFieldsDiv" class="col-lg-9">
 				<button class="btn btn-default btn-sm add-btn" onclick="addField(currentRow + 1, null)">{% blocktrans %}Add field{% endblocktrans %}</button>
-				<button class="btn btn-default btn-sm save-btn" onclick="saveFields()">Save</button>
+				<button class="btn btn-default btn-sm save-btn" onclick="saveFields()">{% blocktrans %}Save{% endblocktrans %}</button>
 				<button class="btn btn-danger btn-sm delete-btn col-lg-offset-9" onclick="deleteObject()">{% blocktrans %}Delete{% endblocktrans %}</button>
 				<div>&nbsp;</div>
 				<form id="define_form" role="form" action="/container/object/save.html" method="POST">{% csrf_token %}
@@ -299,7 +335,13 @@
 									{% endwith %}
 								</select>
 							</div>
-						</div>
+							<button id="addRuleButton" type="button" class="btn btn-default col-lg-12" onclick="addRule()">{% blocktrans %}Add rule{% endblocktrans %}</button>
+							<div id="ruleWizard">
+							</div>
+							<table id="rulesTable" class="table">
+								<thead><tr><th>#</th><th>{% blocktrans %}Summary{% endblocktrans %}</th><th>{% blocktrans %}Action{% endblocktrans %}</th></tr></thead>
+								<tbody id="rulesTableBody"></tbody>
+							</table>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm attribute selection and continue edition{% endblocktrans %}" data-dismiss="modal" onclick="validateAttributeSelection()">{% blocktrans %}Select{% endblocktrans %}</button>
 						</div>

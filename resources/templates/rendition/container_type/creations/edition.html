@@ -53,7 +53,7 @@
 				{% else %}
 					{% if current_field.type == 'FIELD_TYPE_CHOICE' %}
 					<div>
-					<label ><input id="{{current_field.field}}" name="{{current_field.field}}" type="checkbox" value="True" onchange="fieldDefaultChanged(event)" {% if current_field.default.value == 'True' and current_field.default.set_default == 'True' %}checked{% endif %}> <small>{{current_field.field|add:'.placeholder'|get_translated_text:language_code}}</small></label>
+					<label><input id="{{current_field.field}}" name="{{current_field.field}}" type="checkbox" value="True" onchange="fieldDefaultChanged(event)" {% if current_field.default.value == 'True' and current_field.default.set_default == 'True' %}checked{% endif %}> <small>{{current_field.field|add:'.placeholder'|get_translated_text:language_code}}</small></label>
 					</div>
 					{% else %}
 					<input name="{{current_field.field}}" type="text" class="form-control{% if current_field.type == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{current_field.field}}" placeholder="{{current_field.field|add:'.placeholder'|get_translated_text:language_code}}" {% if current_field.default.set_default == 'True' and current_field.default.allow_changes == 'False' %}disabled{% endif %} value="{% if current_field.default.set_default == 'True' %}{{current_field.default.value}}{% endif %}"/>

@@ -58,11 +58,11 @@
 				<table id="resultTable" class="table table.striped">
 					<tr>
 						
-						<th>{{"inception_date"|get_translated_text:profile.language_code}}</th>
+						<th>{{"document_version_high"|get_translated_text:profile.language_code}}</th>
 						
 						<th>{{"name"|get_translated_text:profile.language_code}}</th>
 						
-						<th>{{"short_name"|get_translated_text:profile.language_code}}</th>
+						<th>{{"document_version_low"|get_translated_text:profile.language_code}}</th>
 						
 						<th></th>
 					</tr>
@@ -70,11 +70,11 @@
 					<tr>
 						<script>containers[{{container.id}}] = {{container|get_as_json_string|safe}};</script>
 						
-						<td>{{container.inception_date}}</td>
+						<td>{{container.document_version_high}}</td>
 						
 						<td>{{container.name}}</td>
 						
-						<td>{{container.short_name}}</td>
+						<td>{{container.document_version_low}}</td>
 						
 						<td>
 							<div class="btn-group">
@@ -116,7 +116,7 @@
 								<input name="short_name" type="text" class="form-control" id="short_name" placeholder="{{"global.short_name.placeholder"|get_translated_text:profile.language_code }}" value=""/>
 							</div>
 							
-							{% include "statics/CONT_COMPANY_edition_creations_fr.html" %}
+							{% include "statics/CONT_DOCUMENT_edition_creations_fr.html" %}
 							
 						</div>
 						<div class="modal-footer">

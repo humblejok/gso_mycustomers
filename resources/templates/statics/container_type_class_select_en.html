@@ -4,6 +4,8 @@
 
 	{% if not active_list or "CONT_CONTAINER_CLASS" in active_list %}<option value='CONT_CONTAINER_CLASS'{% if value == 'CONT_CONTAINER_CLASS' %} selected{% endif %}>container.models.Container</option>{% endif %}
 
+	{% if not active_list or "CONT_DOCUMENT_CLASS" in active_list %}<option value='CONT_DOCUMENT_CLASS'{% if value == 'CONT_DOCUMENT_CLASS' %} selected{% endif %}>container.models.Document</option>{% endif %}
+
 	{% if not active_list or "CONT_MAIL_CAMPAIGN_CLASS" in active_list %}<option value='CONT_MAIL_CAMPAIGN_CLASS'{% if value == 'CONT_MAIL_CAMPAIGN_CLASS' %} selected{% endif %}>container.models.MailCampaignContainer</option>{% endif %}
 
 	{% if not active_list or "CONT_PERSON_CLASS" in active_list %}<option value='CONT_PERSON_CLASS'{% if value == 'CONT_PERSON_CLASS' %} selected{% endif %}>container.models.PersonContainer</option>{% endif %}

@@ -1,0 +1,7 @@
+<select class="form-control">
+
+	{% if not active_list or "DOCUMENT_TYPE_EMAIL" in active_list %}<option value='DOCUMENT_TYPE_EMAIL'{% if value == 'DOCUMENT_TYPE_EMAIL' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
+
+	{% if not active_list or "DOCUMENT_TYPE_GENERIC" in active_list %}<option value='DOCUMENT_TYPE_GENERIC'{% if value == 'DOCUMENT_TYPE_GENERIC' %} selected{% endif %}>NO TRANSLATION</option>{% endif %}
+
+</select>
