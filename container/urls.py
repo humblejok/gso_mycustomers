@@ -22,6 +22,9 @@ urlpatterns = patterns(
     url(r'^get_selectable_foreign.html', 'container.views.get_selectable_foreign', name='get_selectable_foreign'),
     url(r'^get_field_type.html', 'container.views.get_field_type', name='get_field_type'),
     
+    url(r'^documents.html', 'container.views.documents', name='documents'),
+    url(r'^document_upload.html', 'container.views.document_upload', name='document_upload'),    
+    
     url(r'^definition_save.html','container.views.definition_save', name='container_definition_save'),
     url(r'^element_save.html','container.views.element_save', name='container_element_save'),
     url(r'^element_delete.html','container.views.element_delete', name='container_element_delete'),

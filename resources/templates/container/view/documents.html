@@ -1,0 +1,98 @@
+{% extends base_template %}
+{% load i18n %}
+{% load container_tags %}
+{% block title %}MyCustomers - {% blocktrans %}Create your own objects{% endblocktrans %}{% endblock %}
+{% block readyoptions %}
+				$(".btn").not('#comment').tooltip();
+{% endblock %}
+{% block headeroptions %}
+<script type="text/javascript">
+		function allowDrop(event) {
+			event.preventDefault();
+			$("#holder").removeClass("hover");
+			$("#holder").addClass("hover");
+			return false;
+		}
+
+		function endDrop(event) {
+			event.preventDefault();
+			$("#holder").removeClass("hover");
+			return false;
+			
+		}
+
+		function handleDrop(event) {
+			$("#holder").removeClass("hover");
+			var file = event.dataTransfer.files[0];
+			var fileReader = new FileReader();
+			console.log(file);
+			sendFile(file);
+			event.preventDefault();
+			return false;
+		}
+
+		function fileUploadProgressHandler(event) {
+			$("#backgroundProgress").addClass("invisible");
+		};
+
+		function sendFile(file) {
+			$("#backgroundProgress").removeClass("invisible");
+			var tempForm = new FormData();
+			tempForm.append('uploaded_file', file);
+			tempForm.append('provider', urlParams['provider'])
+			tempForm.append('action', urlParams['action'])
+			tempForm.append('step', 'crm_file')
+			$.ajax({
+				url: '/container/document_upload.html',
+				type: 'POST',
+				data: tempForm,
+				processData: false,
+				contentType: false,
+				success: console.log('Sent'),
+				complete: fileUploadProgressHandler
+			});
+		};
+
+</script>
+{% endblock %}
+{% block content %}
+		<div class="row">
+			<div class="col-lg-11">
+				<h1 class="">{% blocktrans %}Manage documents{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Retrieve, add or remove documents.{% endblocktrans %}<br/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="panel panel-primary">
+				<div class="panel-heading">{% blocktrans %}Quick add{% endblocktrans %}</div>
+				<div class="panel-body">
+					<div id="holder-small" ondragover="allowDrop(event)" ondragleave="endDrop(event)" ondrop="handleDrop(event)">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">&nbsp;</div>
+			<ul class="nav nav-pills" role="tablist">
+				<li role="presentation" class="active"><a href="#global" aria-controls="global" role="tab" data-toggle="tab">{% blocktrans %}Global{% endblocktrans %}</a></li>
+				<li role="presentation"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">{% blocktrans %}Pending{% endblocktrans %}</a></li>
+			</ul>
+
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane fade in active" id="global">
+					<table class="table table-condensed">
+						<tr><th>{% blocktrans %}Name{% endblocktrans %}</th><th>{% blocktrans %}Actions{% endblocktrans %}</th></tr>
+						{% for document in globals %}
+							<tr><td>{{document.short_name}}</td><td><button class="btn btn-sm btn-default" type="button" data-toggle="tooltip" data-placement="top" title="{% blocktrans %}Remove document{% endblocktrans %}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>
+						{% endfor %}
+					</table>
+				</div>
+				<div role="tabpanel" class="tab-pane fade" id="pending">
+					<table class="table table-condensed">
+						<tr><th>{% blocktrans %}Name{% endblocktrans %}</th><th>{% blocktrans %}Actions{% endblocktrans %}</th></tr>
+						{% for document in pendings %}
+							<tr><td>{{document.short_name}}</td><td><button class="btn btn-sm btn-default" type="button" data-toggle="tooltip" data-placement="top" title="{% blocktrans %}Validate document{% endblocktrans %}"><span class="glyphicon glyphicon-check" aria-hidden="true"></span></button>&nbsp;<button class="btn btn-sm btn-default" type="button" data-toggle="tooltip" data-placement="top" title="{% blocktrans %}Remove document{% endblocktrans %}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+{% endblock %}

@@ -17,7 +17,8 @@ from django.http.response import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from seq_common.utils import classes
 
-from container.models import Attributes, Container, Universe
+from container.models import Attributes, Container, Universe, DocumentContainer,\
+    ThirdPartyContainer
 from container.utilities import setup_content, external_content
 from container.utilities.container_container import get_container_information, \
     set_container_information
@@ -25,12 +26,55 @@ from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
     get_effective_container, get_model_foreign_field_class, get_static_fields, filter_custom_fields
 from django.utils.datastructures import MultiValueDictKeyError
-from container.setup.application.settings import WORKING_PATH
+from container.setup.application.settings import WORKING_PATH, STORAGE_ENGINE
 from container.utilities.security import get_or_create_user_profile,get_or_create_ownership_universes,\
     container_visible
+import datetime
+from container.storage import get_uuid
+from seq_common.utils.classes import my_class_import
 
 
 LOGGER = logging.getLogger(__name__)
+STORAGE = my_class_import('container.storage.' + STORAGE_ENGINE + '.Storer')()
+
+
+def documents(request):
+    profile = get_or_create_user_profile(request.user.id)
+    pending_docs = DocumentContainer.objects.filter(status__identifier='STATUS_TO_BE_VALIDATED')
+    global_docs = DocumentContainer.objects.filter(status__identifier='STATUS_ACTIVE', containers=None)
+    context = {'base_template': profile['base_template'], 'profile': profile, 'globals': global_docs, 'pendings': pending_docs}
+    return render(request, 'container/view/documents.html', context)
+
+def document_upload(request):
+    profile = get_or_create_user_profile(request.user.id)
+    file_name = os.path.join(WORKING_PATH,request.FILES['uploaded_file'].name)
+    with open(file_name, 'wb+') as destination:
+        for chunk in request.FILES['uploaded_file'].chunks():
+            destination.write(chunk)
+    document = DocumentContainer()
+    document.name = request.FILES['uploaded_file'].name
+    document.short_name = os.path.splitext(request.FILES['uploaded_file'].name)[0]
+    document.type = Attributes.objects.get(active=True, identifier='CONT_DOCUMENT')
+    document.inception_date = datetime.date.today()
+    document.status = Attributes.objects.get(active=True, identifier='STATUS_TO_BE_VALIDATED')
+    document.last_technical_updater = request.user
+    document.last_updater = ThirdPartyContainer.objects.get(id=profile['current_work_as']['third_id']) if profile.has_key('current_work_as') and profile['current_work_as'].lower()!='administrator' else None
+    document.document_version_high = 1
+    document.document_version_low = 0
+    document.document_uid = get_uuid()
+    document.document_phid = 0
+    document.save()
+    STORAGE.store_file(document, file_name)
+    return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
+
+def document_delete(request):
+    profile = get_or_create_user_profile(request.user.id)
+    document_id = request.POST['document_id']
+    document = DocumentContainer.objects.get(id=document_id)
+    STORAGE.delete_file(document)
+    document.delete()
+    return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
+
 
 def lists(request):
     # TODO: Check user
@@ -47,7 +91,6 @@ def lists(request):
         results = effective_class.objects.filter(filter_query)
     else:
         all_universes = get_or_create_ownership_universes(profile['current_work_as'])
-        print all_universes
         results = None
         for universe in all_universes:
             if results==None:

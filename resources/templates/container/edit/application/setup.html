@@ -5,7 +5,7 @@
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 						<h4 class="modal-title" id="dynamic_modal_label">{% blocktrans %}Edit application setup{% endblocktrans %}</h4>
 					</div>
-					<form id="dynamic_modal_form" role="form" action="/container/user/save.html" method="POST">{% csrf_token %}
+					<form id="dynamic_modal_form" role="form" action="/container/application/save.html" method="POST">{% csrf_token %}
 						<div class="modal-body">
 							<div class="form-group">
 								<label for="MONGO_URL">{% blocktrans %}URL to MongoDB{% endblocktrans %}</label>
@@ -31,10 +31,14 @@
 								<label for="WORKING_PATH">{% blocktrans %}Temporary/working folder{% endblocktrans %}</label>
 								<input name="WORKING_PATH" type="text" class="form-control" id="WORKING_PATH" placeholder="Enter a valid folder path" value="{{application_settings.WORKING_PATH|get_escaped_strings}}"/>
 							</div>
+							<div class="form-group">
+								<label for="STORAGE_ENGINE">{% blocktrans %}Storage engine{% endblocktrans %}</label>
+								<input name="STORAGE_ENGINE" type="text" class="form-control" id="STORAGE_ENGINE" placeholder="Enter a valid folder path" value="{{application_settings.STORAGE_ENGINE|get_escaped_strings}}"/>
+							</div>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm your modifications{% endblocktrans %}" onclick="confirmDynamicModal('/container/application/save.html', document.getElementById('dynamic_modal_form'))">{% blocktrans %}Save{% endblocktrans %}</button>
+							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm your modifications{% endblocktrans %}" onclick="confirmDynamicModal(event)">{% blocktrans %}Save{% endblocktrans %}</button>
 						</div>
 					</form>
 				</div>
