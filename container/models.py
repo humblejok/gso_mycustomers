@@ -18,6 +18,7 @@ from container.utilities.utils import get_static_fields, \
 from gso_mycustomers.settings import TEMPLATE_DIRS
 from container.setup.application.settings import RESOURCES_MAIN_PATH,\
     TEMPLATES_STATICS_PATH
+from seq_common.utils.classes import my_class_import
 
 
 LOGGER = logging.getLogger(__name__)
@@ -69,6 +70,7 @@ def generate_wizards():
             outfile = os.path.join(TEMPLATES_STATICS_PATH, 'complete_' + wizard.short_name + '_' + language.short_name + '.html')
             with open(outfile,'w') as o:
                 o.write(rendition.encode('utf-8'))
+    my_class_import('container.flow.modify').generate_wizards()
                 
 def generate_global_templates():
     languages = Attributes.objects.filter(active=True, type='available_language')

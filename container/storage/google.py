@@ -22,3 +22,15 @@ class Storer(StorageClass):
     @classmethod
     def retrieve_file(self, document):
         None
+        
+    @classmethod
+    def delete_file(self, document):
+        file_name = str(document.document_phid)
+        target_file_folder = self.get_target_folder(document.document_phid)
+        source_file_path = os.path.join(target_file_folder, file_name)
+        os.remove(source_file_path)
+        return True
+    
+    @classmethod
+    def trash_file(self, document):
+        return False

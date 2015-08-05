@@ -26,17 +26,13 @@ from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
     get_effective_container, get_model_foreign_field_class, get_static_fields, filter_custom_fields
 from django.utils.datastructures import MultiValueDictKeyError
-from container.setup.application.settings import WORKING_PATH, STORAGE_ENGINE
+from container.setup.application.settings import WORKING_PATH, STORER
 from container.utilities.security import get_or_create_user_profile,get_or_create_ownership_universes,\
     container_visible
 import datetime
 from container.storage import get_uuid
-from seq_common.utils.classes import my_class_import
-
 
 LOGGER = logging.getLogger(__name__)
-STORAGE = my_class_import('container.storage.' + STORAGE_ENGINE + '.Storer')()
-
 
 def documents(request):
     profile = get_or_create_user_profile(request.user.id)
@@ -64,17 +60,12 @@ def document_upload(request):
     document.document_uid = get_uuid()
     document.document_phid = 0
     document.save()
-    STORAGE.store_file(document, file_name)
+    STORER.store_file(document, file_name)
+    if profile.has_key('current_work_as') and str(profile['current_work_as']).lower()!='administrator':
+        # Assign to universe
+        working_universes = get_or_create_ownership_universes(profile['current_work_as'])
+        working_universes[0].members.add(document)
     return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
-
-def document_delete(request):
-    profile = get_or_create_user_profile(request.user.id)
-    document_id = request.POST['document_id']
-    document = DocumentContainer.objects.get(id=document_id)
-    STORAGE.delete_file(document)
-    document.delete()
-    return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
-
 
 def lists(request):
     # TODO: Check user
@@ -198,12 +189,12 @@ def base_edit(request):
     return redirect(request.META.get('HTTP_REFERER'))
 
 def delete(request):
-    # TODO: Check user
-    user = User.objects.get(id=request.user.id)
+    profile = get_or_create_user_profile(request.user.id)
     container_id = request.GET['container_id']
-    # TODO: Handle error
-    get_effective_container(container_id).delete()
-    return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
+    if container_visible(container_id, profile):
+        # TODO: Handle error
+        get_effective_container(container_id).delete()
+        return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
 
 def get(request):
     # TODO: Check user

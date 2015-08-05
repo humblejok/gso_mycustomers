@@ -1,3 +1,4 @@
+from seq_common.utils.classes import my_class_import
 import os
 
 SETTINGS_PATH = os.path.realpath(__file__)
@@ -9,3 +10,5 @@ STATICS_PATH = "{{application_settings.STATICS_PATH}}"
 TEMPLATES_STATICS_PATH = "{{application_settings.TEMPLATES_STATICS_PATH}}"
 WORKING_PATH = "{{application_settings.WORKING_PATH}}"
 STORAGE_ENGINE = "{{application_settings.STORAGE_ENGINE}}"
+
+STORER = my_class_import('container.storage.' + STORAGE_ENGINE + '.Storer')()

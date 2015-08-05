@@ -1,0 +1,7 @@
+{% load container_tags %}
+{% for argument in operation.arguments %}
+<div class="form-group">
+	<label for="{{argument}}">{{argument|get_translated_text:language_code}}</label>
+	<input id="{{argument}}" name="{{argument}}" class="form-control" placeholder="{{argument|add:'.placeholder'|get_translated_text:language_code}}"></input>
+</div>
+{% endfor %}

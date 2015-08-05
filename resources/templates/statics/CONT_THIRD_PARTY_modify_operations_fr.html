@@ -1,0 +1,13 @@
+
+<div class="form-group">
+	<label for="step">Etape</label>
+	<select id="step" class="form-control" name="step" onchange="stepChanged()">
+		
+			<option value="compute" {% if selected_value == ope.name %}selected{% endif %}>Calculer la valeur d&#39;un champ</option>
+		
+			<option value="set_field" {% if selected_value == ope.name %}selected{% endif %}>Affecter une valeur à un champ</option>
+		
+			<option value="auto_validate" {% if selected_value == ope.name %}selected{% endif %}>Passer au statut actif</option>
+		
+	</select>
+</div>

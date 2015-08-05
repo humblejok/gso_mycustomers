@@ -43,6 +43,10 @@ class Storer(StorageClass):
         os.remove(source_file_path)
         return True
     
+    @classmethod
+    def trash_file(self, document):
+        return False
+    
     @staticmethod
     def get_target_folder(phid):
         last = phid % 10000

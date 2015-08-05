@@ -1,0 +1,169 @@
+{% extends base_template %}
+{% load i18n %}
+{% load container_tags %}
+{% block title %}MyCustomers - {% blocktrans %}CRUD Workflow{% endblocktrans %}{% endblock %}
+{% block readyoptions %}
+				$(".btn").not('#comment').tooltip();
+{% endblock %}
+{% block headeroptions %}
+<script type="text/javascript">
+
+	var allItems = {{global|safe}};
+	var operations = {{operations|safe}};
+	var steps = [{% for step in steps %}'{{step.identifier}}'{% if not forloop.last %},{% endif %}{% endfor %}];
+
+	var itemTemplate = '<li id="content_%%parent%%_%%index%%" class="list-group-item">%%value%%<span class="glyphicon glyphicon-remove" style="float: right;" onclick="removeStep(%%parent%%,%%index%%)"></span><span class="glyphicon glyphicon-arrow-up" style="float: right;" onclick="moveStepUp(%%parent%%,%%index%%)"></span><span class="glyphicon glyphicon-arrow-down" style="float: right;" onclick="moveStepDown(%%parent%%,%%index%%)"></span><span class="glyphicon glyphicon-pencil" style="float: right;" onclick="editStep(%%parent%%,%%index%%)"></span></li>';
+
+	var currentContent = -1;
+	var currentStep = -1;
+
+	function editStep(parent, index) {
+		var current = steps[parent];
+		var containerType = $("#containerType").val();
+
+		currentContent = parent;
+		currentStep = index;
+
+		console.log(allItems[containerType][current][index]);
+	}
+
+	function buildSteps(parent) {
+		var current = steps[parent];
+		var containerType = $("#containerType").val();
+		$("#content_" + parent).empty();
+		$.each(allItems[containerType][current], function(index, value){
+			$("#content_" + parent).append(itemTemplate.replaceAll('%%parent%%',parent).replaceAll('%%index%%',index).replaceAll('%%value%%', value.step));
+		});
+	}
+
+	function moveStepUp(parent, index) {
+		if (index!==0) {
+			var current = steps[parent];
+			var containerType = $("#containerType").val();
+			var moved = allItems[containerType][current][index];
+			allItems[containerType][current][index] = allItems[containerType][current][index-1];
+			allItems[containerType][current][index-1] = moved;
+			buildSteps(parent);
+		}
+	}
+
+	function moveStepDown(parent, index) {
+		var current = steps[parent];
+		var containerType = $("#containerType").val();
+		
+		if (index<allItems[containerType][current].length-1) {
+			var moved = allItems[containerType][current][index];
+			allItems[containerType][current][index] = allItems[containerType][current][index+1];
+			allItems[containerType][current][index+1] = moved;
+			buildSteps(parent);
+		}
+	}
+
+	function removeStep(parent, index) {
+		var current = steps[parent];
+		var containerType = $("#containerType").val();
+		allItems[containerType][current].splice(index, 1);
+		buildSteps(parent);
+	}
+
+	function saveStep() {
+		var stepName = $("#step").val();
+		var containerType = $("#containerType").val();
+		var current = steps[currentContent];
+
+		if (!allItems.hasOwnProperty(containerType)) {
+			allItems[containerType] = {};
+		}
+		if (!allItems[containerType].hasOwnProperty(current)) {
+			allItems[containerType][current] = [];
+		}
+		
+		$("#content_" + currentContent).append(itemTemplate.replaceAll('%%parent%%',currentContent).replaceAll('%%index%%',allItems[containerType][current].length).replaceAll('%%value%%', stepName));
+		var currentStep = {'step': stepName};
+		$.each(operations[stepName].arguments, function(index, value) {
+			currentStep[value] = $("#" + value).val();
+		});
+		allItems[containerType][current].push(currentStep);
+		console.log(allItems[$("#containerType").val()]);
+	}
+
+	function stepChanged() {
+		console.log("changed");
+		$("#argumentsEditor").empty();
+		$("#argumentsEditor").load("/container/rendition/render_template_for_load.html", {"template_name": $("#containerType").val() + "_" + $("#step").val() + "_arguments_editor"}, editorLoaded);
+	}
+
+	function editorLoaded(event) {
+	}
+
+	function operationsLoaded(event) {
+		$("#addBody").append("<div id='argumentsEditor'></div>");
+		stepChanged();		
+	}
+
+	function addStep(index) {
+		currentContent = index;
+		currentStep = -1;
+		$("#addBody").empty();
+		$("#addBody").load("/container/rendition/render_template_for_load.html", {"template_name": $("#containerType").val() + "_modify_operations"}, operationsLoaded);
+		$("#modal_add_step").modal('show');
+	}
+
+	function clearAndLoad() {
+		$("#addBody").empty();
+	}
+
+</script>
+{% endblock %}
+{% block content %}
+		<div class="row">
+			<div class="col-lg-11">
+				<h1 class="">{% blocktrans %}CRUD Workflow{% endblocktrans %}</h1>
+	  			<p class="lead">{% blocktrans %}Define the operations executed before and after creation or deletion.{% endblocktrans %}<br/>
+			</div>
+		</div>
+		<div class="row">
+			<select class="form-control no-enter" id="containerType" name="containerType" onchange="clearAndLoad()">
+				{% with value='' %}
+					{% include selection_template %}
+				{% endwith %}
+			</select>
+		</div>
+		<div class="row">
+			{% for step in steps %}
+			<div class="col-lg-3">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">{{step.identifier|get_translated_text:profile.language_code}}</h3>
+					</div>
+					<div class="panel-body">
+						<ul class="list-group" id="content_{{forloop.counter0}}">
+
+						</ul>
+						<button type="button" class="btn btn-default col-lg-12" onclick="addStep({{forloop.counter0}})">{% blocktrans %}Add{% endblocktrans %}</button>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+
+		<div class="modal fade" id="modal_add_step" tabindex="-1" role="dialog" aria-labelledby="modal_add_step_label" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="modal_add_step_label">{% blocktrans %}Edit/add step{% endblocktrans %}</h4>
+					</div>
+					<form id="create_form" role="form" action="#" method="POST">
+						<input type="hidden" id="current_content" name="current_content" value="0"/>
+						<div id="addBody" class="modal-body">
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
+							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Validate and create the step{% endblocktrans %}" onclick="saveStep()">{% blocktrans %}Save{% endblocktrans %}</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+{% endblock %}

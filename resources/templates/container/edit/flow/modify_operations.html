@@ -1,0 +1,9 @@
+{% load container_tags %}
+<div class="form-group">
+	<label for="step">{{'flow.step'|get_translated_text:language_code}}</label>
+	<select id="step" class="form-control" name="step" onchange="stepChanged()">
+		{% for ope in operations %}
+			<option value="{{ope.name}}" {% verbatim %}{% if selected_value == ope.name %}selected{% endif %}{% endverbatim %}>{{ope.name|get_translated_text:language_code}}</option>
+		{% endfor %}
+	</select>
+</div>

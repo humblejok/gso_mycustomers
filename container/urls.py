@@ -31,6 +31,12 @@ urlpatterns = patterns(
     url(r'^full_search.html','container.views.full_search', name='container_full_search'),    
     
     #########################
+    # Workflows views       #
+    #########################
+    url(r'^flow/crud.html', 'container.flow.views.crud', name='container_flow_crud'),
+    url(r'^flow/status.html', 'container.flow.views.status', name='container_flow_status'),
+    
+    #########################
     # Rendition views       #
     #########################
     url(r'^rendition/render_many_to_many.html', 'container.rendition.views.render_many_to_many', name='container_render_many_to_many'),
