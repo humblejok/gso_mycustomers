@@ -34,6 +34,8 @@ urlpatterns = patterns(
     # Workflows views       #
     #########################
     url(r'^flow/crud.html', 'container.flow.views.crud', name='container_flow_crud'),
+    url(r'^flow/crud_save.html', 'container.flow.views.crud_save', name='container_flow_crud_save'),
+    
     url(r'^flow/status.html', 'container.flow.views.status', name='container_flow_status'),
     
     #########################

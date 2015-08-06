@@ -24,7 +24,8 @@ setup = client.setup
 available_data_sets = {'container_type_fields': True, 'object_type_fields': True,
                        'container_type_creations': True, 'container_type_details': True,
                        'container_type_lists': True, 'container_type_menus': True,
-                       'user_profiles': False}
+                       'user_profiles': False, 'container_flow_crud': True,
+                       'container_flow_status': True }
 
 
 

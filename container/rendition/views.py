@@ -103,6 +103,5 @@ def render_template_for_load(request):
         selected_value = clean_post_value(request.POST['selected_value'])
     else:
         selected_value = ''
-    print request.POST
     context = {'value': selected_value}
     return render(request, 'statics/' + template_name + '_' + profile['language_code'] + '.html', context)

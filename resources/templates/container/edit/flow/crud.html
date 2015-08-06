@@ -4,6 +4,7 @@
 {% block title %}MyCustomers - {% blocktrans %}CRUD Workflow{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
+				clearAndLoad();
 {% endblock %}
 {% block headeroptions %}
 <script type="text/javascript">
@@ -17,6 +18,10 @@
 	var currentContent = -1;
 	var currentStep = -1;
 
+	function onCallError(e) {
+		alert(e.status);
+	}
+
 	function editStep(parent, index) {
 		var current = steps[parent];
 		var containerType = $("#containerType").val();
@@ -24,16 +29,21 @@
 		currentContent = parent;
 		currentStep = index;
 
-		console.log(allItems[containerType][current][index]);
+		$("#addBody").empty();
+		$("#addBody").load("/container/rendition/render_template_for_load.html", {"template_name": $("#containerType").val() + "_modify_operations"}, operationsLoaded);
+		$("#modal_add_step").modal('show');
+
 	}
 
 	function buildSteps(parent) {
 		var current = steps[parent];
 		var containerType = $("#containerType").val();
 		$("#content_" + parent).empty();
-		$.each(allItems[containerType][current], function(index, value){
-			$("#content_" + parent).append(itemTemplate.replaceAll('%%parent%%',parent).replaceAll('%%index%%',index).replaceAll('%%value%%', value.step));
-		});
+		if (allItems.hasOwnProperty(containerType) && allItems[containerType].hasOwnProperty(current)) {
+			$.each(allItems[containerType][current], function(index, value){
+				$("#content_" + parent).append(itemTemplate.replaceAll('%%parent%%',parent).replaceAll('%%index%%',index).replaceAll('%%value%%', value.step));
+			});
+		}
 	}
 
 	function moveStepUp(parent, index) {
@@ -44,6 +54,7 @@
 			allItems[containerType][current][index] = allItems[containerType][current][index-1];
 			allItems[containerType][current][index-1] = moved;
 			buildSteps(parent);
+			save();
 		}
 	}
 
@@ -56,6 +67,7 @@
 			allItems[containerType][current][index] = allItems[containerType][current][index+1];
 			allItems[containerType][current][index+1] = moved;
 			buildSteps(parent);
+			save();
 		}
 	}
 
@@ -64,6 +76,7 @@
 		var containerType = $("#containerType").val();
 		allItems[containerType][current].splice(index, 1);
 		buildSteps(parent);
+		save();
 	}
 
 	function saveStep() {
@@ -78,26 +91,43 @@
 			allItems[containerType][current] = [];
 		}
 		
-		$("#content_" + currentContent).append(itemTemplate.replaceAll('%%parent%%',currentContent).replaceAll('%%index%%',allItems[containerType][current].length).replaceAll('%%value%%', stepName));
-		var currentStep = {'step': stepName};
+		var newStep = {'step': stepName};
 		$.each(operations[stepName].arguments, function(index, value) {
-			currentStep[value] = $("#" + value).val();
+			newStep[value] = $("#" + value).val();
 		});
-		allItems[containerType][current].push(currentStep);
-		console.log(allItems[$("#containerType").val()]);
+		if (currentStep!==-1) {
+			allItems[containerType][current][currentStep] = newStep;
+		} else {
+			allItems[containerType][current].push(newStep);
+		}
+		buildSteps(currentContent);
+		$('#modal_add_step').modal('hide');
+		save();
 	}
 
 	function stepChanged() {
-		console.log("changed");
 		$("#argumentsEditor").empty();
 		$("#argumentsEditor").load("/container/rendition/render_template_for_load.html", {"template_name": $("#containerType").val() + "_" + $("#step").val() + "_arguments_editor"}, editorLoaded);
 	}
 
 	function editorLoaded(event) {
+		var containerType = $("#containerType").val();
+		var step = steps[currentContent];
+		if (currentStep!==-1) {
+			var stepName = allItems[containerType][step][currentStep].step;
+			$.each(operations[stepName].arguments, function(index, value) {
+				$("#" + value).val(allItems[containerType][step][currentStep][value]);
+			});
+		}
 	}
 
 	function operationsLoaded(event) {
+		var containerType = $("#containerType").val();
+		var step = steps[currentContent];
 		$("#addBody").append("<div id='argumentsEditor'></div>");
+		if (currentStep!==-1) {
+			$("#step").val(allItems[containerType][step][currentStep].step);
+		}
 		stepChanged();		
 	}
 
@@ -111,7 +141,30 @@
 
 	function clearAndLoad() {
 		$("#addBody").empty();
+		$.each(steps, function(index, value){
+			buildSteps(index);
+		});
 	}
+
+	function saveSuccessful(event) {
+		$("#backgroundProgress").addClass("invisible");
+	};
+
+	function save() {
+		$("#backgroundProgress").removeClass("invisible");
+		var updateForm = new FormData();
+		updateForm.append('crud_data', JSON.stringify(allItems));
+		$.ajax({
+			url: '/container/flow/crud_save.html',
+			type: 'POST',
+			data: updateForm,
+			processData: false,
+			contentType: false,
+			success: saveSuccessful,
+			error: onCallError
+		});
+	}
+
 
 </script>
 {% endblock %}
