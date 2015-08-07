@@ -3,13 +3,15 @@
 {% block title %}{% blocktrans %}Container Details View Setup{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
-				initGridster();
+				containerChanged();
 {% endblock %}
 {% block headeroptions %}
 <script>
 	var allItems = {{global|safe}};
-	var currentItem = 0;
-	var emptyWidget = "<li id='gridjet_%%index%%'><div class='form-group'><button id='dismiss_%%index%%' class='col-lg-offset-10 col-lg-1' onclick='dismiss(%%index%%)' type='button'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></button></div><div class='form-group'><label for='title_%%index%%' class='control-label col-lg-2'>Title</label><div class='col-lg-9'><input name='title_%%index%%' id='title_%%index%%' type='text' class='form-control' placeholder='Input block title here'/></div></div><div class='form-group'><label for='type_%%index%%' class='control-label col-lg-2'>Type</label><div class='col-lg-9'><select id='type_%%index%%' name='type_%%index%%' class='form-control'></select></div></div><div class='form-group' id='content_%%index%%'></div></li>";
+	var emptyWidget = "<li id='gridjet_%%index%%'><div class='form-group'><button id='dismiss_%%index%%' class='col-lg-offset-10 btn btn-default' onclick='dismiss(%%index%%)' type='button'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></button></div><div class='form-group'><label for='title_%%index%%' class='control-label col-lg-2'>Title</label><div class='col-lg-9'><input name='title_%%index%%' id='title_%%index%%' type='text' class='form-control' placeholder='Input block title here' onchange='titleChanged(%%index%%)'/></div></div><div class='form-group'><label for='type_%%index%%' class='control-label col-lg-2'>Type</label><div class='col-lg-9'><select id='type_%%index%%' name='type_%%index%%' class='form-control'></select></div></div><div class='form-group' id='content_%%index%%'></div></li>";
+
+	var defaultLayout = {"row": 1, "size_x": 1, "col": 1, "size_y": 1};
+
 	var gridster;
 
 	var allFieldsInformation;
@@ -26,27 +28,11 @@
 		alert(e.status);
 	}
 
-	function containerFieldsSaved(e) {
+	function rebuildWidgets() {
+		var containerType = $("#containerType").val();
+		$("#layoutGrid").empty();
+		$("#layoutGrid").append("<ul id='layoutGridContent'></ul>");
 
-	}
-
-	function checkClear() {
-		currentItem = currentItem - 1;
-		if (currentItem==0) {
-			initGridster();
-		}
-	}
-
-	function clearAndLoad() {
-		if (gridster) {
-			gridster.remove_all_widgets(checkClear);
-		}
-		if (currentItem==0) {
-			initGridster();
-		}
-	}
-
-	function initGridster() {
 		gridster = $(".gridster ul").gridster({
 			widget_margins: [10, 10],
 			widget_base_dimensions: [340, 370],
@@ -56,89 +42,21 @@
 				min_size: [1, 1]
 			}
 		}).data('gridster');
-		containerChanged();
-	}
 
-	function dismiss(toRemove) {
-		for(var index=0;index<currentItem;index++) {
-			if (index==toRemove) {
-				gridster.remove_widget($("#gridjet_" + index));
-			} else if (index>toRemove) {
-				$("#gridjet_" + index).find('[id]').each(function(index, node) {
-					if ($(node).hasAttr('id')) {
-						$(node).attr('id', $(node).attr('id').replace(index.toString(), (index-1).toString()));
-					}
-					if ($(node).hasAttr('name')) {
-						$(node).attr('name', $(node).attr('name').replace(index.toString(), (index-1).toString()));
-					}
-				});
-				$("#gridjet_" + index).attr('id', "gridjet_" + (index-1));
-			}
+		if (!allItems.hasOwnProperty(containerType)) {
+			allItems[containerType] = {'layout': [], 'data': {}};
 		}
-		currentItem -= 1;
-	}
-
-	function checkLoads(event) {
-		var wrkItem = $(this).prop("id");
-		var indexPos = wrkItem.lastIndexOf("_");
-		var identifier = wrkItem.substring(0, indexPos);
-		var index = wrkItem.substr(indexPos + 1);
-		var currentInformation = allItems[$("#containerType").val()];
-		if (currentInformation.data[index].data.hasOwnProperty("track_" + identifier)) {
-			$(this).val(currentInformation.data[index].data["track_" + identifier]);
-		} else {
-			$(this).val(currentInformation.data[index].data[identifier]);
-		}
-	}
-
-	function completeSaveData() {
-		for (var index=0;index<currentItem;index++) {
-			var key = index.toString();
-			if (!blockData.hasOwnProperty(key)) {
-				blockData[key] = {"title": $("#title_" + key).val(), "type": $("#type_" + key).val(), "data": []};
-			} else {
-				blockData[key].title = $("#title_" + key).val();
-				blockData[key].type = $("#type_" + key).val();
-			}
-			if (blockData[key].type=="LAYOUT_HISTORY_CHART" || blockData[key].type=="LAYOUT_DISTRIBUTION_CHART" || blockData[key].type=="LAYOUT_HISTORICAL_DISTRIBUTION_CHART") {
-				blockData[key].data = {
-					"track_type": $("#track_type_" + key).val(), "track_default": $("#track_default_" + key).prop("checked"), "track_frequency": $("#frequency_" + key).val(), "track_datasource":$("#datasource_" + key).val()
-				}
-			}
-			if (blockData[key].type=="LAYOUT_OBJECT_CUSTOM_TEMPLATE") {
-				blockData[key].data = { "template": $("#template_" + key).val() };
-
-			}
-		}
-	}
-
-	function saveLayout() {
-		var gridsterLayout = gridster.serialize();
-		completeSaveData();
-		var toSave = {"layout": gridsterLayout, "data": blockData};
-		var containerSetup = {}
-		containerSetup.type = $("#containerType").val();
-		containerSetup.data = toSave;
-		var updateForm = new FormData();
-		updateForm.append('container_setup', JSON.stringify(containerSetup));
-		updateForm.append('item',urlParams['item']);
-		updateForm.append('type',urlParams['type']);
-		updateForm.append('render_name','view');
-		$.ajax({
-			url: '/container/setup_save.html',
-			type: 'POST',
-			data: updateForm,
-			processData: false,
-			contentType: false,
-			success: containerFieldsSaved,
-			error: onCallError
+		$.each(allItems[containerType].layout, function (index, data) {
+			addWidget(index);
 		});
+		allItems[containerType].layout = gridster.serialize();
 	}
 
-	function trackDefaultChanged(index) {
-		$("#frequency_" + index).prop('disabled', $("#track_default_" + index).prop('checked'));
-		$("#datasource_" + index).prop('disabled', $("#track_default_" + index).prop('checked'));
+	function containerFieldsSaved(e) {
+		$("#backgroundProgress").addClass("invisible");
 	}
+
+
 
 	function onForeignClick(index, fieldName) {
 		var target = "#fieldsList_" + index + " > ";
@@ -146,31 +64,32 @@
 	}
 
 	function onMultipleFieldClick(index, fieldName) {
+		var containerType = $("#containerType").val();
 		var target = "#fieldsList_" + index + " > ";
 		var key = index.toString();
-		if (!blockData.hasOwnProperty(key)) {
-			blockData[key] = {"title": $("#title_" + key).val(), "type": $("#type_" + key).val(), "data": []};
-		}
-		blockData[key].data = [fieldName];
+
+		allItems[containerType].data[key].title = $("#title_" + key).val();
+		allItems[containerType].data[key].type = $("#type_" + key).val();
+		allItems[containerType].data[key].data = [fieldName];
 		$(target + ".list-group-item-success").removeClass("list-group-item-success");
 		$(target + ".main-" + fieldName).toggleClass("list-group-item-success");
 	}
 
 	function onFieldClick(index, fieldName) {
+		var containerType = $("#containerType").val();
 		var target = "#fieldsList_" + index + " > ";
 		var key = index.toString();
-		if (!blockData.hasOwnProperty(key)) {
-			blockData[key] = {"title": $("#title_" + key).val(), "type": $("#type_" + key).val(), "data": []};
-		}
+		allItems[containerType].data[key].title = $("#title_" + key).val();
+		allItems[containerType].data[key].type = $("#type_" + key).val();
 
 		if (fieldName.indexOf(".")!==-1) {
 			var mainField = fieldName.substring(0, fieldName.indexOf("."));
 			var subField = fieldName.substring(fieldName.indexOf(".") + 1);
 			$(target + ".main-" + mainField + ".multiple-master").removeClass("list-group-item-warning");
 			if ($(target + ".main-" + subField + ".sub-" + mainField + ".list-group-item-info").length===1) {
-				blockData[key].data.push(fieldName);
+				allItems[containerType].data[key].data.push(fieldName);
 			} else {
-				blockData[key].data.splice(blockData[key].data.indexOf(fieldName), 1);
+				allItems[containerType].data[key].data.splice(allItems[containerType].data[key].data.indexOf(fieldName), 1);
 			}
 			$(target + ".main-" + subField + ".sub-" + mainField).toggleClass("list-group-item-success");
 			$(target + ".main-" + subField + ".sub-" + mainField).toggleClass("list-group-item-info");
@@ -179,147 +98,208 @@
 			}
 		} else {
 			if ($(target + ".main-" + fieldName + ":not(.multiple-master)").hasClass("list-group-item-success")) {
-				blockData[key].data.splice(blockData[key].data.indexOf(fieldName), 1);
+				allItems[containerType].data[key].data.splice(allItems[containerType].data[key].data.indexOf(fieldName), 1);
 			} else {
-				blockData[key].data.push(fieldName);
+				allItems[containerType].data[key].data.push(fieldName);
 			}
 			$(target + ".main-" + fieldName + ":not(.multiple-slave)").toggleClass("list-group-item-success");
 		}
-
+		console.log(allItems[containerType].data[key]);
 	}
 
-	function changeType(index, callback) {
-		var selectedType = $("#type_" + index).val();
-		$("#content_" + index).empty();
-		var htmlToAppend = "";
-		var callLater = function() {};
-		if (selectedType=="LAYOUT_OBJECT_TYPE_SINGLES") {
-			htmlToAppend += "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
-			$.each(singleFields, function(valueIndex, value) {
-				if (allFieldsInformation[value].type.lastIndexOf("FIELD_TYPE_", 0)===0) {
-					htmlToAppend += '<a class="list-group-item main-' + value + '" onclick="onFieldClick(' + index + ',\'' + value + '\')">' + value + '</a>';
-				} else {
-					htmlToAppend += '<a class="list-group-item multiple-master main-' + value + '" onclick="onForeignClick(' + index + ',\'' + value + '\')">' + value + '</a>';
+	function titleChanged(index) {
+		var containerType = $("#containerType").val();
+		var key = index.toString();
+		allItems[containerType].data[key].title = $("#title_" + key).val();
+	}
 
-					var subCurrentList = [];
-					$.each(allFieldsInformation[value].fields, function(subIndex, subValue) {
-						subCurrentList.push(subIndex);
-					});
-					subCurrentList.sort();
-					$.each(subCurrentList, function (subIndex, subValue) {
-						htmlToAppend += '<a class="list-group-item list-group-item-info multiple-slave hidden main-' + subValue + ' sub-' + value + '" onclick="onFieldClick(' + index + ',\'' + value + '.' + subValue + '\')">' + subValue + '</a>';
-					});
+	function generateList(index) {
+		var htmlToAppend = "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
+		$.each(multipleFields, function(valueIndex, value) {
+			htmlToAppend += '<a class="list-group-item main-' + value + '" onclick="onMultipleFieldClick(' + index + ',\'' + value + '\')">' + value + '</a>';
+		});
+		htmlToAppend += "</div>";
+		return htmlToAppend;
+	}
 
-				}
-			});
-			htmlToAppend += "</div>";
-		} else if (selectedType=="LAYOUT_OBJECT_TYPE_LIST") {
-			htmlToAppend += "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
-			$.each(multipleFields, function(valueIndex, value) {
-				htmlToAppend += '<a class="list-group-item main-' + value + '" onclick="onMultipleFieldClick(' + index + ',\'' + value + '\')">' + value + '</a>';
-			});
-			
-			htmlToAppend += "</div>";
-		} else if (selectedType=="LAYOUT_HISTORY_CHART" || selectedType=="LAYOUT_DISTRIBUTION_CHART" || selectedType=="LAYOUT_HISTORICAL_DISTRIBUTION_CHART") {
-			htmlToAppend += "<div class='form-group'><label for='track_type_%%index%%' class='control-label col-lg-2'>Track type</label><div class='col-lg-9'><select id='track_type_%%index%%' name='track_type_%%index%%' class='form-control'></select></div></div>";
-			htmlToAppend += "<div class='form-group'><div class='col-lg-offset-2'><div class='checkbox'><label for='track_default_%%index%%'><input id='track_default_%%index%%' name='track_default_%%index%%' type='checkbox' checked onchange='trackDefaultChanged(%%index%%)'> Use default source and frequency</label></div></div></div>";
-			htmlToAppend += "<div class='form-group'><label for='frequency_%%index%%' class='control-label col-lg-2'>Frequency</label><div class='col-lg-9'><select id='frequency_%%index%%' name='frequency_%%index%%' class='form-control' disabled></select></div></div>";
-			htmlToAppend += "<div class='form-group'><label for='datasource_%%index%%' class='control-label col-lg-2'>Data source</label><div class='col-lg-9'><select id='datasource_%%index%%' name='datasource_%%index%%' class='form-control' disabled></select></div></div>";
-			htmlToAppend = htmlToAppend.replaceAll('%%index%%', index);
-			
-			callLater = function() {
-				$("#frequency_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "frequency_select"},checkLoads);
-				$("#track_type_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "numeric_type_select"},checkLoads);
-				$("#datasource_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "ata_source_select"},checkLoads);
-			};
-		} else if(selectedType=='LAYOUT_OBJECT_CUSTOM_STANDARD') {
-			htmlToAppend += "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
-			$.each(allCustomFieldsInformation, function(valueIndex, value) {
-				var keyField = value.name.replaceAll(' ','-');
-				htmlToAppend += '<a class="list-group-item multiple-master main-' + keyField + '" onclick="onForeignClick(' + index + ',\'' + keyField + '\')">' + value.name + '</a>';
+	function generateSingles(index) {
+		var htmlToAppend = "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
+		$.each(singleFields, function(valueIndex, value) {
+			if (allFieldsInformation[value].type.lastIndexOf("FIELD_TYPE_", 0)===0) {
+				htmlToAppend += '<a class="list-group-item main-' + value + '" onclick="onFieldClick(' + index + ',\'' + value + '\')">' + value + '</a>';
+			} else {
+				htmlToAppend += '<a class="list-group-item multiple-master main-' + value + '" onclick="onForeignClick(' + index + ',\'' + value + '\')">' + value + '</a>';
 
 				var subCurrentList = [];
-				$.each(value.fields_group.fields, function(subIndex, subValue) {
-					subCurrentList.push(subValue.name);
+				$.each(allFieldsInformation[value].fields, function(subIndex, subValue) {
+					subCurrentList.push(subIndex);
 				});
 				subCurrentList.sort();
 				$.each(subCurrentList, function (subIndex, subValue) {
-					var subKeyField = subValue.replaceAll(' ','-');
-					htmlToAppend += '<a class="list-group-item list-group-item-info multiple-slave hidden main-' + subKeyField + ' sub-' + keyField + '" onclick="onFieldClick(' + index + ',\'' + keyField + '.' + subKeyField + '\')">' + subValue + '</a>';
+					htmlToAppend += '<a class="list-group-item list-group-item-info multiple-slave hidden main-' + subValue + ' sub-' + value + '" onclick="onFieldClick(' + index + ',\'' + value + '.' + subValue + '\')">' + subValue + '</a>';
 				});
+
+			}
+		});
+		htmlToAppend += "</div>";
+		return htmlToAppend;
+	}
+
+	function generateCustomStandard(index) {
+		var htmlToAppend = "<div id='fieldsList_" + index + "' class='list-group col-lg-offset-1 col-lg-10 pre-scrollable' style='height: 195px;'>";
+		$.each(allCustomFieldsInformation, function(valueIndex, value) {
+			var keyField = value.name.replaceAll(' ','-');
+			htmlToAppend += '<a class="list-group-item multiple-master main-' + keyField + '" onclick="onForeignClick(' + index + ',\'' + keyField + '\')">' + value.name + '</a>';
+
+			var subCurrentList = [];
+			$.each(value.fields_group.fields, function(subIndex, subValue) {
+				subCurrentList.push(subValue.name);
 			});
-			htmlToAppend += "</div>";
+			subCurrentList.sort();
+			$.each(subCurrentList, function (subIndex, subValue) {
+				var subKeyField = subValue.replaceAll(' ','-');
+				htmlToAppend += '<a class="list-group-item list-group-item-info multiple-slave hidden main-' + subKeyField + ' sub-' + keyField + '" onclick="onFieldClick(' + index + ',\'' + keyField + '.' + subKeyField + '\')">' + subValue + '</a>';
+			});
+		});
+		htmlToAppend += "</div>";
+		return htmlToAppend
+	}
+
+	function generateCustomTemplate(index) {
+		var htmlToAppend = "<div class='form-group'><label for='template_%%index%%' class='control-label col-lg-2'>Template path</label><div class='col-lg-9'><input id='template_%%index%%' name='template_%%index%%' class='form-control' type='text'></div></div>";
+		htmlToAppend = htmlToAppend.replaceAll('%%index%%', index);
+		return htmlToAppend;
+	}
+
+	function generateChart(index) {
+		var htmlToAppend = "<div class='form-group'><label for='track_type_%%index%%' class='control-label col-lg-2'>Track type</label><div class='col-lg-9'><select id='track_type_%%index%%' name='track_type_%%index%%' class='form-control'></select></div></div>";
+		htmlToAppend += "<div class='form-group'><div class='col-lg-offset-2'><div class='checkbox'><label for='track_default_%%index%%'><input id='track_default_%%index%%' name='track_default_%%index%%' type='checkbox' checked onchange='trackDefaultChanged(%%index%%)'> Use default source and frequency</label></div></div></div>";
+		htmlToAppend += "<div class='form-group'><label for='frequency_%%index%%' class='control-label col-lg-2'>Frequency</label><div class='col-lg-9'><select id='frequency_%%index%%' name='frequency_%%index%%' class='form-control' disabled></select></div></div>";
+		htmlToAppend += "<div class='form-group'><label for='datasource_%%index%%' class='control-label col-lg-2'>Data source</label><div class='col-lg-9'><select id='datasource_%%index%%' name='datasource_%%index%%' class='form-control' disabled></select></div></div>";
+		htmlToAppend = htmlToAppend.replaceAll('%%index%%', index);
+		
+		var callLater = function() {
+			$("#frequency_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "frequency_select"},checkLoads);
+			$("#track_type_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "numeric_type_select"},checkLoads);
+			$("#datasource_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "data_source_select"},checkLoads);
+		};
+		return htmlToAppend;
+	}
+
+	function setTypeWizard(index) {
+		var containerType = $("#containerType").val();
+		var selectedType = $("#type_" + index).val();
+		var htmlToAppend = "";
+		var key = index.toString();
+		$("#content_" + index).empty();
+
+		if (selectedType=="LAYOUT_OBJECT_TYPE_SINGLES") {
+			htmlToAppend = generateSingles(index);
+		} else if (selectedType=="LAYOUT_OBJECT_TYPE_LIST") {
+			htmlToAppend = generateList(index);
+		} else if (selectedType=="LAYOUT_HISTORY_CHART" || selectedType=="LAYOUT_DISTRIBUTION_CHART" || selectedType=="LAYOUT_HISTORICAL_DISTRIBUTION_CHART") {
+			htmlToAppend = generateChart(index);
+		} else if(selectedType=='LAYOUT_OBJECT_CUSTOM_STANDARD') {
+			htmlToAppend = generateCustomStandard(index);
 		} else if(selectedType=='LAYOUT_OBJECT_CUSTOM_TEMPLATE') {
-			htmlToAppend += "<div class='form-group'><label for='template_%%index%%' class='control-label col-lg-2'>Template path</label><div class='col-lg-9'><input id='template_%%index%%' name='template_%%index%%' class='form-control' type='text'></div></div>";
-			htmlToAppend = htmlToAppend.replaceAll('%%index%%', index);
+			htmlToAppend = generateCustomTemplate(index);
 		}
-
-
 		$("#content_" + index).append(htmlToAppend);
 
-		callLater();
-		if (callback) {
-			callback();
+		if (!allItems[containerType].hasOwnProperty('data')) {
+			allItems[containerType].data = {};
 		}
+		if (!allItems[containerType].data.hasOwnProperty(key)) {
+			allItems[containerType].data[key] = {};
+		}
+		allItems[containerType].data[key].title = $("#title_" + key).val();
+		allItems[containerType].data[key].type = selectedType;
 	}
-	
 
-	function buildWidgets() {
-		var currentInformation = allItems[$("#containerType").val()];
-		if (currentInformation) {
-			$.each(currentInformation.layout, function (index, layout) {
-				var closureIndex = currentItem;
-				gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', currentItem),layout.size_x, layout.size_y]);
-				$("#type_" + currentItem).load("/container/rendition/render_template_for_load.html", {"template_name": "layout_object_type_select"},function() {
-					$("#title_" + closureIndex).val(currentInformation.data[closureIndex.toString()].title);
-					$("#type_" + closureIndex).attr('onchange','changeType(' + closureIndex + ')');
-					$("#type_" + closureIndex).val(currentInformation.data[closureIndex.toString()].type);
-					console.log(currentInformation.data[closureIndex.toString()]);
-					changeType(closureIndex, function() {
-						if (currentInformation.data[closureIndex.toString()].type=='LAYOUT_OBJECT_TYPE_SINGLES') {
-							$.each(currentInformation.data[closureIndex.toString()].data, function(fieldIndex, field) {
-								onFieldClick(index, field);
-							});
-						} else if(currentInformation.data[closureIndex.toString()].type=='LAYOUT_OBJECT_TYPE_LIST') {
-							$.each(currentInformation.data[closureIndex.toString()].data, function(fieldIndex, field) {
-								onMultipleFieldClick(closureIndex, field);
-							});
-						} else if (currentInformation.data[closureIndex.toString()].type=='LAYOUT_HISTORY_CHART' || currentInformation.data[closureIndex.toString()].type=='LAYOUT_DISTRIBUTION_CHART' || currentInformation.data[closureIndex.toString()].type=='LAYOUT_HISTORICAL_DISTRIBUTION_CHART') {
-							$("#track_default_" + closureIndex).prop('checked', currentInformation.data[index.toString()].data.track_default)
-							$("#track_default_" + closureIndex).change();
-						} else if (currentInformation.data[closureIndex.toString()].type=='LAYOUT_OBJECT_CUSTOM_STANDARD') {
-							$.each(currentInformation.data[closureIndex.toString()].data, function(fieldIndex, field) {
-								onFieldClick(index, field);
-							});
-						} else if (currentInformation.data[closureIndex.toString()].type=='LAYOUT_OBJECT_CUSTOM_TEMPLATE') {
-							console.log(currentInformation.data[index.toString()].data);
-							$("#template_" + closureIndex).val(currentInformation.data[index.toString()].data.template);
-						}
+	function changeType(index) {
+		var containerType = $("#containerType").val();
+		setTypeWizard(index);
+		allItems[containerType].data[index.toString()].data = [];
+	}
 
-					});
-					
-				});
-				currentItem = currentItem + 1;
+	function populateTypeWizard(wizardType, index, dataSet) {
+		var key = index.toString();
+		if (wizardType=='LAYOUT_OBJECT_TYPE_SINGLES') {
+			$.each(dataSet, function(fieldIndex, field) {
+				onFieldClick(index, field);
 			});
+		} else if(wizardType=='LAYOUT_OBJECT_TYPE_LIST') {
+			$.each(dataSet, function(fieldIndex, field) {
+				onMultipleFieldClick(index, field);
+			});
+		} else if (wizardType=='LAYOUT_HISTORY_CHART' || wizardType=='LAYOUT_DISTRIBUTION_CHART' || wizardType=='LAYOUT_HISTORICAL_DISTRIBUTION_CHART') {
+			$("#track_default_" + key).prop('checked', currentInformation.data[key].data.track_default)
+			$("#track_default_" + key).change();
+		} else if (wizardType=='LAYOUT_OBJECT_CUSTOM_STANDARD') {
+			$.each(dataSet, function(fieldIndex, field) {
+				onFieldClick(index, field);
+			});
+		} else if (wizardType=='LAYOUT_OBJECT_CUSTOM_TEMPLATE') {
+			$("#template_" + key).val(dataSet.template);
 		}
 	}
 
-	function addWidget(layout) {
-		gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', currentItem),layout.size_x, layout.size_y]);
-		var index = currentItem;
-		$("#type_" + currentItem).load("/container/rendition/render_template_for_load.html", {"template_name": "layout_object_type_select"}, function() {
-			changeType(index);
+	function dismiss(index) {
+		var containerType = $("#containerType").val();
+		gridster.remove_widget($("#gridjet_" + index));
+		allItems[containerType].layout = gridster.serialize();
+		$.each(Object.keys(allItems[containerType].data), function(subIndex, value){
+			var keyId = parseInt(value);
+			if (index<keyId) {
+				console.log(index + "<" + keyId);
+				allItems[containerType].data[(keyId-1).toString()] = allItems[containerType].data[value];
+				delete allItems[containerType].data[value];
+			}
 		});
-		$("#type_" + currentItem).attr('onchange','changeType(' + currentItem + ')');
-		
-		currentItem = currentItem + 1;
+		console.log(allItems[containerType].data);
+		rebuildWidgets();
 	}
 
-	function fieldsLoaded(e) {
-		allFieldsInformation = e.static_fields;
-		allCustomFieldsInformation = e.custom_fields;
+	function addWidget(index) {
+		var userAdd = index===-1;
+		var containerType = $("#containerType").val();
+		if (userAdd) {
+			console.log("add");
+			if (!allItems.hasOwnProperty(containerType)) {
+				allItems[containerType] = {'layout': [], 'data': {}};
+			}
+			index = allItems[containerType].layout.length;
+			console.log(index);
+		}
+		var key = index.toString();
+		var currentLayout = defaultLayout;
+		if (allItems[containerType].layout.length>index) {
+			currentLayout = allItems[containerType].layout[index];
+		}
 
-		currentItem = 0;
+		gridster.add_widget.apply(gridster, [emptyWidget.replaceAll('%%index%%', index), currentLayout.size_x, currentLayout.size_y]);
+
+		if (userAdd) {
+			allItems[containerType].layout = gridster.serialize();
+			allItems[containerType].data[index.toString()] = {};
+		}
+		$("#type_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "layout_object_type_select"}, function() {
+			if (allItems[containerType].data.hasOwnProperty(key)) {
+				$("#type_" + index).val(allItems[containerType].data[key].type);
+				$("#title_" + index).val(allItems[containerType].data[key].title);
+				setTypeWizard(index);
+				var workingData = $.extend(true, {}, allItems[containerType].data[key].data);
+				allItems[containerType].data[key].data = [];
+				populateTypeWizard(allItems[containerType].data[key].type, index, workingData);
+			}
+		});
+		$("#type_" + index).attr('onchange','changeType(' + index + ')');
+	}
+
+	function fieldsLoaded(event) {
+		allFieldsInformation = event.static_fields;
+		allCustomFieldsInformation = event.custom_fields;
+
 		allFields = [];
 		singleFields = [];
 		multipleFields = [];
@@ -340,18 +320,32 @@
 				}
 			}
 		});
+		rebuildWidgets();
+	}
 
-		buildWidgets();
-
-		if (callbacks) {
-			$.each(callbacks, function(index, callback){
-				callback();
-			});
-		}
+	function saveLayout() {
+		$("#backgroundProgress").removeClass("invisible");
+		var containerSetup = {}
+		containerSetup.type = $("#containerType").val();
+		allItems[containerSetup.type].layout = gridster.serialize();
+		containerSetup.data = allItems[containerSetup.type];
+		var updateForm = new FormData();
+		updateForm.append('container_setup', JSON.stringify(containerSetup));
+		updateForm.append('item',urlParams['item']);
+		updateForm.append('type',urlParams['type']);
+		updateForm.append('render_name','view');
+		$.ajax({
+			url: '/container/setup_save.html',
+			type: 'POST',
+			data: updateForm,
+			processData: false,
+			contentType: false,
+			success: containerFieldsSaved,
+			error: onCallError
+		});
 	}
 
 	function containerChanged() {
-		initialLoad = true;
 		var fieldsForm = new FormData();
 		fieldsForm.append('container_type', $("#containerType").val());
 		$.ajax({
@@ -363,8 +357,8 @@
 			success: fieldsLoaded,
 			error: onCallError
 		});
-
 	}
+
 
 </script>
 {% endblock %}
@@ -376,7 +370,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<select class="form-control no-enter" id="containerType" name="containerType" onchange="clearAndLoad()">
+			<select class="form-control no-enter" id="containerType" name="containerType" onchange="containerChanged()">
 				{% with value='' %}
 					{% include selection_template %}
 				{% endwith %}
@@ -384,14 +378,12 @@
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
-			<button class="btn btn-default col-lg-3" type="button" data-placement="bottom" title="{% blocktrans %}Add a new widget to the current layout{% endblocktrans %}" onclick='addWidget({"row": 1, "size_x": 1, "col": 1, "size_y": 1})'>{% blocktrans %}Add{% endblocktrans %}</button>
+			<button class="btn btn-default col-lg-3" type="button" data-placement="bottom" title="{% blocktrans %}Add a new widget to the current layout{% endblocktrans %}" onclick='addWidget(-1)'>{% blocktrans %}Add{% endblocktrans %}</button>
 			<button class="btn btn-default col-lg-offset-6 col-lg-3" type="button" data-placement="bottom" title="{% blocktrans %}Save the current layout{% endblocktrans %}" onclick="saveLayout()">{% blocktrans %}Save{% endblocktrans %}</button>
 		</div>
 		<div class="row">
 			<form class="form-horizontal" role="form">
 				<div id="layoutGrid" class="gridster col-lg-12">
-					<ul id="layoutGridContent">
-					</ul>
 				</div>
 			</form>
 		</div>

@@ -14,7 +14,6 @@ from django.http.response import HttpResponse
 
 def crud(request):
     profile = get_or_create_user_profile(request.user.id)
-    print dumps(setup_content.get_data('container_flow_crud'))
     context = {'base_template': profile['base_template'],
                'profile': profile,
                'selection_template': 'statics/container_type_' + profile['language_code'] + '.html',
@@ -29,7 +28,6 @@ def crud_save(request):
     crud_data = request.POST['crud_data']
     crud_data = json.loads(crud_data)
     setup_content.set_data('container_flow_crud', crud_data)
-    print crud_data
     return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
     
 def status(request):

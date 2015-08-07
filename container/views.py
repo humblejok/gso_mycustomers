@@ -31,6 +31,7 @@ from container.utilities.security import get_or_create_user_profile,get_or_creat
     container_visible
 import datetime
 from container.storage import get_uuid
+from container.flow import modify
 
 LOGGER = logging.getLogger(__name__)
 
@@ -111,8 +112,8 @@ def base_edit(request):
     # TODO: Handle error
     effective_class = get_effective_class(container_type)
 
-    active_status = Attributes.objects.get(identifier='STATUS_ACTIVE')
-    container_attribute = Attributes.objects.get(identifier=container_type)
+    pending_status = Attributes.objects.get(identifier='STATUS_TO_BE_VALIDATED')
+    container_attribute = Attributes.objects.get(identifier=container_type, active=True)
     if request.POST.has_key('container_id'):
         container_id = request.POST['container_id']
         try:
@@ -126,13 +127,15 @@ def base_edit(request):
     # Initial setup
     # TODO: Check if name already exists for that container type
     source.type = container_attribute
+    # PRE SAVE UPDATE
+    modify.execute_modify(source, 'STEP_PRE_CREATE')
     for post_field in request.POST.keys():
         field_info = Attributes()
         field_info.short_name = post_field
         field_info.name = post_field
         source.set_attribute('web', field_info, request.POST[post_field])
 
-    source.status = active_status
+    source.status = pending_status
     source.save()
     # Working on creations mandatory fields
     creation_data = setup_content.get_data('container_type_creations')
@@ -181,6 +184,7 @@ def base_edit(request):
                     setattr(source, field, False)
                 else:
                     LOGGER.error(field + " - Received data are incomplete, it does not match the creation requirements!")
+    modify.execute_modify(source, 'STEP_POST_CREATE')
     source.save()
     if container_id==None and profile.has_key('current_work_as') and str(profile['current_work_as']).lower()!='administrator':
         # Assign to universe
@@ -193,7 +197,10 @@ def delete(request):
     container_id = request.GET['container_id']
     if container_visible(container_id, profile):
         # TODO: Handle error
-        get_effective_container(container_id).delete()
+        container = get_effective_container(container_id)
+        modify.execute_modify(container, 'STEP_PRE_DELETE')
+        container.delete()
+        modify.execute_modify(container, 'STEP_POST_DELETE')
         return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
 
 def get(request):
@@ -215,6 +222,7 @@ def get(request):
                    'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
                    'custom_data': custom_data,
                    'container_type': container_type, 'layout': working_data[container_type]}
+        print working_data[container_type]
         return render(request,'rendition/container_type/details/view.html', context)
     else:
         return HttpResponseForbidden()
@@ -307,6 +315,7 @@ def element_save(request):
         # TODO: Handle error
         effective_class = get_effective_class(container_type)
         container = get_effective_container(container_id)
+        modify.execute_modify(container, 'STEP_PRE_SAVE')
         if container_data.has_key('many-to-many'):
             foreign, all_fields = get_model_foreign_field_class(effective_class, container_data['many-to-many'])
             if foreign!=None:
@@ -337,6 +346,7 @@ def element_save(request):
                 field_info.short_name = field_key.split('.')[0]
                 field_info.name = field_key.split('.')[0]
                 container.set_attribute('web', field_info, container_data[field_key])
+        modify.execute_modify(container, 'STEP_POST_SAVE')
         container.save()
         return HttpResponse('{"result": "Finished", "status_message": "Saved"}',"json")
     else:

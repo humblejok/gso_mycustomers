@@ -10,6 +10,8 @@ from django.template import loader
 from django.template.context import Context
 import os
 from gso_mycustomers.settings import TEMPLATE_DIRS
+from container.utilities import setup_content
+import sys
 
 AVAILABLE_OPERATIONS = {
                     'set_field': {
@@ -34,14 +36,22 @@ AVAILABLE_OPERATIONS = {
                         }
                    }
 
+SELF = sys.modules[__name__]
+
+def execute_modify(container, operation):
+    crud_flow = setup_content.get_data('container_flow_crud')
+    if crud_flow.has_key(container.type.identifier):
+        if crud_flow[container.type.identifier].has_key(operation):
+            for operation_step in crud_flow[container.type.identifier][operation]:
+                getattr(SELF, operation_step['step'])(container, **operation_step)
+
 def set_field(container, **kwargs):
     field_info = Attributes()
     field_info.short_name = kwargs['field']
     container.set_attribute('flow', field_info, kwargs['value'])
-    container.save()
     
 def compute(container, **kwargs):
-    value = eval(kwargs['formula'])
+    value = container.process_formula(kwargs['formula'])
     set_field(container, field=kwargs['field'], value=value)
     
 def auto_validate(container, **kwargs):

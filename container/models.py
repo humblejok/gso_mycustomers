@@ -245,6 +245,9 @@ class CoreModel(models.Model):
     def __unicode__(self):
         return unicode(self.get_value())
     
+    def process_formula(self, formula):
+        return eval(formula)
+    
     def set_attribute(self, source, field_info, string_value):
         try:
             if string_value!='' and string_value!=None:
