@@ -46,10 +46,11 @@ def render_custom_standard(request):
     container = effective_class.objects.get(id=container_id)
     
     effective_container_fields = complete_custom_fields_information(container_type, container_fields, profile['language_code'])
-    
     custom_data = enhance_container_information(get_container_information(container), effective_container_fields)
                         
-    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index, 'container': container, 'fields': effective_container_fields, 'custom_data': custom_data, 'application_settings': settings}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index,
+               'container': container, 'fields': effective_container_fields, 'custom_data': custom_data,
+               'application_settings': settings}
     return render(request, 'container/view/custom_fields_list.html', context)
 
 def render_custom_history(request):

@@ -117,8 +117,9 @@ def complete_custom_fields_information(container_type, filtering_fields=None, la
                             sub_field_info['field_id'] = sub_field_info['name'].replace(' ','-')
                             if sub_field_info['type']=='FIELD_TYPE_CHOICE':
                                 sub_field_info['template'] = 'statics/' + sub_field_info['attribute'] + '_' + language_code + '.html'
-                            if filtering_fields==None or field_name in filtering_fields:
+                            if filtering_fields==None or (field_name + '.' + sub_field_info['name'].replace(' ','-')) in filtering_fields:
                                 all_data[field_name].append(sub_field_info)
+    print all_data
     return all_data
 
 def complete_fields_information(model_class, information, language_code='en'):

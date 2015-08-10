@@ -13,8 +13,6 @@ containers = client.additional_content['containers']
 
 def enhance_container_information(custom_data, custom_info):
     enhanced_data = {}
-    print custom_data
-    print custom_info
     if custom_data!=None:
         for field in custom_data.keys():
             if custom_info.has_key(field) and custom_info[field]['type'] in ['FIELD_TYPE_CHOICE']:
