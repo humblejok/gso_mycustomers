@@ -1,7 +1,7 @@
 {% extends base_template %}
 {% load i18n %}
 {% load container_tags %}
-{% block title %}MyCustomers - {% blocktrans %}Status workflow{% endblocktrans %}{% endblock %}
+{% block title %}{{application_settings.APPLICATION_NAME}} - {% blocktrans %}Status workflow{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 {% endblock %}

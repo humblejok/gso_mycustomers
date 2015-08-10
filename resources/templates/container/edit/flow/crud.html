@@ -1,7 +1,7 @@
 {% extends base_template %}
 {% load i18n %}
 {% load container_tags %}
-{% block title %}MyCustomers - {% blocktrans %}CRUD Workflow{% endblocktrans %}{% endblock %}
+{% block title %}{{application_settings.APPLICATION_NAME}} - {% blocktrans %}CRUD Workflow{% endblocktrans %}{% endblock %}
 {% block readyoptions %}
 				$(".btn").not('#comment').tooltip();
 				clearAndLoad();

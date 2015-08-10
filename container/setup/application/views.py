@@ -43,7 +43,7 @@ def save(request):
 def reset_nosql(request):
     profile = get_or_create_user_profile(request.user.id)
     # TODO Check permissions
-    return render(request, 'container/edit/application/reset_nosql.html', {'base_template': profile['base_template'], 'profile': profile, 'data_sets': available_data_sets.keys()})
+    return render(request, 'container/edit/application/reset_nosql.html', {'base_template': profile['base_template'], 'profile': profile, 'data_sets': available_data_sets.keys(), 'application_settings': settings})
 
 def reset_nosql_execute(request):
     profile = get_or_create_user_profile(request.user.id)
@@ -63,13 +63,13 @@ def setup_users(request):
     # TODO Check permissions
     print complete_fields_information(UserMapping, get_static_fields(UserMapping), profile['language_code'])
     return render(request, 'container/edit/application/setup_users.html',
-                  {'base_template': profile['base_template'], 'profile': profile,
+                  {'base_template': profile['base_template'], 'profile': profile, 'application_settings': settings,
                    'all_users': all_users, 'mapping_fields':complete_fields_information(UserMapping, get_static_fields(UserMapping), profile['language_code'])})
 
 def get_user_assigment(request):
     profile = get_or_create_user_profile(request.user.id)
     mapping = UserMapping.objects.filter(related_user__id=request.POST['user_id']).order_by('third_container__type', 'third_container__name')
-    context = {'thirds': mapping, 'language_code': profile['language_code']}
+    context = {'thirds': mapping, 'language_code': profile['language_code'], 'application_settings': settings}
     return render(request, 'rendition/application/user_mapping.html', context)
     
 def add_user_assigment(request):

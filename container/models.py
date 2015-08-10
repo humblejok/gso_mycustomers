@@ -19,6 +19,7 @@ from gso_mycustomers.settings import TEMPLATE_DIRS
 from container.setup.application.settings import RESOURCES_MAIN_PATH,\
     TEMPLATES_STATICS_PATH
 from seq_common.utils.classes import my_class_import
+from container.setup.application import settings
 
 
 LOGGER = logging.getLogger(__name__)
@@ -77,7 +78,7 @@ def generate_global_templates():
     template = loader.get_template('rendition/gso.html')
     for language in languages:
         entries = GlobalMenuEntries.objects.all().order_by('id')
-        context = Context({'entries': entries, 'language_code': language.short_name})
+        context = Context({'entries': entries, 'language_code': language.short_name, 'application_settings': settings})
         rendition = template.render(context)
         outfile = os.path.join(TEMPLATE_DIRS[0], 'gso_' + language.short_name + '.html')
         with open(outfile,'w') as o:

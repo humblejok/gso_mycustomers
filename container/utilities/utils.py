@@ -80,25 +80,45 @@ def get_model_foreign_field_class(model_class, field):
         return classes.my_class_import(all_fields[field]['target_class']), all_fields
     else:
         return None, None
-    
-def complete_custom_fields_information(container_type, filtering_fields=None):
+
+def complete_custom_historical_fields_information(container_type, filtering_fields=None, language_code='en'):
     all_data = {}
-   
+    # TODO Add profile and language
     all_custom_fields = setup_content.get_data('container_type_fields')
     if all_custom_fields.has_key(container_type):
         all_fields_information = setup_content.get_data('object_type_fields')
         for field in all_custom_fields[container_type]:
-            if all_fields_information.has_key(field['type']):
-                for group in all_fields_information[field['type']]:
-                    if group['name']==field['name']:
-                        group_name = group['name'].replace(' ','-')
-                        for field_info in group['fields']:
-                            field_name = field_info['name'].replace(' ','-')
-                            full_name = group_name + '.' + field_name
-                            if field_info['type']=='FIELD_TYPE_CHOICE':
-                                field_info['template'] = 'statics/' + field_info['attribute'] + '_en.html'
-                            if filtering_fields==None or full_name in filtering_fields:
-                                all_data[full_name] = field_info
+            if field['type']=='OBJECT_TYPE_HISTORICAL':
+                for detailled_field in all_fields_information[field['type']]:
+                    if detailled_field['name']==field['name']:
+                        field_name = detailled_field['name'].replace(' ','-')
+                        all_data[field_name] = []
+                        for sub_field_info in detailled_field['fields']:
+                            sub_field_info['field_id'] = sub_field_info['name'].replace(' ','-')
+                            if sub_field_info['type']=='FIELD_TYPE_CHOICE':
+                                sub_field_info['template'] = 'statics/' + sub_field_info['attribute'] + '_' + language_code + '.html'
+                            if filtering_fields==None or field_name in filtering_fields:
+                                all_data[field_name].append(sub_field_info)
+    return all_data
+   
+def complete_custom_fields_information(container_type, filtering_fields=None, language_code='en'):
+    all_data = {}
+    # TODO Add profile and language
+    all_custom_fields = setup_content.get_data('container_type_fields')
+    if all_custom_fields.has_key(container_type):
+        all_fields_information = setup_content.get_data('object_type_fields')
+        for field in all_custom_fields[container_type]:
+            if field['type']=='OBJECT_TYPE_STANDARD':
+                for detailled_field in all_fields_information[field['type']]:
+                    if detailled_field['name']==field['name']:
+                        field_name = detailled_field['name'].replace(' ','-')
+                        all_data[field_name] = []
+                        for sub_field_info in detailled_field['fields']:
+                            sub_field_info['field_id'] = sub_field_info['name'].replace(' ','-')
+                            if sub_field_info['type']=='FIELD_TYPE_CHOICE':
+                                sub_field_info['template'] = 'statics/' + sub_field_info['attribute'] + '_' + language_code + '.html'
+                            if filtering_fields==None or field_name in filtering_fields:
+                                all_data[field_name].append(sub_field_info)
     return all_data
 
 def complete_fields_information(model_class, information, language_code='en'):
@@ -131,7 +151,6 @@ def complete_fields_information(model_class, information, language_code='en'):
                     information[field]['template'] = 'statics/' + information[field]['fields'][information[field]['filter']]['link']['type'] + '_' + language_code + '.html'
                     information[field]['template_m2m'] = 'statics/' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
                     information[field]['template_m2m_complete'] = 'statics/complete_' + attributes_class.objects.get(type='element_wizard', name=information[field]['target_class'], active=True).short_name + '_' + language_code + '.html'
-                    print field, information[field]['target_class'], information[field]['is_container'], information[field]['template_m2m_complete']
                     information[field]['datasource'] = '/container/filter.html?container_class=' + information[field]['target_class']
     return information
 

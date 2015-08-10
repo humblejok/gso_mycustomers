@@ -1,0 +1,42 @@
+
+<form id="object_form" role="form" action="/object_instanciante.html" method="POST">
+	
+		<div class="form-group">
+			<label for="date">Date</label>
+			<input name="date" type="text" class="form-control no-enter" id="date" placeholder="Enter a date" value=""/>
+		</div>
+		<script>
+			
+				$("#date").datepicker({ dateFormat: "yy-mm-dd" });
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="type">Type</label>
+			<input name="type" type="text" class="form-control no-enter" id="type" placeholder="Enter a type" value=""/>
+		</div>
+		<script>
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="status">Status</label>
+			<input name="status" type="text" class="form-control no-enter" id="status" placeholder="Enter a status" value=""/>
+		</div>
+		<script>
+			
+		</script>
+	
+		<div class="form-group">
+			<label for="value">Value</label>
+			<input name="value" type="text" class="form-control no-enter" id="value" placeholder="Enter a value" value=""/>
+		</div>
+		<script>
+			
+		</script>
+	
+	<div class="row">
+		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		<button type="submit" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="Create the Quote and save it">Continue</button>
+	</div>
+</form>

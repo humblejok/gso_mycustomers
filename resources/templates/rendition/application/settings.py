@@ -3,6 +3,7 @@ import os
 
 SETTINGS_PATH = os.path.realpath(__file__)
 
+APPLICATION_NAME = '{{application_settings.APPLICATION_NAME}}'
 MONGO_URL = "{{application_settings.MONGO_URL}}"
 RESOURCES_MAIN_PATH = "{{application_settings.RESOURCES_MAIN_PATH}}"
 MAIN_PATH = "{{application_settings.MAIN_PATH}}"

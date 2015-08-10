@@ -8,6 +8,10 @@
 					<form id="dynamic_modal_form" role="form" action="/container/application/save.html" method="POST">{% csrf_token %}
 						<div class="modal-body">
 							<div class="form-group">
+								<label for="APPLICATION_NAME">{% blocktrans %}Application name{% endblocktrans %}</label>
+								<input name="APPLICATION_NAME" type="text" class="form-control" id="APPLICATION_NAME" placeholder="Enter the name of the applicaTtion" value="{{application_settings.APPLICATION_NAME|get_escaped_strings}}"/>
+							</div>
+							<div class="form-group">
 								<label for="MONGO_URL">{% blocktrans %}URL to MongoDB{% endblocktrans %}</label>
 								<input name="MONGO_URL" type="text" class="form-control" id="MONGO_URL" placeholder="Enter a Mongo URL" value="{{application_settings.MONGO_URL|get_escaped_strings}}"/>
 							</div>

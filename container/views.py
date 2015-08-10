@@ -19,12 +19,14 @@ from seq_common.utils import classes
 
 from container.models import Attributes, Container, Universe, DocumentContainer,\
     ThirdPartyContainer
-from container.utilities import setup_content, external_content
+from container.utilities import setup_content, external_content,\
+    container_container
 from container.utilities.container_container import get_container_information, \
-    set_container_information
+    set_container_information, set_container_history
 from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
-    get_effective_container, get_model_foreign_field_class, get_static_fields, filter_custom_fields
+    get_effective_container, get_model_foreign_field_class, get_static_fields, filter_custom_fields,\
+    complete_custom_historical_fields_information
 from django.utils.datastructures import MultiValueDictKeyError
 from container.setup.application.settings import WORKING_PATH, STORER
 from container.utilities.security import get_or_create_user_profile,get_or_create_ownership_universes,\
@@ -32,6 +34,7 @@ from container.utilities.security import get_or_create_user_profile,get_or_creat
 import datetime
 from container.storage import get_uuid
 from container.flow import modify
+from container.setup.application import settings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +42,7 @@ def documents(request):
     profile = get_or_create_user_profile(request.user.id)
     pending_docs = DocumentContainer.objects.filter(status__identifier='STATUS_TO_BE_VALIDATED')
     global_docs = DocumentContainer.objects.filter(status__identifier='STATUS_ACTIVE', containers=None)
-    context = {'base_template': profile['base_template'], 'profile': profile, 'globals': global_docs, 'pendings': pending_docs}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'globals': global_docs, 'pendings': pending_docs, 'application_settings': settings}
     return render(request, 'container/view/documents.html', context)
 
 def document_upload(request):
@@ -91,7 +94,9 @@ def lists(request):
                 results = results | universe.members.filter(type__identifier=container_type)
     results = [get_effective_container(result.id) for result in results]
     request.session['django_language'] = profile['language_code']
-    context = {'base_template': profile['base_template'], 'profile': profile, 'containers': results, 'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'containers': results,
+               'container_type': container_type, 'container_label': Attributes.objects.get(identifier=container_type).name,
+               'application_settings': settings}
     return render(request, 'statics/' + container_type + '_results_lists_en.html', context)
 
 def definition_save(request):
@@ -170,7 +175,6 @@ def base_edit(request):
                             data[creation_data[field]['filter']] = request.POST[base_key]
                         else:
                             data[key.replace(base_key + '.', '')] = request.POST[key]
-                    print data
                     new_instance = target_class.retrieve_or_create('web', 'FinaLE', field, data)
                     new_instances.append(new_instance)
                     index = index + 1
@@ -215,18 +219,28 @@ def get(request):
         filtering = lambda d, k: d[k]['data']
         working_data = setup_content.get_data('container_type_details')
         fields = list(itertools.chain(*[filtering(working_data[container_type]['data'], k) for k in working_data[container_type]['data'].keys()]))
-        custom_fields = complete_custom_fields_information(container_type)
+        custom_fields = complete_custom_fields_information(container_type, language_code=profile['language_code'])
+        custom_history_fields = complete_custom_historical_fields_information(container_type, language_code=profile['language_code'])
         custom_data = get_container_information(container)
         context = {'base_template': profile['base_template'], 'profile': profile, 
-                   'custom_fields': custom_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}, profile['language_code']),
+                   'custom_fields': custom_fields, 'custom_history_fields': custom_history_fields, 'complete_fields': complete_fields_information(effective_class,  {field:{} for field in fields}, profile['language_code']),
                    'container': container, 'container_json': dumps(dict_to_json_compliance(model_to_dict(container), effective_class)),
-                   'custom_data': custom_data,
+                   'custom_data': custom_data, 'application_settings': settings,
                    'container_type': container_type, 'layout': working_data[container_type]}
-        print working_data[container_type]
         return render(request,'rendition/container_type/details/view.html', context)
     else:
         return HttpResponseForbidden()
         
+def reset_container_custom_information(request):
+    profile = get_or_create_user_profile(request.user.id)
+    container_id = request.GET['container_id']
+    if container_visible(container_id, profile):
+        # TODO: Handle error
+        container = get_effective_container(container_id)
+        container_container.reset_container_information(container)
+        return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
+    else:
+        return HttpResponseForbidden()
 
 def get_field_type(request):
     profile = get_or_create_user_profile(request.user.id)
@@ -235,7 +249,6 @@ def get_field_type(request):
     current_field = request.POST['current_field']
     
     all_fields = get_static_fields(get_effective_class(container_type))
-    print  all_fields[current_field]['type']
     return HttpResponse(all_fields[current_field]['type']) 
 
 def get_selectable_foreign(request):
@@ -337,8 +350,14 @@ def element_save(request):
                 getattr(container, container_data['many-to-many']).add(entry)
                 container.save()
         elif container_custom:
-            for entry in container_data.keys():
-                set_container_information(container, entry, container_data[entry], None)
+            if container_data.has_key('history') and container_data['history']=='True':
+                current_history_field = container_data['field']
+                del container_data['history']
+                del container_data['field']
+                set_container_history(container, current_history_field, container_data, None)
+            else:
+                for entry in container_data.keys():
+                    set_container_information(container, entry, container_data[entry], None)
         else:
             for field_key in container_data.keys():
                 #TODO Handle relation
@@ -358,7 +377,7 @@ def full_search(request):
     container_data = request.POST['container_data']
     container_data = json.loads(container_data)
     results = []
-    context = {'base_template': profile['base_template'], 'profile': profile}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'application_settings': settings}
     if container_data.has_key('type') and container_data['type']!=None and container_data['type']!='':
         effective_class = get_effective_class(container_type)
         if container_data.has_key('many-to-many'):
@@ -368,7 +387,6 @@ def full_search(request):
             foreign = effective_class
             all_fields = get_static_fields(foreign)
         del container_data['id']
-        print container_data
         query_filter = {(key + '__identifier' if all_fields.has_key(key) and all_fields[key]['type']=='ForeignKey' and all_fields[key]['target_class']=='container.models.Attributes' else key):container_data[key] for key in container_data.keys() if container_data[key]!='' and container_data[key]!=None}
         query_filter = {(key + '__icontains' if all_fields.has_key(key) and all_fields[key]['type']=='FIELD_TYPE_TEXT' else key):query_filter[key] for key in query_filter.keys()}
         query_Q = {key:container_data[key] for key in query_filter.keys() if all_fields.has_key(key) and all_fields[key]['type'] in ['ForeignKey','ManyToManyField']}
@@ -376,10 +394,7 @@ def full_search(request):
         for key in query_Q.keys():
             query_Q_filters.append(Q({key + '__name__icontains':container_data[key]}) | Q({key + '__short_name__icontains':container_data[key]}))
             del query_filter[key]
-        print query_filter
-        print query_Q_filters
         first = foreign.objects.filter(**query_filter)
-        print first
         results = first.filter(*query_Q_filters)
     context['results'] = results
     return render(request, 'container/view/search_results.html', context)
@@ -441,7 +456,7 @@ def custom_edit(request):
     custom_id = request.GET['custom']
     target = request.GET['target']
     container = get_effective_container(container_id)
-    context = {'base_template': profile['base_template'], 'profile': profile,'container': container, 'all_types': {}}
+    context = {'base_template': profile['base_template'], 'profile': profile,'container': container, 'all_types': {}, 'application_settings': settings}
     all_types = Attributes.objects.filter(type__startswith=custom_id).order_by('type').distinct('type')
     all_types_json = {}
     for a_type in all_types:

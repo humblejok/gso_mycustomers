@@ -28,7 +28,9 @@ urlpatterns = patterns(
     url(r'^definition_save.html','container.views.definition_save', name='container_definition_save'),
     url(r'^element_save.html','container.views.element_save', name='container_element_save'),
     url(r'^element_delete.html','container.views.element_delete', name='container_element_delete'),
-    url(r'^full_search.html','container.views.full_search', name='container_full_search'),    
+    url(r'^full_search.html','container.views.full_search', name='container_full_search'),
+    
+    url(r'^reset_custom_information.html','container.views.reset_container_custom_information', name='container_reset_container_custom_information'),
     
     #########################
     # Workflows views       #
@@ -47,6 +49,8 @@ urlpatterns = patterns(
     url(r'^rendition/render_custom_standard.html', 'container.rendition.views.render_custom_standard', name='container_render_custom_standard'),
     url(r'^rendition/render_custom_template.html', 'container.rendition.views.render_custom_template', name='container_render_custom_template'),
     url(r'^rendition/render_template_for_load.html', 'container.rendition.views.render_template_for_load', name='container_render_template_for_load'),
+    url(r'^rendition/render_custom_history.html', 'container.rendition.views.render_custom_history', name='container_render_custom_history'),
+    
     #########################
     # Setup views           #
     #########################

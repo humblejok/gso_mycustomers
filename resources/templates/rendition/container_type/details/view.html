@@ -77,6 +77,9 @@
 			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_CUSTOM_STANDARD") {
 				var rendition_url = "/container/rendition/render_custom_standard.html";
 				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_fields": JSON.stringify(layoutInformation.data[index].data)}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
+			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_CUSTOM_HISTORY") {
+				var rendition_url = "/container/rendition/render_custom_history.html";
+				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_fields": JSON.stringify(layoutInformation.data[index].data)}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
 			} else if (layoutInformation.data[index].type=="LAYOUT_OBJECT_CUSTOM_TEMPLATE") {
 				var rendition_url = "/container/rendition/render_custom_template.html";
 				$("#zone_" + index).load(rendition_url, {"widget_index": index, "widget_title": layoutInformation.data[index].title, "container_id": {{container.id}}, "container_type": "{{container.type.identifier}}", "container_template": layoutInformation.data[index].data.template}, function() {$(".btn").not('#comment').tooltip(); controlLoading(); });
@@ -153,7 +156,7 @@
 		</div>
 	{% for index in layout|get_dict_key:"data" %}
 		{% with template_name=layout|get_dict_key:"data"|get_dict_key:index|get_dict_key:"type" %}
-			{% include 'rendition/container_type/details/edition/'|add:template_name|add:".html" with index=index complete_fields=complete_fields custom_fields=custom_fields data=layout|get_dict_key:"data"|get_dict_key:index container=container custom_data=custom_data language_code=profile.language_code %}
+			{% include 'rendition/container_type/details/edition/'|add:template_name|add:".html" with index=index complete_fields=complete_fields custom_fields=custom_fields custom_history_fields=custom_history_fields data=layout|get_dict_key:"data"|get_dict_key:index container=container custom_data=custom_data language_code=profile.language_code %}
 		{% endwith %}
 	{% endfor %}
 

@@ -13,6 +13,8 @@ containers = client.additional_content['containers']
 
 def enhance_container_information(custom_data, custom_info):
     enhanced_data = {}
+    print custom_data
+    print custom_info
     if custom_data!=None:
         for field in custom_data.keys():
             if custom_info.has_key(field) and custom_info[field]['type'] in ['FIELD_TYPE_CHOICE']:
@@ -30,20 +32,25 @@ def get_container_information(container, clean=True):
         all_data = new_data
     return all_data
 
-def get_container_provider_information(security, provider):
-    data = get_container_information(security)
+def get_container_provider_information(container, provider):
+    data = get_container_information(container)
     if data!=None:
         return data[provider]
     return data
+
+def set_container_history(container, field, value, provider = None):
+    None
     
-def set_container_information(security, field, value, provider = None):
+    
+def set_container_information(container, field, value, provider = None):
     valid_field_name = field.replace('.','%')
-    data = get_container_information(security, False)
+    data = get_container_information(container, False)
+    print data
     if data==None:
         if provider==None:
-            data = {'_id': security.id, valid_field_name: value}
+            data = {'_id': container.id, valid_field_name: value}
         else:
-            data = {'_id': security.id, provider:  {valid_field_name: value}}
+            data = {'_id': container.id, provider:  {valid_field_name: value}}
         containers.insert(data)
     else:
         if provider==None:
@@ -51,3 +58,6 @@ def set_container_information(security, field, value, provider = None):
         else:
             data[provider][valid_field_name] = value
         containers.save(data)
+        
+def reset_container_information(container):
+    containers.remove({'_id': container.id})

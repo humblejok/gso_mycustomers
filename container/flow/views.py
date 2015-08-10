@@ -11,6 +11,7 @@ from json import dumps
 from container.utilities import setup_content
 import json
 from django.http.response import HttpResponse
+from container.setup.application import settings
 
 def crud(request):
     profile = get_or_create_user_profile(request.user.id)
@@ -19,7 +20,8 @@ def crud(request):
                'selection_template': 'statics/container_type_' + profile['language_code'] + '.html',
                'global': dumps(setup_content.get_data('container_flow_crud')),
                'operations': dumps(AVAILABLE_OPERATIONS),
-               'steps': Attributes.objects.filter(type='crud_step', active=True).order_by('id')
+               'steps': Attributes.objects.filter(type='crud_step', active=True).order_by('id'),
+               'application_settings': settings
                }
     return render(request, 'container/edit/flow/crud.html', context)
 
@@ -32,5 +34,5 @@ def crud_save(request):
     
 def status(request):
     profile = get_or_create_user_profile(request.user.id)
-    context = {'base_template': profile['base_template'], 'profile': profile}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'application_settings': settings}
     return render(request, 'container/edit/flow/status.html', context)

@@ -1,0 +1,95 @@
+{% load container_tags %}
+{% load i18n %}
+		<script>
+
+			function onresultselect_{{index}}(data) {
+				$("#results_{{index}}").empty();
+				onedit_{{index}}(data);
+			}
+
+			function onsearch_{{index}}() {
+				{% for entry in data.data %}
+					{% for field in custom_history_fields|get_dict_key:entry %}
+						editedData[{{index}}]['{{field.field_id}}'] = $("#{{entry}}-{{index}}-{{field.field_id}}").val();
+					{% endfor %}
+				{% endfor %}
+				searchContainer({{index}});
+			}
+
+			function onchange_{{index}}(save) {
+				{% for entry in data.data %}
+					editedData[{{index}}] = {'history': 'True', 'field': '{{entry}}'};
+					{% for field in custom_history_fields|get_dict_key:entry %}
+						editedData[{{index}}]['{{field.field_id}}'] = $("#{{entry}}-{{index}}-{{field.field_id}}").val();
+					{% endfor %}
+				{% endfor %}
+				if (save) {
+					updateContainer({{index}}, true);
+				} else {
+					console.log(editedData[{{index}}]);
+				}
+			}
+
+			function onedit_{{index}}(data) {
+				clean_{{index}}();
+				console.log(data);
+				if (data) {
+					{% for entry in data.data %}
+						{% for field in custom_history_fields|get_dict_key:entry %}
+							if (data['{{field.field_id}}']!==null && data['{{field.field_id}}'].hasOwnProperty('identifier')) {
+								$("#{{entry}}-{{index}}-{{field.field_id}}").val(data['{{field.field_id}}'].identifier);
+							} else if (data['{{field.field_id}}']!==null && data['{{field.field_id}}'].hasOwnProperty('name')) {
+								$("#{{entry}}-{{index}}-{{field.field_id}}").val(data['{{field.field_id}}'].name);
+							} else {
+								$("#{{entry}}-{{index}}-{{field.field_id}}").val(data['{{field.field_id}}']!==null?data['{{field.field_id}}']:"");
+							}
+						{% endfor %}
+					{% endfor %}
+				}
+			}
+
+			function clean_{{index}}() {
+				{% for entry in data.data %}
+					{% for field in custom_history_fields|get_dict_key:entry %}
+						$("#{{entry}}-{{index}}-{{field.field_id}}").val("");
+					{% endfor %}
+				{% endfor %}
+			}
+		</script>
+
+		<div class="modal fade" id="modal_define_{{index}}" tabindex="-1" role="dialog" aria-labelledby="modal_define_{{index}}_label" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="modal_define_{{index}}_label">{{data.title|get_translated_text:language_code}} - {% blocktrans %}Add/edit information{% endblocktrans %}</h4>
+					</div>
+					<form id="edit_form_{{index}}" role="form" action="#" method="POST">{% csrf_token %}
+						<div id="optionBody"  class="modal-body">
+							<div class="row">&nbsp;</div>
+							{% for entry in data.data %}
+								{% for field in custom_history_fields|get_dict_key:entry %}
+								<div class="form-group">
+									<label for="{{entry}}-{{index}}-{{field.field_id}}">{{field.field_id|get_translated_text:language_code}}</label>
+									{% if field|get_dict_key:'template' %}
+										<select id="{{entry}}-{{index}}-{{field.field_id}}" name="{{entry}}-{{index}}-{{field.field_id}}" class="form-control">
+										{% with value=custom_data|get_dict_key:entry %}
+											{% include field|get_dict_key:'template' %}
+										{% endwith %}
+										</select>
+									{% else %}
+									<input name="{{entry}}-{{index}}-{{field.field_id}}" type="text" class="form-control{% if field|get_dict_key:'type' == 'FIELD_TYPE_DATE' %} date-form-field{% endif %}" id="{{entry}}-{{index}}-{{field.field_id}}" placeholder="{{field.field_id|add:'.placeholder'|get_translated_text:language_code}}" value="{{custom_data|get_dict_key:entry}}"/>
+									{% endif %}
+								</div>
+								{% endfor %}
+							{% endfor %}
+						</div>
+					</form>
+					<div class="modal-footer">
+						{% if complete_fields|get_dict_key:data.data.0|get_dict_key:"is_container" %}<button id="searchButton_{{index}}" type="button" class="btn btn-info" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Search containers with these information{% endblocktrans %}" onclick="onsearch_{{index}}()">{% blocktrans %}Search{% endblocktrans %}</button>{% endif %}
+						<button  id="saveButton_{{index}}" type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Save the modifications{% endblocktrans %}" onclick="onchange_{{index}}(true)" data-dismiss="modal">{% blocktrans %}Save{% endblocktrans %}</button>
+						<button  id="closeButton_{{index}}" type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Close the popup{% endblocktrans %}" onclick="onchange_{{index}}(false)" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
+					</div>
+				</div>
+			</div>
+		</div>

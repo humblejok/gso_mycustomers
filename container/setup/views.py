@@ -20,6 +20,7 @@ from container.utilities.utils import complete_fields_information
 import logging
 from container.setup.application.settings import TEMPLATES_STATICS_PATH
 from container.utilities.security import get_or_create_user_profile
+from container.setup.application import settings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def setup(request):
     item = request.GET['item']
     item_view_type = request.GET['type']
     all_data = setup_content.get_data(item + '_' + item_view_type)
-    context = {'base_template': profile['base_template'], 'profile': profile, 'data_set': Attributes.objects.filter(type=item), 'selection_template': 'statics/' + item + '_' + profile['language_code'] + '.html','global': dumps(all_data) if not all_data.has_key('global') else dumps(all_data['global']), 'user': {} if not all_data.has_key('user') else dumps(all_data['user'])}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'data_set': Attributes.objects.filter(type=item), 'selection_template': 'statics/' + item + '_' + profile['language_code'] + '.html','global': dumps(all_data) if not all_data.has_key('global') else dumps(all_data['global']), 'user': {} if not all_data.has_key('user') else dumps(all_data['user']), 'application_settings': settings}
     return render(request, 'rendition/' + item + '/' + item_view_type + '/setup.html', context)
 
 def save(request):
@@ -60,7 +61,7 @@ def save(request):
             for field in container_setup["data"]:
                 if '.' not in field:
                     data_as_dict[field] = {'name': field}
-        context = Context({"fields":container_setup['fields'], "complete_fields": complete_fields_information(effective_class,  data_as_dict), "container" : container_setup["type"]})
+        context = Context({"fields":container_setup['fields'], "complete_fields": complete_fields_information(effective_class,  data_as_dict), "container" : container_setup["type"], 'application_settings': settings})
         template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
         rendition = template.render(context)
         # TODO Implement multi-langage
@@ -78,7 +79,7 @@ def save(request):
         languages = Attributes.objects.filter(active=True, type='available_language')
         template = loader.get_template('rendition/gso.html')
         for language in languages:
-            context = Context({'entries': entries, 'headers': headers, 'language_code': language.short_name})
+            context = Context({'entries': entries, 'headers': headers, 'language_code': language.short_name, 'application_settings': settings})
             template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
             rendition = template.render(context)
             outfile = os.path.join(TEMPLATES_STATICS_PATH, container_setup["type"] + '_' + item_render_name + '_' + item_view_type + '_' + language.short_name + '.html')
@@ -97,7 +98,8 @@ def save(request):
             context = Context({"fields": data_as_dict,
                                "complete_fields": complete_fields_information(effective_class,  data_as_dict, language.short_name),
                                "container" : container_setup["type"],
-                               "language_code": profile['language_code']})
+                               "language_code": profile['language_code'],
+                               'application_settings': settings})
             template = loader.get_template('rendition/' + item + '/' + item_view_type + '/' + item_render_name + '.html')
             rendition = template.render(context)
             outfile = os.path.join(TEMPLATES_STATICS_PATH, container_setup["type"] + '_' + item_render_name + '_' + item_view_type + '_' + language.short_name + '.html')
@@ -164,5 +166,5 @@ def menu_render(request):
     if request.POST.has_key('selected'):
         selected = request.POST['selected']
     entries = MenuEntries.objects.filter(menu_target__identifier=menu_target, container_type__identifier=container_type)
-    context = {'base_template': profile['base_template'], 'profile': profile, 'entries': entries, 'selected': selected}
+    context = {'base_template': profile['base_template'], 'profile': profile, 'entries': entries, 'selected': selected, 'application_settings': settings}
     return render(request, 'rendition/menu_setup_select_renderer.html', context)

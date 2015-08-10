@@ -4,15 +4,19 @@
 	<li role="presentation" class="dropdown-header">Actions</li>
 	
 		
-		<li><a href="/container/get.html?container_id={{container.id}}&container_type={{container.type.identifier}}">Open</a></li>
-		
-	
-		
 		<li><a href="#" onclick="callModal('add_document', {{container.id}})">Add a document</a></li>
 		
 	
 		
+		<li><a href="/container/get.html?container_id={{container.id}}&container_type={{container.type.identifier}}">Open</a></li>
+		
+	
+		
 		<li><a href="#" onclick="proceedPageAjax('/container/delete.html?container_id={{container.id}}&container_type={{container.type.identifier}}', null, 'GET')">Delete</a></li>
+		
+	
+		
+		<li><a href="#" onclick="proceedPageAjax('/container/reset_custom_information.html?container_id={{container.id}}&container_type={{container.type.identifier}}', null, 'GET')">Reset custom information</a></li>
 		
 	
 	
