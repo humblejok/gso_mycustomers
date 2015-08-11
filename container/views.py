@@ -356,6 +356,7 @@ def element_save(request):
                 del container_data['field']
                 set_container_history(container, current_history_field, container_data, None)
             else:
+                print container_data
                 for entry in container_data.keys():
                     set_container_information(container, entry, container_data[entry], None)
         else:

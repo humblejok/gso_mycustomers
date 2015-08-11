@@ -9,7 +9,7 @@ from django.shortcuts import render
 from container.utilities.utils import complete_custom_fields_information,clean_post_value,\
     complete_custom_historical_fields_information
 from container.utilities.container_container import get_container_information,\
-    enhance_container_information
+    enhance_container_information, get_container_history
 from container.utilities.security import get_or_create_user_profile
 from container.setup.application import settings
     
@@ -47,7 +47,6 @@ def render_custom_standard(request):
     
     effective_container_fields = complete_custom_fields_information(container_type, container_fields, profile['language_code'])
     custom_data = enhance_container_information(get_container_information(container), effective_container_fields)
-                        
     context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title, 'index':widget_index,
                'container': container, 'fields': effective_container_fields, 'custom_data': custom_data,
                'application_settings': settings}
@@ -69,7 +68,7 @@ def render_custom_history(request):
     container = effective_class.objects.get(id=container_id)
     
     effective_container_fields = complete_custom_historical_fields_information(container_type, container_fields, profile['language_code'])
-    custom_data = enhance_container_information(get_container_information(container), effective_container_fields)
+    custom_data = get_container_history(container, container_fields[0])
     context = {'base_template': profile['base_template'], 'profile': profile, 'title': widget_title,
                'index':widget_index, 'container': container, 'fields': effective_container_fields[container_fields[0]],
                'custom_data': custom_data, 'application_settings': settings}

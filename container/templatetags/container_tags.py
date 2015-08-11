@@ -10,13 +10,20 @@ from container.models import CoreModel, Attributes, FieldLabel, Container
 from container.utilities.utils import dict_to_json_compliance,\
     get_effective_class
 import logging
-import urllib
 from django.contrib.auth.models import User
 from container.utilities import setup_content
 
 LOGGER = logging.getLogger(__name__)
 
 register = template.Library()
+
+@register.filter()
+def get_custom_root(field_name):
+    return field_name.split('.')[0]
+
+@register.filter()
+def get_custom_field(field_name):
+    return field_name.split('.')[1]
 
 @register.filter()
 def get_wizard_fields(container_type, target):

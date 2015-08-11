@@ -22,6 +22,8 @@
 
 		var currentMaxRuleIndex = 0;
 
+		var selectedValues = {};
+
 		function onCallError(e) {
 			alert(e.status);
 		}
@@ -40,12 +42,25 @@
 			} else {
 				field.insertBefore(field.prev());
 			}
+			if (selectedValues.hasOwnProperty(index)) {
+				if (selectedValues.hasOwnProperty(index+way)) {
+					var exchange = selectedValues[index];
+					selectedValues[index] = selectedValues[index+way];
+					selectedValues[index+way] = exchange;
+				} else {
+					var exchange = selectedValues[index];
+					selectedValues[index+way] = exchange;
+					delete selectedValues[index]
+				}
+			}
+			console.log(selectedValues);
 			reindexFieldEntries();
 		}
 
 		function removeFieldEntry(rowIndex) {
 			currentRow = currentRow - 1;
 			$('#fieldsTable tr:nth-child(' + (rowIndex+1) + ')').remove();
+
 			reindexFieldEntries();
 		}
 
@@ -54,6 +69,7 @@
 				var removeButton = $(value).find('.remove-btn');
 				var nameField = $(value).find("input[id^='fieldName_']");
 				var typeField = $(value).find("td[id^='fieldTypeId_']");
+				var useFilter = $(value).find("td[id^='useFilter_']");
 				var attributeField = $(value).find("input[id^='attributeType_']")
 				var editButton = $(value).find('.edit-btn');
 				var upButton = $(value).find('.up-btn');
@@ -71,9 +87,11 @@
 				editButton.attr('id','editButton_' + index);
 				editButton.attr('onclick','changeChoice(' + index + ')');
 
+				useFilter.attr('id', 'useFilter_' + index);
 				nameField.attr('id','fieldName_' + index);
 				typeField.attr('id','fieldTypeId_' + index);
 				attributeField.attr('id','attributeType_' + index);
+				useFilter.attr('name', 'useFilter_' + index);
 				nameField.attr('name','fieldName_' + index);
 				typeField.attr('name','fieldTypeId_' + index);
 				attributeField.attr('name','attributeType_' + index);
@@ -151,6 +169,9 @@
 				newField.type = $("#fieldTypeId_" + index + " > select").val();
 				if ($("#fieldTypeId_" + index + " > select").val()=='FIELD_TYPE_CHOICE') {
 					newField.attribute = $("#attributeType_" + index).val();
+					if ($("#useFilter_" + index).val()==="True") {
+						newField.filter = selectedValues[index];
+					}
 				}
 				currentObject.fields.push(newField);
 			});
@@ -177,6 +198,9 @@
 				if (urlParams.name==value.name) {
 					$("#currentItems").append('<li id="item_' + index + '" class="list-group-item list-group-item-success" onclick="changeSelection(\'#item_' + index + '\',\'' + value.name + '\')">' + value.name + '</li>');
 					currentObject = value;
+					if (value.hasOwnProperty('filter')) {
+						selectedValues[index] = value['filter'];
+					}
 					changeSelection('#item_' + index,value.name);
 				} else {
 					$("#currentItems").append('<li id="item_' + index + '" class="list-group-item" onclick="changeSelection(\'#item_' + index + '\',\'' + value.name + '\')">' + value.name + '</li>');
@@ -192,11 +216,13 @@
 			if ($("#fieldTypeId_" + index + " > select").val()!='FIELD_TYPE_CHOICE') {
 				$('#editButton_' + index).attr("disabled", true);
 				$('#attributeType_' + index).val("");
+				$('#useFilter_' + index).val("False");
 			} else {
 				currentIndex = index;
 				$('#editButton_' + index).removeAttr("disabled");
 				if (launch) {
 					$('#modal_select_attribute').modal({});
+					attributeChanged();
 				}
 			}
 		}
@@ -205,17 +231,26 @@
 			currentIndex = index;
 			currentMaxRuleIndex = 0;
 			$('#attributeType').val($('#attributeType_' + index).val());
+			$('#useFilter').prop('checked', $('#useFilter_' + index).val()==='True');
 			$('#modal_select_attribute').modal({});
+			attributeChanged();
 		}
 
 		function validateAttributeSelection() {
 			var attributeType = $('#attributeType').val();
 			$('#attributeType_' + currentIndex).val(attributeType);
+			$('#useFilter_' + currentIndex).val($('#useFilter').prop('checked')?"True":"False");
+			console.log($('#useFilter_' + currentIndex).val());
+			
 		}
 
 		function addField(index, value) {
 			currentRow = index;
-			$("#fieldsTable").append('<tr><td><input id="attributeType_' + index + '" name="attributeType_' + index + '" type="hidden" value="' + (value?value.attribute:"") + '"><input type="text" class="form-control" id="fieldName_' + index + '" value="' + (value?value.name:"") + '"/></td><td id="fieldTypeId_' + index + '"></td><td><button type="button" class="btn btn-default btn-sm edit-btn" id="editButton_' + index + '" onclick="changeChoice(' + index +')"><span class="glyphicon glyphicon-edit" ></span></button>&nbsp;&nbsp;<button type="button" class="btn btn-default btn-sm up-btn"><span class="glyphicon glyphicon-arrow-up" onclick="moveFieldEntry(' + index +',-1)"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm down-btn" onclick="moveFieldEntry(' + index +',1)"><span class="glyphicon glyphicon-arrow-down"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm remove-btn" onclick="removeFieldEntry(' + index + ')"><span class="glyphicon glyphicon-remove"></span></button></td></tr>');
+			if (value.hasOwnProperty("filter")) {
+				selectedValues[index] = value.filter;
+				console.log(selectedValues);
+			}
+			$("#fieldsTable").append('<tr><td><input id="useFilter_' + index + '" name="useFilter_' + index + '" type="hidden" value="' + (value.hasOwnProperty("filter")?"True":"False") + '"><input id="attributeType_' + index + '" name="attributeType_' + index + '" type="hidden" value="' + (value?value.attribute:"") + '"><input type="text" class="form-control" id="fieldName_' + index + '" value="' + (value?value.name:"") + '"/></td><td id="fieldTypeId_' + index + '"></td><td><button type="button" class="btn btn-default btn-sm edit-btn" id="editButton_' + index + '" onclick="changeChoice(' + index +')"><span class="glyphicon glyphicon-edit" ></span></button>&nbsp;&nbsp;<button type="button" class="btn btn-default btn-sm up-btn"><span class="glyphicon glyphicon-arrow-up" onclick="moveFieldEntry(' + index +',-1)"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm down-btn" onclick="moveFieldEntry(' + index +',1)"><span class="glyphicon glyphicon-arrow-down"></span></button>&nbsp;<button type="button" class="btn btn-default btn-sm remove-btn" onclick="removeFieldEntry(' + index + ')"><span class="glyphicon glyphicon-remove"></span></button></td></tr>');
 			$("#fieldTypeId_" + index).load("/container/rendition/render_template_for_load.html", {"template_name": "field_type_select", "selected_value": value==null?value:value['type']}, function() {
 				$("#fieldTypeId_" + index + " > select").attr('id','fieldSelectTypeId_' + index);
 				$("#fieldTypeId_" + index + " > select").attr('name','fieldSelectTypeId_' + index);
@@ -225,38 +260,42 @@
 			reindexFieldEntries();
 		}
 
-		function saveRule() {
-
-			discardRule();
+		function onSelectAttributeValue(event) {
+			console.log(event.target.id);
+			if (!selectedValues.hasOwnProperty(currentIndex)) {
+				selectedValues[currentIndex] = [];
+			}
+			var position = $.inArray(event.target.id, selectedValues[currentIndex]);
+			$(event.target).toggleClass("list-group-item-success");
+			if (position===-1) {
+				selectedValues[currentIndex].push(event.target.id);
+			} else {
+				selectedValues[currentIndex].splice(position, 1);
+			}
+			console.log(selectedValues[currentIndex]);
 		}
 
-		function discardRule() {
-			$("#addRuleButton").prop("disabled", false);
-			$("#ruleWizard").empty();
-		}
-
-		function sourceFieldChanged() {
-			$("#ruleDefinition").empty();
-			var ruleSourceIndex = $("#sourceField").val();
-			console.log(ruleSourceIndex);
-			console.log(currentObject.fields[ruleSourceIndex]);
-			if (currentObject.fields[ruleSourceIndex].type==="FIELD_TYPE_CHOICE") {
-				$("#ruleDefinition").html("test");
+		function attributeValuesLoaded() {
+			$("#selectedAttributes > .list-group-item").click(onSelectAttributeValue);
+			if ($('#useFilter_' + currentIndex).val()==='True') {
+				var workingSet = selectedValues[currentIndex].slice();
+				selectedValues[currentIndex] = [];
+				$.each(workingSet, function(index, value){
+					$("#" + value).trigger( "click" );
+				});
 			}
 		}
 
-		function addRule() {
-			$("#addRuleButton").prop("disabled", true);
-			$("#ruleWizard").empty();
-							
-			$("#ruleWizard").html("<div class='row'>&nbsp;</div><div class='form-group'><label for='sourceField'>{% blocktrans %}Source field{% endblocktrans %}</label><select name='sourceField' class='form-control' id='sourceField' value='' onchange='sourceFieldChanged()'/></div><div id='ruleDefinition' class='row'></div><button class='btn btn-danger col-lg-5'>{% blocktrans %}Save rule{% endblocktrans %}</button><button class='btn btn-warning col-lg-offset-2 col-lg-5' onclick='discardRule()'>{% blocktrans %}Discard{% endblocktrans %}</button><div class='row'>&nbsp;</div>");
-			$.each(currentObject.fields, function(index, field){
-				if(index!==currentIndex) {
-					$("#sourceField").append("<option value='" + index + "'>" + field.name + "</option>");
-				}
-			});
-			sourceFieldChanged();
+		function attributeChanged() {
+			var attribute = $("#attributeType").val() + "_list_elements";
+			$("#selectedAttributes").empty();
+			if ($("#useFilter").prop('checked')) {
+				$("#selectedAttributes").load("/container/rendition/render_template_for_load.html", {"template_name": attribute}, attributeValuesLoaded);
+			} else {
+				selectedValues[currentIndex] = [];
+			}
 		}
+
 	</script>
 {% endblock %}
 	</head>
@@ -328,22 +367,26 @@
 					<form id="create_form" role="form" action="" method="POST">
 						<div class="modal-body">
 							<div id="fieldTypeInput" class="form-group">
-								<label for="attributeType">Attribute</label>
-								<select class='form-control no-enter' id='attributeType' name='attributeType'>
-									{% with value='' %}
-										{% include 'statics/all_types_option_en.html' %}
+								<label for="attributeType">{% blocktrans %}Attribute{% endblocktrans %}</label>
+								<select class='form-control no-enter' id='attributeType' name='attributeType' onchange='attributeChanged()'>
+									{% with value='' template='statics/all_types_option_'|add:profile.language_code|add:'.html' %}
+										{% include template %}
 									{% endwith %}
 								</select>
 							</div>
-							<button id="addRuleButton" type="button" class="btn btn-default col-lg-12" onclick="addRule()">{% blocktrans %}Add rule{% endblocktrans %}</button>
-							<div id="ruleWizard">
+							<div class="form-group">
+								<label>
+									<input id="useFilter" type="checkbox" onchange="attributeChanged()"> {% blocktrans %}Limit choice{% endblocktrans %}
+								</label>
 							</div>
-							<table id="rulesTable" class="table">
-								<thead><tr><th>#</th><th>{% blocktrans %}Summary{% endblocktrans %}</th><th>{% blocktrans %}Action{% endblocktrans %}</th></tr></thead>
-								<tbody id="rulesTableBody"></tbody>
-							</table>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm attribute selection and continue edition{% endblocktrans %}" data-dismiss="modal" onclick="validateAttributeSelection()">{% blocktrans %}Select{% endblocktrans %}</button>
+							<div class="form-group">
+								<ul id="selectedAttributes" class="list-group">
+									
+								</ul>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Confirm attribute selection and continue edition{% endblocktrans %}" data-dismiss="modal" onclick="validateAttributeSelection()">{% blocktrans %}Select{% endblocktrans %}</button>
+							</div>
 						</div>
 					</form>
 				</div>

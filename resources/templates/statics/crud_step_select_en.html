@@ -1,8 +1,12 @@
 <select class="form-control">
 
+	{% if not active_list or "STEP_POST_CREATE" in active_list %}<option value='STEP_POST_CREATE'{% if value == 'STEP_POST_CREATE' %} selected{% endif %}>After creation</option>{% endif %}
+
 	{% if not active_list or "STEP_POST_DELETE" in active_list %}<option value='STEP_POST_DELETE'{% if value == 'STEP_POST_DELETE' %} selected{% endif %}>After deletion</option>{% endif %}
 
 	{% if not active_list or "STEP_POST_SAVE" in active_list %}<option value='STEP_POST_SAVE'{% if value == 'STEP_POST_SAVE' %} selected{% endif %}>After saving</option>{% endif %}
+
+	{% if not active_list or "STEP_PRE_CREATE" in active_list %}<option value='STEP_PRE_CREATE'{% if value == 'STEP_PRE_CREATE' %} selected{% endif %}>Before creation</option>{% endif %}
 
 	{% if not active_list or "STEP_PRE_DELETE" in active_list %}<option value='STEP_PRE_DELETE'{% if value == 'STEP_PRE_DELETE' %} selected{% endif %}>Before deletion</option>{% endif %}
 

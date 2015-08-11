@@ -6,10 +6,16 @@ Created on Apr 24, 2015
 from container.models import Attributes
 from pymongo.mongo_client import MongoClient
 from container.setup.application.settings import MONGO_URL
+from container.utilities.utils import complete_custom_historical_fields_information,\
+    get_custom_historical_key
+from seq_common.utils.dates import epoch_time
+import datetime
+from container.utilities import setup_content
 
 client = MongoClient(MONGO_URL)
 
 containers = client.additional_content['containers']
+historical = client.additional_content['historical']
 
 def enhance_container_information(custom_data, custom_info):
     enhanced_data = {}
@@ -37,8 +43,48 @@ def get_container_provider_information(container, provider):
     return data
 
 def set_container_history(container, field, value, provider = None):
-    None
+    print field
+    print value
+    # TODO Handle Intraday
+    collection_id = field + '_' + str(container.id)
+    key_field = get_custom_historical_key(container.type.identifier, field)
+    fields_info = setup_content.get_data('container_type_fields')[container.type.identifier]
+    for info in fields_info:
+        if info['name']==field and info['type']=='OBJECT_TYPE_HISTORICAL':
+            break
     
+    if key_field!=None:
+        wrk_id = epoch_time(datetime.datetime.strptime(value[key_field], '%Y-%m-%d'))
+    else:
+        wrk_id = None
+    if info['instanceType']=='FIELD_ASSIGNMENT_SINGLE' or (info['instanceType']=='FIELD_ASSIGNMENT_LIMITED' and int(info['repeat'])==1):
+        value['_id'] = wrk_id
+        historical[collection_id].update({'_id':wrk_id}, value, True)
+    else:
+        content = historical[collection_id].find_one({'_id':wrk_id})
+        if content==None:
+            content = []
+        else:
+            content = content['content']
+        if info['instanceType']=='FIELD_ASSIGNMENT_MULTIPLE' or ((info['instanceType']=='FIELD_ASSIGNMENT_LIMITED' and len(content)<int(info['repeat'])) or value.has_key['index']):
+            if value.has_key['index']:
+                new_content = []
+                for element in content:
+                    if element['index']==value['index']:
+                        new_content.append(value)
+                    else:
+                        new_content.append(element)
+                content = new_content
+            else:
+                content.append(value)
+        else:
+            None
+        historical[collection_id].update({'_id':wrk_id}, {'_id': wrk_id, 'content': content}, True)
+
+def get_container_history(container, field, ascending=True):
+    collection_id = field + '_' + str(container.id)
+    content = historical[collection_id].find().sort('_id',1 if ascending else -1)
+    return content
     
 def set_container_information(container, field, value, provider = None):
     valid_field_name = field.replace('.','%')

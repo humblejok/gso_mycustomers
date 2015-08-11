@@ -100,10 +100,22 @@ def complete_custom_historical_fields_information(container_type, filtering_fiel
                             if filtering_fields==None or field_name in filtering_fields:
                                 all_data[field_name].append(sub_field_info)
     return all_data
-   
+
+def get_custom_historical_key(container_type, field_name):
+    all_custom_fields = setup_content.get_data('container_type_fields')
+    if all_custom_fields.has_key(container_type):
+        all_fields_information = setup_content.get_data('object_type_fields')
+        for field in all_custom_fields[container_type]:
+            if field['type']=='OBJECT_TYPE_HISTORICAL':
+                for detailled_field in all_fields_information[field['type']]:
+                    if detailled_field['name']==field_name:
+                        for sub_field in detailled_field['fields']:
+                            if sub_field['type']=='FIELD_TYPE_DATE':
+                                return sub_field['name']
+    return None
+            
 def complete_custom_fields_information(container_type, filtering_fields=None, language_code='en'):
     all_data = {}
-    # TODO Add profile and language
     all_custom_fields = setup_content.get_data('container_type_fields')
     if all_custom_fields.has_key(container_type):
         all_fields_information = setup_content.get_data('object_type_fields')
@@ -119,7 +131,6 @@ def complete_custom_fields_information(container_type, filtering_fields=None, la
                                 sub_field_info['template'] = 'statics/' + sub_field_info['attribute'] + '_' + language_code + '.html'
                             if filtering_fields==None or (field_name + '.' + sub_field_info['name'].replace(' ','-')) in filtering_fields:
                                 all_data[field_name].append(sub_field_info)
-    print all_data
     return all_data
 
 def complete_fields_information(model_class, information, language_code='en'):
