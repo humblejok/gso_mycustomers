@@ -26,7 +26,7 @@ from container.utilities.container_container import get_container_information, \
 from container.utilities.utils import complete_fields_information, \
     dict_to_json_compliance, complete_custom_fields_information, get_effective_class, \
     get_effective_container, get_model_foreign_field_class, get_static_fields, filter_custom_fields,\
-    complete_custom_historical_fields_information
+    complete_custom_historical_fields_information, clean_post_value
 from django.utils.datastructures import MultiValueDictKeyError
 from container.setup.application.settings import WORKING_PATH, STORER
 from container.utilities.security import get_or_create_user_profile,get_or_create_ownership_universes,\
@@ -69,8 +69,33 @@ def document_upload(request):
         # Assign to universe
         working_universes = get_or_create_ownership_universes(profile['current_work_as'])
         working_universes[0].members.add(document)
-    return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
+    return HttpResponse('{"result": ' + str(document.id) + ', "file": "' + document.name + '", "status_message": "Saved"}',"json")
 
+
+def document_delete(request):
+    profile = get_or_create_user_profile(request.user.id)
+    document_id = clean_post_value(request.POST['document_id'])
+    if container_visible(document_id, profile):
+        document = DocumentContainer.objects.get(id=document_id)
+        document.delete()
+        return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
+    else:
+        return HttpResponseForbidden()
+    
+def document_assign(request):
+    profile = get_or_create_user_profile(request.user.id)
+    document_id = request.POST['document_id']
+    container_id = request.POST['container_id']
+    if container_visible(document_id, profile) and container_visible(container_id, profile):
+        container = get_effective_container(container_id)
+        document = get_effective_container(document_id)
+        if not document.containers.filter(id=container.id).exists():
+            document.containers.add(container)
+            document.save()
+        return HttpResponse('{"result": true, "status_message": "Saved"}',"json")
+    else:
+        return HttpResponseForbidden()
+    
 def lists(request):
     # TODO: Check user
     if not request.user.is_authenticated():
@@ -206,6 +231,8 @@ def delete(request):
         container.delete()
         modify.execute_modify(container, 'STEP_POST_DELETE')
         return HttpResponse('{"result": true, "status_message": "Deleted"}',"json")
+    else:
+        return HttpResponseForbidden()
 
 def get(request):
     # TODO: Check user

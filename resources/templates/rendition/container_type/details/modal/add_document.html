@@ -5,6 +5,13 @@
 				var add_document_container_type = urlParams['container_type'];
 				var add_document_currentItem = 0;
 
+				var file_id_association = {};
+				var documents = [];
+
+				function add_document_error(event) {
+					
+				}
+
 				function add_document_initialize(container) {
 					add_document_container_id = container.id;
 					add_document_container_type = container.type.identifier;
@@ -12,21 +19,29 @@
 					$("#modal_add_document").modal();
 				}
 
-				function add_document() {
-					var updateForm = new FormData();
-					updateForm.append('container_id', add_document_container_id);
-					updateForm.append('container_type', add_document_container_type);
-					updateForm.append('price_date', $('#price_date').val());
-					updateForm.append('price_value', $('#price_value').val());
-					$.ajax({
-						url: '/container/add_document.html',
-						type: 'POST',
-						data: updateForm,
-						processData: false,
-						contentType: false,
-						success: containerFieldsSaved,
-						error: onCallError
-					});
+				function documentAssigned(event) {
+					$("#modal_add_document").modal("hide");
+				}
+
+				function assign_document() {
+					if (documents.length>0) {
+						$.each(documents, function(index, document_id) {
+							var updateForm = new FormData();
+							updateForm.append('container_id', add_document_container_id);
+							updateForm.append('document_id', document_id);
+							$.ajax({
+								url: '/container/document_assign.html',
+								type: 'POST',
+								data: updateForm,
+								processData: false,
+								contentType: false,
+								success: documentAssigned,
+								error: add_document_error
+							});
+						});
+					} else {
+						documentAssigned();
+					}
 				}
 
 
@@ -49,9 +64,10 @@
 					$.each(event.dataTransfer.files, function(index, currentFile) {
 						var file = currentFile;
 						var fileReader = new FileReader();
-						$("#add_document_holder_details").append("<tr class='file-item_" + add_document_currentItem + "'><td class='selected-file'>" + file.name + "</td><td><button class='btn btn-default' type='button' role='button' onclick='add_document_remove_file(" + add_document_currentItem + ")'><span class='glyphicon glyphicon-remove'/></button></td></tr>");
-						add_document_currentItem = add_document_currentItem + 1;
+						$("#add_document_holder_details").append("<tr id='file-item_" + add_document_currentItem + "'><td class='selected-file'>" + file.name + "</td><td><button id='remove-buton_" + add_document_currentItem + "' class='btn btn-default' type='button' role='button'><span class='glyphicon glyphicon-remove'/></button></td></tr>");
+						file_id_association[file.name] = add_document_currentItem;
 						add_document_send_file(file);
+						add_document_currentItem = add_document_currentItem + 1;
 					});
 					return false;
 				}
@@ -59,25 +75,45 @@
 				function add_document_upload_handler(event) {
 					console.log(event);
 					$("#backgroundProgress").addClass("invisible");
+					$("#file-item_" + file_id_association[event.file]).attr("id", event.result.toString());
+					$("#remove-buton_" + file_id_association[event.file]).attr("onclick", "add_document_remove_file(" + file_id_association[event.file] + "," + event.result + ")");
+					documents.push(event.result);
 				};
 
-				function add_document_remove_file(itemIndex) {
-					console.log(".file-item_" + itemIndex);
-					$(".file-item_" + itemIndex).remove();
+				function add_document_remove_handler(event) {
+					console.log(event);
+					$("#backgroundProgress").addClass("invisible");
 				}
 
-				function add_document_send_file(file) {
+
+				function add_document_remove_file(itemIndex, documentId) {
+					$("#file-item_" + itemIndex).remove();
+					documents.splice( $.inArray(documentId, documents), 1 );
+					console.log(documents);
 					$("#backgroundProgress").removeClass("invisible");
 					var tempForm = new FormData();
-					tempForm.append('uploaded_file', file);
+					tempForm.append('document_id', documentId);
 					$.ajax({
-						url: '/file_upload.html',
+						url: '/container/document_delete.html',
 						type: 'POST',
 						data: tempForm,
 						processData: false,
 						contentType: false,
-						success: console.log('Sent'),
-						complete: add_document_upload_handler
+						success: add_document_remove_handler
+					});
+				}
+
+				function add_document_send_file(file, currentItem) {
+					$("#backgroundProgress").removeClass("invisible");
+					var tempForm = new FormData();
+					tempForm.append('uploaded_file', file);
+					$.ajax({
+						url: '/container/document_upload.html',
+						type: 'POST',
+						data: tempForm,
+						processData: false,
+						contentType: false,
+						success: add_document_upload_handler
 					});
 				};
 
@@ -107,7 +143,7 @@
 							</div>
 						</form>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Add document(s){% endblocktrans %}" onclick="add_document()" data-dismiss="modal">{% blocktrans %}Save{% endblocktrans %}</button>
+							<button type="button" class="btn btn-warning" role="button" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Add document(s){% endblocktrans %}" onclick="assign_document()" data-dismiss="modal">{% blocktrans %}Save{% endblocktrans %}</button>
 							<button type="button" class="btn btn-success" data-dismiss="modal">{% blocktrans %}Close{% endblocktrans %}</button>
 						</div>
 					</div>
